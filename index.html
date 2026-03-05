@@ -765,7 +765,7 @@ body{font-family:Arial,sans-serif;color:#333;margin:0;padding:40px;}
 
       const btn = document.getElementById('submitBtn');
       btn.disabled = true;
-      btn.textContent = 'Submitting...';
+      btn.textContent = 'Submitting... please wait';
 
       try {
         const res = await fetch(WEBHOOK_URL, {
@@ -782,8 +782,7 @@ body{font-family:Arial,sans-serif;color:#333;margin:0;padding:40px;}
           throw new Error(err.message || `Server error (${res.status})`);
         }
 
-        showStatus('Your invoice has been submitted. A copy will be emailed to you shortly.', 'success');
-        btn.textContent = 'Submitted';
+        showStatus('Invoice received. You will get a confirmation email with your PDF attached within a few minutes. If you do not receive it within 15 minutes, contact EOC Staffing - it means something went wrong and finance may not have received it either.', 'success');
 
         // Reset after delay
         setTimeout(() => {
