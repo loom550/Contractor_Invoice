@@ -773,7 +773,7 @@ body{font-family:Arial,sans-serif;color:#333;margin:0;padding:0;}
         }, 5000);
 
       } catch (err) {
-        showStatus(`Submission failed: ${err.message}. Please try again or contact EOC Staffing.`, 'error');
+        showStatus(err.message || 'Submission failed. Please try again or contact EOC Staffing.', 'error');
         btn.disabled    = false;
         btn.textContent = 'Submit Invoice';
       }
