@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contractor Invoice Submission</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #00A651;
+      --green-dark: #007a3d;
+      --green-light: #e8f5ee;
+      --green-mid: #c8e6d4;
+      --navy: #1a3a5c;
+      --navy-light: #2a4a6c;
+      --grey-footer: #6D6E71;
+      --grey-border: #d8dde3;
+      --grey-bg: #f5f7fa;
+      --white: #ffffff;
+      --text: #2c3e50;
+      --text-muted: #6b7c93;
+      --error: #cc2936;
+      --error-bg: #fdf0f0;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+      --shadow-card: 0 2px 8px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.04);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--grey-bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px 16px 64px;
+    }
+
+    /* Background texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 10%, rgba(0,166,81,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 90%, rgba(26,58,92,0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    .header {
+      background: var(--navy);
+      border-radius: 12px 12px 0 0;
+      padding: 28px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .header-left h1 {
+      color: var(--white);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .header-left p {
+      color: rgba(255,255,255,0.55);
+      font-size: 13px;
+      margin-top: 4px;
+      font-weight: 400;
+    }
+
+    .header-badge {
+      background: var(--green);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* Card */
+    .card {
+      background: var(--white);
+      box-shadow: var(--shadow-card);
+    }
+
+    .card-section {
+      padding: 32px 36px;
+      border-bottom: 1px solid #eef0f3;
+    }
+
+    .card-section:last-of-type {
+      border-bottom: none;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--green-mid);
+    }
+
+    /* Fields */
+    .field-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .field-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+    .field-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .field-grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-group.span-2 { grid-column: span 2; }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--navy);
+      letter-spacing: 0.2px;
+    }
+
+    label .req {
+      color: var(--green);
+      margin-left: 2px;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    select,
+    textarea {
+      border: 1.5px solid var(--grey-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      width: 100%;
+      color: var(--text);
+      background: var(--white);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="number"] {
+      font-family: 'DM Mono', monospace;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(0,166,81,0.12);
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #bcc5ce;
+    }
+
+    input.invalid, select.invalid {
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px rgba(204,41,54,0.08);
+    }
+
+    .field-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Daily log */
+    .log-table-wrap {
+      border: 1.5px solid var(--grey-border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .log-table-head {
+      display: grid;
+      grid-template-columns: 160px 100px 1fr 44px;
+      gap: 0;
+      background: var(--navy);
+      padding: 10px 16px;
+    }
+
+    .log-table-head span {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .log-row {
+      display: grid;
+      grid-template-columns: 160px 100px 1fr 44px;
+      gap: 0;
+      align-items: center;
+      padding: 10px 16px;
+      border-top: 1px solid #eef0f3;
+      transition: background 0.1s;
+    }
+
+    .log-row:hover { background: #fafbfc; }
+
+    .log-row:first-child { border-top: none; }
+
+    .log-row input {
+      border: 1.5px solid transparent;
+      border-radius: 6px;
+      background: transparent;
+      padding: 8px 10px;
+      font-size: 13.5px;
+      width: 100%;
+    }
+
+    .log-row input:focus {
+      background: var(--white);
+      border-color: var(--green);
+      box-shadow: 0 0 0 2px rgba(0,166,81,0.1);
+    }
+
+    .log-row input[type="number"] {
+      font-family: 'DM Mono', monospace;
+    }
+
+    .log-row .description-cell {
+      padding-right: 8px;
+    }
+
+    .remove-row-btn {
+      background: none;
+      border: none;
+      color: #c0c8d0;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 6px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+    }
+
+    .remove-row-btn:hover {
+      color: var(--error);
+      background: var(--error-bg);
+    }
+
+    .add-row-btn {
+      width: 100%;
+      padding: 11px;
+      background: none;
+      border: none;
+      border-top: 1.5px solid #eef0f3;
+      color: var(--green);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .add-row-btn:hover { background: var(--green-light); }
+
+    /* Totals bar */
+    .totals-bar {
+      background: var(--navy);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 16px;
+    }
+
+    .totals-bar .label {
+      color: rgba(255,255,255,0.65);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .totals-bar .value {
+      color: white;
+      font-size: 26px;
+      font-weight: 700;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: -0.5px;
+    }
+
+    .totals-bar .value span {
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 400;
+      margin-left: 4px;
+    }
+
+    /* Statement */
+    .attestation {
+      background: var(--green-light);
+      border: 1.5px solid var(--green-mid);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 13px;
+      color: var(--navy);
+      line-height: 1.6;
+    }
+
+    .attestation strong { color: var(--green-dark); }
+
+    /* Footer actions */
+    .form-footer {
+      padding: 24px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-top: 1px solid #eef0f3;
+    }
+
+    .status-msg {
+      font-size: 13.5px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      display: none;
+      flex: 1;
+    }
+
+    .status-msg.success {
+      background: var(--green-light);
+      color: var(--green-dark);
+      border: 1.5px solid var(--green-mid);
+      display: block;
+    }
+
+    .status-msg.error {
+      background: var(--error-bg);
+      color: var(--error);
+      border: 1.5px solid rgba(204,41,54,0.2);
+      display: block;
+    }
+
+    .submit-btn {
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 13px 32px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+      letter-spacing: -0.2px;
+    }
+
+    .submit-btn:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled { background: #a0adb8; cursor: not-allowed; transform: none; }
+
+    /* Page footer */
+    .page-footer {
+      background: var(--grey-footer);
+      border-radius: 0 0 12px 12px;
+      padding: 14px 36px;
+      text-align: center;
+    }
+
+    .page-footer p {
+      color: rgba(255,255,255,0.7);
+      font-size: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      body { padding: 16px 8px 48px; }
+      .header { padding: 20px; flex-direction: column; align-items: flex-start; }
+      .card-section { padding: 24px 20px; }
+      .field-grid.cols-2,
+      .field-grid.cols-3,
+      .field-grid.cols-4 { grid-template-columns: 1fr; }
+      .field-group.span-2 { grid-column: span 1; }
+      .log-table-head { display: none; }
+      .log-row { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 8px; padding: 12px 16px; }
+      .log-row .description-cell { grid-column: span 2; padding-right: 0; }
+      .log-row .remove-cell { grid-column: 2; justify-self: end; }
+      .form-footer { flex-direction: column; align-items: stretch; padding: 20px; }
+      .submit-btn { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-left">
+        <h1>Contractor Invoice Submission</h1>
+        <p>The Loomex Group - Emergency Management Division</p>
+      </div>
+      <div class="header-badge">Independent Contractor</div>
+    </div>
+
+    <div class="card">
+
+      <!-- Contractor Info -->
+      <div class="card-section">
+        <div class="section-label">Contractor Information</div>
+        <div class="field-grid cols-2">
+          <div class="field-group">
+            <label for="contractorName">Full Name <span class="req">*</span></label>
+            <input type="text" id="contractorName" placeholder="First and last name" autocomplete="name">
+          </div>
+          <div class="field-group">
+            <label for="contractorId">Contractor ID <span class="req">*</span></label>
+            <input type="text" id="contractorId" placeholder="EVAC-CON-XXXXX" style="font-family:'DM Mono',monospace; letter-spacing:0.5px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Invoice Details -->
+      <div class="card-section">
+        <div class="section-label">Invoice Details</div>
+        <div class="field-grid cols-3">
+          <div class="field-group">
+            <label for="invoiceNumber">Your Invoice Number <span class="req">*</span></label>
+            <input type="text" id="invoiceNumber" placeholder="e.g. INV-2026-001" style="font-family:'DM Mono',monospace;">
+            <div class="field-hint">Use your own numbering sequence</div>
+          </div>
+          <div class="field-group">
+            <label for="periodStart">Period Start <span class="req">*</span></label>
+            <input type="date" id="periodStart">
+          </div>
+          <div class="field-group">
+            <label for="periodEnd">Period End <span class="req">*</span></label>
+            <input type="date" id="periodEnd">
+          </div>
+        </div>
+        <div class="field-grid cols-2" style="margin-top:16px;">
+          <div class="field-group">
+            <label for="site">Site <span class="req">*</span></label>
+            <select id="site">
+              <option value="">Select site...</option>
+              <option value="Kingston">Kingston</option>
+              <option value="Kapuskasing">Kapuskasing</option>
+              <option value="Timmins">Timmins</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="invoiceDate">Invoice Date <span class="req">*</span></label>
+            <input type="date" id="invoiceDate">
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily Log -->
+      <div class="card-section">
+        <div class="section-label">Daily Hours Log</div>
+
+        <div class="log-table-wrap">
+          <div class="log-table-head">
+            <span>Date</span>
+            <span>Hours</span>
+            <span>Description of Work</span>
+            <span></span>
+          </div>
+          <div id="logRows"></div>
+          <button type="button" class="add-row-btn" onclick="addLogRow()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Add Day
+          </button>
+        </div>
+
+        <div class="totals-bar">
+          <div class="label">Total Hours This Invoice</div>
+          <div class="value" id="totalHours">0.00<span>hrs</span></div>
+        </div>
+      </div>
+
+      <!-- Attestation -->
+      <div class="card-section">
+        <div class="section-label">Declaration</div>
+        <div class="attestation">
+          By submitting this invoice, <strong>I certify that the hours and descriptions listed above are accurate and reflect work performed for The Loomex Group</strong> during the stated period. I understand this invoice will be reviewed by Loomex finance and that payment will be issued based on the applicable rate on file.
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="form-footer">
+        <div class="status-msg" id="statusMsg"></div>
+        <button class="submit-btn" id="submitBtn" onclick="submitInvoice()">Submit Invoice</button>
+      </div>
+
+    </div>
+
+    <div class="page-footer">
+      <p>Submitted invoices are processed by The Loomex Group finance team. For questions contact EOC Staffing.</p>
+    </div>
+  </div>
+
+  <script>
+    // ─── CONFIG ──────────────────────────────────────────────────────────────────
+    // Replace these two values before deploying. Store the secret somewhere safe
+    // (environment config, GitHub Actions secret injected at build time, etc.)
+    // The actual Airtable API key NEVER appears here - it lives in Power Automate.
+    const WEBHOOK_URL    = 'YOUR_POWER_AUTOMATE_HTTP_TRIGGER_URL';
+    const WEBHOOK_SECRET = 'YOUR_SHARED_SECRET';
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    let rowCount = 0;
+
+    // Set default dates
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('invoiceDate').value = today;
+
+    function addLogRow(date = '', hours = '', description = '') {
+      rowCount++;
+      const id = `row_${rowCount}`;
+      const div = document.createElement('div');
+      div.className = 'log-row';
+      div.id = id;
+      div.innerHTML = `
+        <input type="date" class="row-date" value="${date}" onchange="recalcTotal()">
+        <input type="number" class="row-hours" value="${hours}" min="0" max="24" step="0.25"
+               placeholder="0.00" oninput="recalcTotal()">
+        <div class="description-cell">
+          <input type="text" class="row-desc" value="${description}" placeholder="Brief description of work performed">
+        </div>
+        <div class="remove-cell" style="display:flex;justify-content:center;">
+          <button class="remove-row-btn" onclick="removeRow('${id}')" title="Remove day">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      `;
+      document.getElementById('logRows').appendChild(div);
+      recalcTotal();
+    }
+
+    function removeRow(id) {
+      const rows = document.querySelectorAll('.log-row');
+      if (rows.length <= 1) {
+        showStatus('You need at least one day entry.', 'error');
+        return;
+      }
+      document.getElementById(id)?.remove();
+      recalcTotal();
+    }
+
+    function recalcTotal() {
+      const inputs = document.querySelectorAll('.row-hours');
+      let total = 0;
+      inputs.forEach(i => {
+        const v = parseFloat(i.value);
+        if (!isNaN(v) && v > 0) total += v;
+      });
+      document.getElementById('totalHours').innerHTML =
+        `${total.toFixed(2)}<span>hrs</span>`;
+    }
+
+    function collectRows() {
+      const rows = [];
+      document.querySelectorAll('.log-row').forEach(row => {
+        rows.push({
+          date:        row.querySelector('.row-date').value,
+          hours:       parseFloat(row.querySelector('.row-hours').value) || 0,
+          description: row.querySelector('.row-desc').value.trim()
+        });
+      });
+      return rows;
+    }
+
+    function validate() {
+      const required = ['contractorName','contractorId','invoiceNumber','periodStart','periodEnd','site','invoiceDate'];
+      let ok = true;
+
+      required.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el.value.trim()) {
+          el.classList.add('invalid');
+          ok = false;
+        } else {
+          el.classList.remove('invalid');
+        }
+      });
+
+      // At least one row with a date and hours
+      const rows = collectRows();
+      const validRows = rows.filter(r => r.date && r.hours > 0);
+      if (validRows.length === 0) {
+        showStatus('Please add at least one day with a date and hours.', 'error');
+        return false;
+      }
+
+      // Period sanity check
+      const start = document.getElementById('periodStart').value;
+      const end   = document.getElementById('periodEnd').value;
+      if (start && end && end < start) {
+        showStatus('Period end date cannot be before start date.', 'error');
+        return false;
+      }
+
+      if (!ok) {
+        showStatus('Please fill in all required fields.', 'error');
+        return false;
+      }
+
+      return true;
+    }
+
+    async function submitInvoice() {
+      if (!validate()) return;
+
+      const rows      = collectRows();
+      const totalHrs  = rows.reduce((s, r) => s + r.hours, 0);
+
+      const payload = {
+        contractorName: document.getElementById('contractorName').value.trim(),
+        contractorId:   document.getElementById('contractorId').value.trim(),
+        invoiceNumber:  document.getElementById('invoiceNumber').value.trim(),
+        invoiceDate:    document.getElementById('invoiceDate').value,
+        periodStart:    document.getElementById('periodStart').value,
+        periodEnd:      document.getElementById('periodEnd').value,
+        site:           document.getElementById('site').value,
+        totalHours:     parseFloat(totalHrs.toFixed(2)),
+        dailyLog:       rows,
+        submittedAt:    new Date().toISOString()
+      };
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+
+      try {
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Loomex-Secret': WEBHOOK_SECRET
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || `Server error (${res.status})`);
+        }
+
+        showStatus('Your invoice has been submitted. A copy will be emailed to you shortly.', 'success');
+        btn.textContent = 'Submitted';
+
+        // Reset after delay
+        setTimeout(() => {
+          document.getElementById('contractorName').value = '';
+          document.getElementById('contractorId').value   = '';
+          document.getElementById('invoiceNumber').value  = '';
+          document.getElementById('periodStart').value    = '';
+          document.getElementById('periodEnd').value      = '';
+          document.getElementById('site').value           = '';
+          document.getElementById('invoiceDate').value    = today;
+          document.getElementById('logRows').innerHTML    = '';
+          rowCount = 0;
+          addLogRow();
+          recalcTotal();
+          btn.disabled    = false;
+          btn.textContent = 'Submit Invoice';
+          document.getElementById('statusMsg').className = 'status-msg';
+        }, 5000);
+
+      } catch (err) {
+        showStatus(`Submission failed: ${err.message}. Please try again or contact EOC Staffing.`, 'error');
+        btn.disabled    = false;
+        btn.textContent = 'Submit Invoice';
+      }
+    }
+
+    function showStatus(msg, type) {
+      const el = document.getElementById('statusMsg');
+      el.textContent = msg;
+      el.className   = `status-msg ${type}`;
+    }
+
+    // Start with one empty row
+    addLogRow();
+  </script>
+</body>
+</html>
