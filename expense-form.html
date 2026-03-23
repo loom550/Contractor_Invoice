@@ -911,21 +911,46 @@
   }
   // ---- VALIDATE ----
   function validate(rows) {
-    const required = ['contractorName','contractorEmail','activation','site','periodStart','periodEnd'];
+    const fieldLabels = {
+      contractorName: 'Full Name',
+      contractorEmail: 'Email Address',
+      activation: 'Activation',
+      site: 'Site',
+      periodStart: 'Period Start Date',
+      periodEnd: 'Period End Date'
+    };
+    const missing = [];
     let ok = true;
-    required.forEach(fid => {
+
+    Object.keys(fieldLabels).forEach(fid => {
       const el = document.getElementById(fid);
-      if (!el.value.trim()) { el.classList.add('invalid'); ok = false; }
-      else el.classList.remove('invalid');
+      if (!el.value.trim()) {
+        el.classList.add('invalid');
+        missing.push(fieldLabels[fid]);
+        ok = false;
+      } else {
+        el.classList.remove('invalid');
+      }
     });
-    if (!ok) { showStatus('Please complete all required fields.', 'error'); return false; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('contractorEmail').value.trim())) {
-      showStatus('Please enter a valid email address.', 'error'); return false;
+
+    if (!ok) {
+      showStatus(`Please complete the following required fields: <strong>${missing.join(', ')}</strong>`, 'error');
+      return false;
     }
-    if (rows.length === 0) { showStatus('Please add at least one expense item.', 'error'); return false; }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('contractorEmail').value.trim())) {
+      document.getElementById('contractorEmail').classList.add('invalid');
+      showStatus('Please enter a valid email address.', 'error');
+      return false;
+    }
+
+    if (rows.length === 0) {
+      showStatus('Please add at least one expense item.', 'error');
+      return false;
+    }
 
     // Check dates on each row
-    let missingDate = false;
+    let missingDateRows = [];
     document.querySelectorAll('.expense-row').forEach(rowEl => {
       const id = parseInt(rowEl.id.replace('row-', ''));
       const type = document.getElementById(`type-${id}`)?.value;
@@ -933,14 +958,21 @@
       const dateEl = document.getElementById(`f-date-${id}`);
       if (dateEl && !dateEl.value) {
         dateEl.classList.add('invalid');
-        missingDate = true;
+        missingDateRows.push(`#${id}`);
       } else if (dateEl) {
         dateEl.classList.remove('invalid');
       }
     });
-    if (missingDate) { showStatus('Please enter a date for each expense item.', 'error'); return false; }
+    if (missingDateRows.length > 0) {
+      showStatus(`Please enter a date for expense item${missingDateRows.length > 1 ? 's' : ''}: <strong>${missingDateRows.join(', ')}</strong>`, 'error');
+      return false;
+    }
 
-    if (!hasSig) { showStatus('Please draw your signature before submitting.', 'error'); return false; }
+    if (!hasSig) {
+      showStatus('Please draw your signature before submitting.', 'error');
+      return false;
+    }
+
     return true;
   }
 
