@@ -905,7 +905,7 @@
 
     // Certification note
     setCell('A21', 's', `Submitted by: ${fd.contractorName} | ${fd.contractorEmail} | ${new Date().toLocaleDateString('en-CA')}`);
-    setCell('A22', 's', 'Contractor signature captured electronically on submission via Loomex Expense Portal.');
+   
 
     return XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
   }
