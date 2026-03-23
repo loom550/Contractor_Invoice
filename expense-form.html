@@ -488,6 +488,7 @@
             <option value="EOC">EOC</option>
           </select>
         </div>
+         </div>
       <div style="margin-top:16px">
         <div class="field-group">
           <label>Submission Period <span class="req">*</span></label>
@@ -861,7 +862,7 @@
     d.push(['CONTRACTOR EXPENSE REPORT']);
     d.push([]);
     d.push(['Contractor:', fd.contractorName, '', 'Activation:', fd.activation]);
-    d.push(['Email:', fd.contractorEmail, '', 'Job Number:', || 'N/A']);
+    d.push(['Email:', fd.contractorEmail, '', 'Job Number:', 'N/A']);
     d.push(['Site:', fd.site, '', 'Period:', `${fd.periodStart} to ${fd.periodEnd}`]);
     d.push(['Submitted:', new Date().toLocaleDateString('en-CA')]);
     d.push([]);
