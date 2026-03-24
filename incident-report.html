@@ -634,7 +634,7 @@
   <div class="confirm-icon">✅</div>
   <div class="confirm-title">Incident Report Submitted</div>
   <div class="confirm-sub">Your report has been received and forwarded to EOC Operations.<br>A copy has been filed in LOOMI.</div>
-  <a href="LOOMI_URL_HERE" class="return-btn">← Return to LOOMI</a>
+  <a href="https://apps.powerapps.com/play/e/default-f37e3a4c-5aaa-4bf9-93d2-cc21b157eb4c/a/7931aba6-deb3-46e1-adcf-8c6da94b685e?tenantId=f37e3a4c-5aaa-4bf9-93d2-cc21b157eb4c&hint=759f0376-6b17-47cd-b8da-7ce58489a79b&sourcetime=1774315838613" class="return-btn">← Return to LOOMI</a>
 </div>
 
 <script>
@@ -790,7 +790,7 @@
     selectedFiles.forEach((f, i) => payload.append(`attachment_${i}`, f, f.name));
 
     try {
-      const res = await fetch('WORKER_URL_HERE', { method: 'POST', body: payload });
+      const res = await fetch('https://super-violet-90e9.loomex-it.workers.dev/incident-submit', { method: 'POST', body: payload });
       if (res.ok) {
         document.getElementById('form-area').style.display = 'none';
         document.getElementById('confirmation').style.display = 'block';
