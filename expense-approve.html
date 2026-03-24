@@ -511,7 +511,8 @@
       if (!res.ok) { showState('error'); return; }
       submission = await res.json();
       renderSubmission(submission);
-      showState('content');
+showState('content');
+resizeCanvas();
     } catch {
       showState('error');
     }
