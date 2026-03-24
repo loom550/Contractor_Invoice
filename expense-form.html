@@ -570,6 +570,7 @@
   // ---- SITE NOTICES ----
   function handleSiteChange() {
     const site = document.getElementById('site').value;
+    document.getElementById('totalDisplay').innerHTML = '$0.00<span>CAD</span>';
     document.getElementById('notice-kingston').style.display = site === 'Kingston' ? 'block' : 'none';
     document.getElementById('notice-timmins').style.display  = site === 'Timmins'  ? 'block' : 'none';
     document.querySelectorAll('.expense-row').forEach(row => {
