@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Expense Approval -- Loomex EOC</title>
+  <title>Expense Approval -- Loomex</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
@@ -21,6 +21,7 @@
       --text-muted: #6b7c93;
       --error: #cc2936;
       --error-bg: #fdf0f0;
+      --amber: #E8A317;
       --shadow-card: 0 2px 8px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.04);
     }
 
@@ -45,7 +46,7 @@
       z-index: 0;
     }
 
-    .container { max-width: 820px; margin: 0 auto; position: relative; z-index: 1; }
+    .container { max-width: 860px; margin: 0 auto; position: relative; z-index: 1; }
 
     /* HEADER */
     .header {
@@ -135,9 +136,23 @@
       font-weight: 700;
       color: var(--navy);
     }
+    .summary-item.approved-item { background: #e8f5ee; border-color: var(--green-mid); }
+    .summary-item.approved-item .s-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--green-dark);
+    }
+    .summary-item.partial-item { background: #fff8e1; border-color: #f5d88a; }
+    .summary-item.partial-item .s-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: #7a5200;
+    }
 
-    /* ALREADY APPROVED */
-    .approved-banner {
+    /* ALREADY PROCESSED BANNER */
+    .processed-banner {
       display: none;
       padding: 12px 18px;
       background: var(--green-light);
@@ -164,9 +179,10 @@
     }
     .exp-table thead th:first-child { border-radius: 6px 0 0 0; }
     .exp-table thead th:last-child  { border-radius: 0 6px 0 0; }
-    .exp-table tbody tr { border-bottom: 1px solid #eef0f3; }
-    .exp-table tbody tr:last-child { border-bottom: none; }
-    .exp-table tbody tr:hover td { background: #fafbfc; }
+    .exp-table tbody tr.expense-row { border-bottom: none; }
+    .exp-table tbody tr.expense-row:hover td { background: #fafbfc; }
+    .exp-table tbody tr.expense-row.row-rejected td { background: #fff5f5; }
+    .exp-table tbody tr.expense-row.row-approved td { background: #f8fffe; }
     .exp-table td { padding: 9px 12px; vertical-align: middle; }
     .exp-table tfoot td {
       padding: 10px 12px;
@@ -176,6 +192,62 @@
       color: var(--navy);
     }
 
+    /* RECEIPT + DECISION ROW (sits under each expense row) */
+    .exp-table tr.detail-row td {
+      padding: 0 12px 12px;
+      border-bottom: 1px solid #eef0f3;
+    }
+    .detail-inner {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #fafbfc;
+      border: 1px solid #eef0f3;
+    }
+    .exp-table tr.expense-row.row-rejected + tr.detail-row td { /* keep bg consistent */ }
+    .exp-table tr.expense-row.row-rejected + tr.detail-row .detail-inner { background: #fff5f5; border-color: #fcd0d0; }
+    .exp-table tr.expense-row.row-approved + tr.detail-row .detail-inner { background: #f0faf5; border-color: var(--green-mid); }
+
+    /* Receipts inline */
+    .receipts-inline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; flex: 1; }
+    .receipt-thumb {
+      width: 64px; height: 64px; object-fit: cover; border-radius: 6px;
+      border: 1px solid var(--grey-border); cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .receipt-thumb:hover { transform: scale(1.06); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .receipt-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 10px; background: var(--white);
+      border: 1px solid var(--grey-border); border-radius: 6px;
+      font-size: 12px; font-weight: 500; color: var(--navy); text-decoration: none;
+    }
+    .receipt-link:hover { background: var(--green-light); border-color: var(--green-mid); }
+    .no-receipts { color: var(--text-muted); font-size: 12px; font-style: italic; }
+
+    /* Decision controls */
+    .decision-controls { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+    .btn-dec {
+      padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 700;
+      border: 1.5px solid var(--grey-border); background: var(--white); cursor: pointer;
+      font-family: 'DM Sans', sans-serif; transition: all 0.12s; white-space: nowrap;
+    }
+    .btn-dec.approve { color: var(--green); }
+    .btn-dec.approve.active { background: var(--green); color: white; border-color: var(--green); }
+    .btn-dec.reject  { color: var(--error); }
+    .btn-dec.reject.active  { background: var(--error); color: white; border-color: var(--error); }
+    .reason-input {
+      width: 100%; margin-top: 6px;
+      border: 1.5px solid var(--grey-border); border-radius: 6px;
+      padding: 6px 10px; font-size: 12px; font-family: 'DM Sans', sans-serif;
+      resize: vertical; min-height: 46px;
+    }
+    .reason-input:focus { outline: none; border-color: var(--amber); }
+
+    /* TYPE BADGES */
     .type-badge {
       font-size: 10px;
       font-weight: 700;
@@ -209,11 +281,7 @@
       background: var(--white);
       transition: border-color 0.15s, box-shadow 0.15s;
     }
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--green);
-      box-shadow: 0 0 0 3px rgba(0,166,81,0.12);
-    }
+    input[type="text"]:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(0,166,81,0.12); }
     input.invalid { border-color: var(--error); box-shadow: 0 0 0 3px rgba(204,41,54,0.08); }
 
     /* SIGNATURE */
@@ -326,12 +394,7 @@
     .btn-contact:hover { background: var(--error-bg); border-color: var(--error); }
 
     /* PAGE FOOTER */
-    .page-footer {
-      background: var(--grey-footer);
-      border-radius: 0 0 12px 12px;
-      padding: 14px 36px;
-      text-align: center;
-    }
+    .page-footer { background: var(--grey-footer); border-radius: 0 0 12px 12px; padding: 14px 36px; text-align: center; }
     .page-footer p { color: rgba(255,255,255,0.7); font-size: 12px; }
 
     @keyframes spinsmall { to { transform: rotate(360deg); } }
@@ -346,6 +409,16 @@
       margin-right: 6px;
     }
 
+    /* LIGHTBOX */
+    #lightbox {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    #lightbox.open { display: flex; }
+    #lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
+    #lightbox .lb-close { position: absolute; top: 20px; right: 28px; color: #fff; font-size: 28px; cursor: pointer; line-height: 1; }
+
     @media (max-width: 640px) {
       body { padding: 0 0 48px; }
       .header { padding: 20px; border-radius: 0; flex-wrap: wrap; }
@@ -357,7 +430,8 @@
       .btn-row { flex-direction: column; }
       .btn-approve, .btn-contact { min-width: unset; width: 100%; text-align: center; }
       .exp-table { font-size: 12px; }
-      .exp-table td, .exp-table th { padding: 8px; }
+      .exp-table td, .exp-table th { padding: 7px 8px; }
+      .decision-controls { margin-left: 0; width: 100%; }
     }
   </style>
 </head>
@@ -367,9 +441,9 @@
   <div class="header">
     <div class="header-left">
       <h1>Expense Approval</h1>
-      <p>The Loomex Group -- EOC Admin Review</p>
+      <p>The Loomex Group -- Admin Review</p>
     </div>
-    <div class="header-badge">EOC Admin</div>
+    <div class="header-badge">Admin</div>
   </div>
 
   <div class="card">
@@ -378,7 +452,7 @@
     <div id="stateLoading" class="card-section state-box">
       <div class="spinner-lg"></div>
       <h2>Loading submission...</h2>
-      <p>Retrieving expense report from EOC system</p>
+      <p>Retrieving expense report from system</p>
     </div>
 
     <!-- ERROR -->
@@ -394,17 +468,18 @@
       <!-- SECTION 1: Summary -->
       <div class="card-section">
         <div class="section-label">Submission Summary</div>
-        <div class="approved-banner" id="approvedBanner"></div>
+        <div class="processed-banner" id="processedBanner"></div>
         <div class="summary-grid" id="summaryGrid"></div>
       </div>
 
-      <!-- SECTION 2: Expense Details -->
+      <!-- SECTION 2: Expense Details + Per-Row Decisions -->
       <div class="card-section">
-        <div class="section-label">Expense Details</div>
+        <div class="section-label">Expense Details &amp; Approval Decisions</div>
         <div style="overflow-x:auto">
           <table class="exp-table">
             <thead>
               <tr>
+                <th>#</th>
                 <th>Type</th>
                 <th>Date</th>
                 <th>Detail</th>
@@ -424,7 +499,7 @@
       <div class="card-section">
         <div class="section-label">Admin Approval &amp; Signature</div>
         <div class="attestation">
-          By approving below, <strong>I confirm that this expense report has been reviewed and is compliant with contract terms and reimbursement conditions</strong>. This will be forwarded to Finance for payment processing.
+          By submitting below, <strong>I confirm that reviewed items are compliant with contract terms and reimbursement conditions</strong>. Approved items will be forwarded to Finance for payment processing.
         </div>
         <div class="field-group">
           <label for="adminName">Your Name <span class="req">*</span></label>
@@ -439,12 +514,12 @@
 
       <!-- FOOTER ACTIONS -->
       <div class="form-footer">
-        <div class="action-note">
-          <strong>Approving</strong> will generate a countersigned copy of this expense report and send it to Finance. If you have questions about any line items, use <strong>Contact Contractor</strong> to follow up before approving.
+        <div class="action-note" id="actionNote">
+          <strong>Per-row decisions:</strong> Use the Approve / Reject toggles on each line item above. Rejected items require a reason. Only approved items will be sent to Finance.
         </div>
         <div class="status-msg" id="statusMsg"></div>
         <div class="btn-row">
-          <button class="btn-approve" id="approveBtn" onclick="approveSubmission()">&#10003; Approve &amp; Send to Finance</button>
+          <button class="btn-approve" id="approveBtn" onclick="submitDecision()">&#10003; Submit Approval Decision</button>
           <button class="btn-contact" id="contactBtn">&#9993; Contact Contractor</button>
         </div>
       </div>
@@ -454,15 +529,22 @@
   </div><!-- card -->
 
   <div class="page-footer">
-    <p>The Loomex Group Ltd -- EOC Admin Portal -- For support contact eocadmin@loomex.ca</p>
+    <p>The Loomex Group Ltd -- Admin Portal -- For support contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="dfbab0bcbebbb2b6b19fb3b0b0b2baa7f1bcbe">[email&#160;protected]</a></p>
   </div>
 
 </div>
 
-<script>
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()">
+  <span class="lb-close">&times;</span>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   const WORKER_URL = 'https://loomex-expense.loomex-it.workers.dev';
   const token = new URLSearchParams(window.location.search).get('token');
   let submission = null;
+  let rowDecisions = [];
 
   // ---- SIGNATURE ----
   const canvas = document.getElementById('sig-canvas');
@@ -498,9 +580,9 @@
 
   // ---- STATE ----
   function showState(state) {
-    document.getElementById('stateLoading').style.display  = state === 'loading'  ? 'block' : 'none';
-    document.getElementById('stateError').style.display    = state === 'error'    ? 'block' : 'none';
-    document.getElementById('contentWrap').style.display   = state === 'content'  ? 'block' : 'none';
+    document.getElementById('stateLoading').style.display = state === 'loading' ? 'block' : 'none';
+    document.getElementById('stateError').style.display   = state === 'error'   ? 'block' : 'none';
+    document.getElementById('contentWrap').style.display  = state === 'content' ? 'block' : 'none';
   }
 
   // ---- LOAD ----
@@ -510,28 +592,29 @@
       const res = await fetch(`${WORKER_URL}/expense-submission?token=${token}`);
       if (!res.ok) { showState('error'); return; }
       submission = await res.json();
-      renderSubmission(submission);
-showState('content');
-resizeCanvas();
-    } catch {
-      showState('error');
-    }
+      renderSubmission();
+      showState('content');
+      resizeCanvas();
+    } catch { showState('error'); }
   }
 
   const BADGE_CLS = { hotel: 'badge-hotel', meal: 'badge-meal', mileage: 'badge-mileage', rental: 'badge-rental', misc: 'badge-misc' };
   const BADGE_LBL = { hotel: 'Hotel', meal: 'Meal', mileage: 'Mileage', rental: 'Rental Car', misc: 'Misc' };
   function fmt(n) { return `$${parseFloat(n || 0).toFixed(2)}`; }
+  function fmtNum(n) { return parseFloat(n || 0).toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
-  function renderSubmission(sub) {
-    const fd = sub.formData;
+  // ---- RENDER ----
+  function renderSubmission() {
+    const fd  = submission.formData;
+    const sub = submission;
 
-    // Already approved
-    if (sub.status === 'approved') {
-      const b = document.getElementById('approvedBanner');
-      b.textContent = `✓ This expense report was approved by ${sub.approvedBy} on ${new Date(sub.approvedAt).toLocaleDateString('en-CA')}.`;
+    // Already processed
+    if (sub.status !== 'pending') {
+      const b = document.getElementById('processedBanner');
+      b.textContent = `✓ This expense report was ${sub.status} by ${sub.approvedBy || 'EOC Admin'} on ${new Date(sub.approvedAt).toLocaleDateString('en-CA')}.`;
       b.style.display = 'block';
       document.getElementById('approveBtn').disabled = true;
-      document.getElementById('approveBtn').textContent = `Approved by ${sub.approvedBy}`;
+      document.getElementById('approveBtn').textContent = `${sub.status === 'approved' ? 'Approved' : 'Processed'} by ${sub.approvedBy}`;
     }
 
     // Contact button
@@ -539,35 +622,64 @@ resizeCanvas();
       window.location.href = `mailto:${fd.contractorEmail}?subject=Re: Expense Report - ${fd.activation} (${fd.periodStart} to ${fd.periodEnd})&body=Hi ${fd.contractorName},%0A%0ARegarding your expense submission (Ref: ${token}),%0A%0A`;
     };
 
-    // Summary grid
-    const items = [
-      { l: 'Contractor',   v: fd.contractorName },
-      { l: 'Email',        v: fd.contractorEmail },
-      { l: 'Activation',   v: fd.activation },
-      { l: 'Job Number',   v: fd.jobNumber || 'N/A' },
-      { l: 'Site',         v: fd.site },
-      { l: 'Period',       v: `${fd.periodStart} to ${fd.periodEnd}` },
-      { l: 'Submitted',    v: new Date(sub.submittedAt).toLocaleString('en-CA') },
-      { l: 'Total Claimed', v: fmt(fd.total), total: true },
-    ];
-    document.getElementById('summaryGrid').innerHTML = items.map(i => `
-      <div class="summary-item${i.total ? ' total-item' : ''}">
-        <div class="s-label">${i.l}</div>
-        <div class="s-val">${i.v}</div>
-      </div>
-    `).join('');
+    // Init all decisions to approved
+    rowDecisions = (fd.rows || []).map((_, i) => ({ rowIndex: i, approved: true, reason: '' }));
+
+    // Summary grid (starts with claimed total; approved total item added after)
+    renderSummaryGrid();
 
     // Expense table
+    renderExpenseTable();
+  }
+
+  function renderSummaryGrid() {
+    const fd  = submission.formData;
+    const sub = submission;
+    const approvedTotal = calcApprovedTotal();
+    const rejectedCount = rowDecisions.filter(d => !d.approved).length;
+    const allApproved   = rejectedCount === 0;
+
+    const items = [
+      { l: 'Contractor',    v: fd.contractorName },
+      { l: 'Email',         v: fd.contractorEmail },
+      { l: 'Activation',    v: fd.activation },
+      { l: 'Job Number',    v: fd.jobNumber || 'N/A' },
+      { l: 'Site',          v: fd.site },
+      { l: 'Period',        v: `${fd.periodStart} to ${fd.periodEnd}` },
+      { l: 'Submitted',     v: new Date(sub.submittedAt).toLocaleString('en-CA') },
+      { l: 'Total Claimed', v: fmt(fd.total), cls: 'total-item' },
+    ];
+
+    // Add approved total if any rejections
+    if (!allApproved) {
+      items.push({ l: `Approved Total (${rowDecisions.length - rejectedCount} of ${rowDecisions.length} items)`, v: `$${fmtNum(approvedTotal)}`, cls: 'partial-item' });
+    } else {
+      items.push({ l: 'Approved Total', v: `$${fmtNum(approvedTotal)}`, cls: 'approved-item' });
+    }
+
+    document.getElementById('summaryGrid').innerHTML = items.map(i =>
+      `<div class="summary-item${i.cls ? ' ' + i.cls : ''}">
+        <div class="s-label">${i.l}</div>
+        <div class="s-val">${i.v}</div>
+      </div>`
+    ).join('');
+  }
+
+  function renderExpenseTable() {
+    const fd = submission.formData;
+    const receiptFilenames = submission.receiptFilenames || [];
     const tbody = document.getElementById('expTableBody');
-    tbody.innerHTML = fd.rows.map(r => {
+    tbody.innerHTML = '';
+
+    (fd.rows || []).forEach((r, i) => {
       const badgeCls = BADGE_CLS[r.type] || 'badge-misc';
       const badgeLbl = BADGE_LBL[r.type] || r.type;
       let detail = '', actual = '—', claimed = '', exceeded = '—';
 
       if (r.type === 'meal') {
-        detail  = r.mealPeriod || '—';
-        actual  = fmt(r.mealsActual);
-        claimed = fmt(r.mealClaimed);
+        detail   = r.mealPeriod || '—';
+        actual   = fmt(r.mealsActual);
+        claimed  = fmt(r.mealClaimed);
         exceeded = r.exceeded === 'Y'
           ? '<span class="exceeded-y">Exceeded</span>'
           : r.exceeded === 'N' ? '<span class="exceeded-n">Within limit</span>' : '—';
@@ -580,7 +692,12 @@ resizeCanvas();
         claimed = fmt(r.value);
       }
 
-      return `<tr>
+      // Main expense row
+      const tr = document.createElement('tr');
+      tr.className = 'expense-row row-approved';
+      tr.id = `erow-${i}`;
+      tr.innerHTML = `
+        <td style="color:var(--text-muted);font-size:12px;font-weight:700;">#${i + 1}</td>
         <td><span class="type-badge ${badgeCls}">${badgeLbl}</span></td>
         <td>${r.date || '—'}</td>
         <td>${detail}</td>
@@ -588,54 +705,138 @@ resizeCanvas();
         <td>${claimed}</td>
         <td>${exceeded}</td>
         <td><strong>${fmt(r.value)}</strong></td>
-      </tr>`;
-    }).join('');
+      `;
+      tbody.appendChild(tr);
+
+      // Detail row: receipts + decision controls
+      const rowReceipts = receiptFilenames.filter(f => f.startsWith(`Item${i + 1}-`));
+      const tr2 = document.createElement('tr');
+      tr2.className = 'detail-row';
+      tr2.id = `drow-${i}`;
+      tr2.innerHTML = `<td colspan="8">
+        <div class="detail-inner" id="detail-inner-${i}">
+          <div class="receipts-inline" id="receipts-${i}">
+            ${rowReceipts.length === 0 ? '<span class="no-receipts">No receipts</span>' : '<span class="no-receipts">Loading receipts...</span>'}
+          </div>
+          <div class="decision-controls">
+            <button class="btn-dec approve active" id="abtn-${i}" onclick="setDecision(${i}, true)">&#10003; Approve</button>
+            <button class="btn-dec reject" id="rbtn-${i}" onclick="setDecision(${i}, false)">&#10005; Reject</button>
+          </div>
+          <div id="reason-wrap-${i}" style="display:none;width:100%;">
+            <textarea class="reason-input" id="reason-${i}" placeholder="Rejection reason (required)" oninput="rowDecisions[${i}].reason = this.value; renderSummaryGrid();"></textarea>
+          </div>
+        </div>
+      </td>`;
+      tbody.appendChild(tr2);
+
+      // Load receipts async
+      if (rowReceipts.length > 0) loadReceipts(i, rowReceipts);
+    });
 
     document.getElementById('expTableFoot').innerHTML = `
       <tr>
-        <td colspan="6" style="text-align:right">Total Claimed</td>
+        <td colspan="7" style="text-align:right">Total Claimed</td>
         <td>${fmt(fd.total)}</td>
       </tr>`;
   }
 
-  // ---- BUILD APPROVED EXCEL ----
-  function buildApprovedExcel(fd, adminName) {
-    const wb = XLSX.utils.book_new();
-    const d  = [];
-    d.push(['THE LOOMEX GROUP LTD']);
-    d.push(['CONTRACTOR EXPENSE REPORT -- APPROVED']);
-    d.push([]);
-    d.push(['Contractor:', fd.contractorName, '', 'Activation:', fd.activation]);
-    d.push(['Email:', fd.contractorEmail, '', 'Job Number:', fd.jobNumber || 'N/A']);
-    d.push(['Site:', fd.site, '', 'Period:', `${fd.periodStart} to ${fd.periodEnd}`]);
-    d.push([]);
-    d.push(['Type', 'Date', 'Description / Detail', 'Actual ($)', 'Claimed ($)', 'Exceeded?', 'Total ($)']);
-
-    fd.rows.forEach(r => {
-      if (r.type === 'meal') {
-        d.push(['Meal', r.date, r.mealPeriod, (r.mealsActual||0).toFixed(2), (r.mealClaimed||0).toFixed(2), r.exceeded, (r.value||0).toFixed(2)]);
-      } else if (r.type === 'mileage') {
-        d.push(['Mileage', r.date, `${r.description} (${r.km} km)`, '', (r.value||0).toFixed(2), '', (r.value||0).toFixed(2)]);
+  // ---- LOAD RECEIPTS FROM R2 ----
+  function loadReceipts(rowIndex, filenames) {
+    const area = document.getElementById(`receipts-${rowIndex}`);
+    area.innerHTML = '';
+    filenames.forEach(filename => {
+      const ext = filename.split('.').pop().toLowerCase();
+      const url = `${WORKER_URL}/expense-receipt?token=${encodeURIComponent(token)}&filename=${encodeURIComponent(filename)}`;
+      if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'receipt-thumb';
+        img.title = filename;
+        img.onclick = () => openLightbox(url);
+        img.onerror = () => img.replaceWith(makeReceiptLink(url, ext));
+        area.appendChild(img);
       } else {
-        const lbl = { hotel: 'Hotel', rental: 'Rental Car', misc: 'Misc' }[r.type] || r.type;
-        d.push([lbl, r.date, r.description, (r.amount||0).toFixed(2), (r.amount||0).toFixed(2), '', (r.value||0).toFixed(2)]);
+        area.appendChild(makeReceiptLink(url, ext));
+      }
+    });
+  }
+
+  function makeReceiptLink(url, ext) {
+    const a = document.createElement('a');
+    a.href = url; a.target = '_blank'; a.className = 'receipt-link';
+    a.innerHTML = `&#128196; ${ext.toUpperCase()} Receipt`;
+    return a;
+  }
+
+  // ---- PER-ROW DECISION ----
+  function setDecision(index, approved) {
+    rowDecisions[index].approved = approved;
+    if (approved) rowDecisions[index].reason = '';
+
+    document.getElementById(`abtn-${index}`).classList.toggle('active', approved);
+    document.getElementById(`rbtn-${index}`).classList.toggle('active', !approved);
+    document.getElementById(`erow-${index}`).className = `expense-row ${approved ? 'row-approved' : 'row-rejected'}`;
+    document.getElementById(`reason-wrap-${index}`).style.display = approved ? 'none' : 'block';
+    if (approved && document.getElementById(`reason-${index}`)) {
+      document.getElementById(`reason-${index}`).value = '';
+    }
+    renderSummaryGrid();
+
+    // Update action note
+    const rejectedCount = rowDecisions.filter(d => !d.approved).length;
+    document.getElementById('actionNote').innerHTML = rejectedCount > 0
+      ? `<strong>${rejectedCount} item${rejectedCount > 1 ? 's' : ''} marked for rejection.</strong> Ensure each has a reason entered. Approved items will go to Finance; the contractor will receive a per-item decision email.`
+      : `<strong>Per-row decisions:</strong> Use the Approve / Reject toggles on each line item above. Only approved items will be sent to Finance.`;
+  }
+
+  function calcApprovedTotal() {
+    return (submission.formData.rows || [])
+      .filter((_, i) => rowDecisions[i]?.approved !== false)
+      .reduce((s, r) => s + parseFloat(r.value || 0), 0);
+  }
+
+  // ---- BUILD APPROVED EXCEL (original template + strikethrough on rejected rows) ----
+  async function buildApprovedExcel(fd, adminName) {
+    // Fetch original Excel from R2 via Worker
+    const res = await fetch(`${WORKER_URL}/expense-excel?token=${encodeURIComponent(token)}`);
+    if (!res.ok) throw new Error('Could not retrieve original Excel from server.');
+    const { base64: originalBase64 } = await res.json();
+
+    // Read with style preservation
+    const wb = XLSX.read(originalBase64, { type: 'base64', cellStyles: true });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+
+    // Expense rows start at Excel row 9 (1-indexed), so row index i → Excel row 9+i
+    const FIRST_ROW = 9;
+    const COL_COUNT = 8; // columns A-H
+
+    rowDecisions.forEach(d => {
+      if (d.approved) return; // leave approved rows untouched
+      const excelRow = FIRST_ROW + d.rowIndex;
+      for (let col = 0; col < COL_COUNT; col++) {
+        const cellRef = XLSX.utils.encode_cell({ r: excelRow - 1, c: col }); // encode_cell is 0-indexed
+        if (!ws[cellRef]) continue;
+        // Merge with any existing style, add strikethrough
+        ws[cellRef].s = Object.assign({}, ws[cellRef].s || {}, {
+          font: Object.assign({}, (ws[cellRef].s || {}).font || {}, { strike: true })
+        });
+        // Append rejection reason to the description cell (column C = index 2)
+        if (col === 2 && d.reason) {
+          ws[cellRef].v = (ws[cellRef].v || '') + ` [REJECTED: ${d.reason}]`;
+        }
       }
     });
 
-    d.push([]);
-    d.push(['', '', '', '', '', 'TOTAL CLAIMED:', (fd.total||0).toFixed(2)]);
-    d.push([]);
-    d.push(['CONTRACTOR CERTIFICATION']);
-    d.push([`${fd.contractorName} -- Signature captured electronically on submission.`]);
-    d.push([]);
-    d.push(['EOC ADMIN APPROVAL']);
-    d.push(['Approved By:', adminName, '', 'Date:', new Date().toLocaleDateString('en-CA')]);
-    d.push(['Admin signature captured electronically on approval.']);
+    // Write admin approval fields (adjust cell refs to match your template)
+    function setCell(ref, t, v) {
+      if (!ws[ref]) ws[ref] = {};
+      ws[ref].t = t; ws[ref].v = v;
+    }
+    setCell('A20', 's', 'Approved');
+    setCell('B20', 's', adminName);
+    setCell('C20', 's', new Date().toLocaleDateString('en-CA'));
 
-    const ws = XLSX.utils.aoa_to_sheet(d);
-    ws['!cols'] = [{wch:14},{wch:12},{wch:34},{wch:12},{wch:12},{wch:10},{wch:13}];
-    XLSX.utils.book_append_sheet(wb, ws, 'Expense Report');
-    return XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+    return XLSX.write(wb, { type: 'base64', bookType: 'xlsx', cellStyles: true });
   }
 
   // ---- STATUS ----
@@ -646,43 +847,54 @@ resizeCanvas();
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
-  // ---- APPROVE ----
-  async function approveSubmission() {
+  // ---- SUBMIT ----
+  async function submitDecision() {
     const adminName = document.getElementById('adminName').value.trim();
     if (!adminName) {
       document.getElementById('adminName').classList.add('invalid');
-      showStatus('Please enter your name before approving.', 'error'); return;
+      showStatus('Please enter your name before submitting.', 'error'); return;
     }
-    if (!hasSig) { showStatus('Please draw your signature before approving.', 'error'); return; }
+    if (!hasSig) { showStatus('Please draw your signature before submitting.', 'error'); return; }
+
+    const anyApproved = rowDecisions.some(d => d.approved !== false);
+    if (!anyApproved) { showStatus('At least one line item must be approved. Contact the contractor directly to reject all items.', 'error'); return; }
+
+    const missingReasons = rowDecisions.filter(d => d.approved === false && !d.reason.trim());
+    if (missingReasons.length > 0) {
+      showStatus(`Please provide a rejection reason for item${missingReasons.length > 1 ? 's' : ''} #${missingReasons.map(d => d.rowIndex + 1).join(', #')}.`, 'error'); return;
+    }
 
     const btn = document.getElementById('approveBtn');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>Processing...';
 
     try {
-      const adminSignatureBase64  = canvas.toDataURL('image/png');
-      const approvedExcelBase64   = buildApprovedExcel(submission.formData, adminName);
+      const adminSignatureBase64 = canvas.toDataURL('image/png');
+      const approvedExcelBase64  = await buildApprovedExcel(submission.formData, adminName);
+      const rejectedCount = rowDecisions.filter(d => !d.approved).length;
+      const approvedCount = rowDecisions.length - rejectedCount;
 
       const res = await fetch(`${WORKER_URL}/expense-approve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, adminName, adminSignatureBase64, approvedExcelBase64 })
+        body: JSON.stringify({ token, adminName, adminSignatureBase64, approvedExcelBase64, rowDecisions })
       });
 
       const result = await res.json();
       if (!result.success) throw new Error(result.error || 'Approval failed');
 
-      showStatus(`<strong>&#10003; Approved and sent to Finance.</strong><br>The approved expense report for <strong>${submission.formData.contractorName}</strong> has been forwarded to Finance.`, 'success');
-      btn.innerHTML = `&#10003; Approved by ${adminName}`;
+      const msg = rejectedCount > 0
+        ? `<strong>&#10003; Done.</strong> ${approvedCount} item${approvedCount !== 1 ? 's' : ''} approved and sent to Finance. ${rejectedCount} item${rejectedCount !== 1 ? 's' : ''} rejected -- <strong>${submission.formData.contractorName}</strong> has been notified with a per-item breakdown.`
+        : `<strong>&#10003; Approved and sent to Finance.</strong> The approved expense report for <strong>${submission.formData.contractorName}</strong> has been forwarded to Finance.`;
+      showStatus(msg, 'success');
+      btn.innerHTML = `&#10003; Submitted by ${adminName}`;
 
     } catch (err) {
-      showStatus(`Approval failed: ${err.message}`, 'error');
+      showStatus(`Submission failed: ${err.message}`, 'error');
       btn.disabled = false;
-      btn.innerHTML = '&#10003; Approve &amp; Send to Finance';
+      btn.innerHTML = '&#10003; Submit Approval Decision';
     }
   }
 
-  loadSubmission();
-</script>
-</body>
-</html>
+  // ---- LIGHTBOX ----
+  function openLightbox(url) { document.getElementById(
