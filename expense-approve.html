@@ -897,4 +897,10 @@
   }
 
   // ---- LIGHTBOX ----
-  function openLightbox(url) { document.getElementById(
+  function openLightbox(url) { document.getElementById('lightboxImg').src = url; document.getElementById('lightbox').classList.add('open'); }
+  function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+
+  loadSubmission();
+</script>
+</body>
+</html>
