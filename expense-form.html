@@ -256,13 +256,9 @@
       font-size: 12px;
       font-weight: 700;
       border: 1.5px solid;
-      white-space: normal;
+      white-space: nowrap;
       min-width: 130px;
       width: 100%;
-      text-align: center;
-      height: auto;
-      min-height: 42px;
-      padding: 6px 12px;
     }
     .exceeded-yes { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
     .exceeded-no  { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
@@ -817,7 +813,7 @@
       if (claimedEl) claimedEl.value = ineligible ? '$0.00' : (period && actual > 0 ? `$${claimed.toFixed(2)}` : '');
       if (excEl) {
         if (ineligible) {
-          excEl.textContent = `Not eligible at ${site}`; excEl.className = 'exceeded-badge exceeded-yes';
+          excEl.textContent = `Ineligible (${site})`; excEl.className = 'exceeded-badge exceeded-yes';
         } else if (!period || actual === 0) {
           excEl.textContent = '--'; excEl.className = 'exceeded-badge exceeded-na';
         } else if (exceeded) {
