@@ -150,6 +150,8 @@
       font-weight: 700;
       color: #7a5200;
     }
+    .summary-item.report-item { background: #f0f4ff; border-color: #c5d0f0; }
+    .summary-item.report-item .s-val { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 700; color: #1a3a5c; }
 
     /* ALREADY PROCESSED BANNER */
     .processed-banner {
@@ -529,7 +531,7 @@
   </div><!-- card -->
 
   <div class="page-footer">
-    <p>The Loomex Group Ltd -- Admin Portal -- For support contact <a href="mailto:eocadmin@loomex.ca">eocadmin@loomex.ca</a></p>
+    <p>The Loomex Group Ltd -- Admin Portal -- For support contact <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="dfbab0bcbebbb2b6b19fb3b0b0b2baa7f1bcbe">[email&#160;protected]</a></p>
   </div>
 
 </div>
@@ -640,6 +642,7 @@
     const allApproved   = rejectedCount === 0;
 
     const items = [
+      { l: 'Report #',      v: sub.reportNumber || '—', cls: 'report-item' },
       { l: 'Contractor',    v: fd.contractorName },
       { l: 'Email',         v: fd.contractorEmail },
       { l: 'Activation',    v: fd.activation },
@@ -832,6 +835,7 @@
       if (!ws[ref]) ws[ref] = {};
       ws[ref].t = t; ws[ref].v = v;
     }
+    setCell('A1', 's', submission.reportNumber || '');
     setCell('A20', 's', 'Approved');
     setCell('B20', 's', adminName);
     setCell('C20', 's', new Date().toLocaleDateString('en-CA'));
