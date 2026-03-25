@@ -259,7 +259,7 @@
       border: 1.5px solid;
       white-space: nowrap;
       min-width: 130px;
-width: 100%;
+      width: 100%;
     }
     .exceeded-yes { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
     .exceeded-no  { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
@@ -661,7 +661,7 @@ width: 100%;
         <div class="row-fields fields-meal">
           <div class="field-group">
             <label>Date</label>
-            <input type="date" id="f-date-${id}">
+            <input type="date" id="f-date-${id}" ${da}>
           </div>
           <div class="field-group">
             <label>Meal Period</label>
@@ -692,7 +692,7 @@ width: 100%;
         <div class="row-fields fields-mileage">
           <div class="field-group">
             <label>Date</label>
-            <input type="date" id="f-date-${id}">
+            <input type="date" id="f-date-${id}" ${da}>
           </div>
           <div class="field-group">
             <label>Route / Description</label>
@@ -999,11 +999,7 @@ width: 100%;
       setCell(`A${r}`, 's', row.date || '');
       let desc = row.description || '';
       if (row.type === 'meal') {
-        if (row.mealIneligible) {
-          desc = `${row.mealPeriod} (NOT ELIGIBLE at ${fd.site} -- EOC review required)`;
-        } else {
-          desc = row.mealPeriod + (row.mealsActual > ({ Breakfast: 15, Lunch: 20, Dinner: 45 }[row.mealPeriod] || 0) ? ' (exceeded -- claimed at allowance)' : '');
-        }
+        desc = row.mealPeriod || '';
       }
       if (row.type === 'mileage') desc = `${row.description || ''} (${row.km} km @ $0.59)`;
       setCell(`B${r}`, 's', desc);
