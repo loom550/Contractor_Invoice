@@ -813,7 +813,7 @@
       if (claimedEl) claimedEl.value = ineligible ? '$0.00' : (period && actual > 0 ? `$${claimed.toFixed(2)}` : '');
       if (excEl) {
         if (ineligible) {
-          excEl.textContent = `Ineligible (${site})`; excEl.className = 'exceeded-badge exceeded-yes';
+          excEl.textContent = `Ineligible`; excEl.className = 'exceeded-badge exceeded-yes';
         } else if (!period || actual === 0) {
           excEl.textContent = '--'; excEl.className = 'exceeded-badge exceeded-na';
         } else if (exceeded) {
