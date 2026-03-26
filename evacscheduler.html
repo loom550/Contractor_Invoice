@@ -11,93 +11,90 @@
     --navy: #1a3a5c; --navy-light: #234d75;
     --bg: #0d1117; --surface: #161b22; --surface2: #1e2530; --surface3: #252d38;
     --border: #2a3340;
-    --text: #e6edf3; --text-dim: #8b949e; --text-muted: #4a5568;
+    --text: #e6edf3; --text-dim: #c0cad6; --text-muted: #6b7a8d;
     --red: #e05252; --yellow: #d4a017;
     --full: #00A651; --partial: #d4a017; --empty: #e05252;
-    --drawer-width: 420px;
+    --draft: #7aa8d4;
+    --drawer-width: 440px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'IBM Plex Sans', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+  body { font-family: 'IBM Plex Sans', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; font-size: 14px; }
 
-  /* HEADER */
   .header { background: var(--navy); padding: 0 20px; display: flex; align-items: center; gap: 20px; height: 52px; border-bottom: 2px solid var(--green); flex-shrink: 0; }
   .logo { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: var(--green); letter-spacing: 0.12em; }
   .header-divider { width: 1px; height: 24px; background: var(--navy-light); }
-  .activation-badge { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.06em; }
+  .activation-badge { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 0.06em; }
   .user-badge { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-  .user-email { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); }
-  .role-pill { padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.06em; }
+  .user-email { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted); }
+  .role-pill { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; font-family: 'IBM Plex Mono', monospace; }
   .role-pill.scheduler { background: rgba(0,166,81,0.2); color: var(--green); border: 1px solid rgba(0,166,81,0.4); }
   .role-pill.ic { background: rgba(26,58,92,0.6); color: #7aa8d4; border: 1px solid var(--navy-light); }
-  .reload-btn { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 4px 10px; border-radius: 4px; font-size: 11px; font-family: 'IBM Plex Mono', monospace; cursor: pointer; transition: all 0.15s; }
+  .reload-btn { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-family: 'IBM Plex Mono', monospace; cursor: pointer; transition: all 0.15s; }
   .reload-btn:hover { color: var(--text); border-color: var(--text-dim); }
 
-  /* ERROR BAR */
-  .error-bar { background: rgba(224,82,82,0.12); border-bottom: 1px solid rgba(224,82,82,0.3); padding: 6px 20px; font-size: 12px; color: var(--red); display: none; flex-shrink: 0; }
+  .error-bar { background: rgba(224,82,82,0.12); border-bottom: 1px solid rgba(224,82,82,0.3); padding: 7px 20px; font-size: 13px; color: var(--red); display: none; flex-shrink: 0; }
 
-  /* SITE TABS */
   .site-tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 20px; flex-shrink: 0; }
-  .site-tab { padding: 10px 24px; font-size: 12px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; border: none; background: transparent; color: var(--text-dim); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+  .site-tab { padding: 10px 24px; font-size: 13px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; border: none; background: transparent; color: var(--text-dim); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
   .site-tab.active { color: var(--text); border-bottom-color: var(--green); }
   .site-tab:hover:not(.active) { color: var(--text); }
   .site-tab:disabled { opacity: 0.3; cursor: not-allowed; }
 
-  /* WEEK NAV */
   .week-nav { display: flex; align-items: center; gap: 12px; padding: 8px 20px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
-  .week-nav button { background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+  .week-nav button { background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
   .week-nav button:hover { background: var(--surface3); }
-  .week-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.06em; }
+  .week-label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 0.06em; }
   .legend { margin-left: auto; display: flex; gap: 16px; align-items: center; }
-  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-dim); }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-dim); }
   .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-  /* ROLE BAR (scheduler only) */
   .role-bar { display: flex; align-items: center; gap: 8px; padding: 6px 20px; background: var(--surface2); border-bottom: 1px solid var(--border); flex-shrink: 0; }
-  .role-bar label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
-  .role-bar select { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-family: 'IBM Plex Sans', sans-serif; cursor: pointer; min-width: 220px; }
+  .role-bar label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+  .role-bar select { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 4px; font-size: 13px; font-family: 'IBM Plex Sans', sans-serif; cursor: pointer; min-width: 240px; }
   .role-bar select:focus { outline: 1px solid var(--green); }
-  .add-role-btn { background: var(--green); border: none; color: #fff; padding: 4px 14px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+  .add-role-btn { background: var(--green); border: none; color: #fff; padding: 5px 14px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
   .add-role-btn:hover { background: var(--green-dim); }
 
-  /* IC READ-ONLY BANNER */
-  .ic-banner { display: none; align-items: center; gap: 10px; padding: 7px 20px; background: rgba(26,58,92,0.4); border-bottom: 1px solid var(--navy-light); flex-shrink: 0; font-size: 11px; color: #7aa8d4; }
-  .ic-banner span { font-family: 'IBM Plex Mono', monospace; font-size: 10px; }
+  .ic-banner { display: none; align-items: center; gap: 10px; padding: 7px 20px; background: rgba(26,58,92,0.4); border-bottom: 1px solid var(--navy-light); flex-shrink: 0; font-size: 12px; color: #7aa8d4; }
 
-  /* GRID */
   .grid-wrapper { flex: 1; overflow: auto; position: relative; }
   .grid-table { border-collapse: collapse; width: max-content; min-width: 100%; }
 
-  .role-col { position: sticky; left: 0; z-index: 10; background: var(--surface); width: 185px; min-width: 185px; }
-  .role-header-cell { position: sticky; left: 0; top: 0; z-index: 20; background: var(--surface); padding: 10px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; border-right: 2px solid var(--border); border-bottom: 1px solid var(--border); }
+  .role-col { position: sticky; left: 0; z-index: 10; background: var(--surface); width: 210px; min-width: 210px; }
+  .role-header-cell { position: sticky; left: 0; top: 0; z-index: 20; background: var(--surface); padding: 10px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; border-right: 2px solid var(--border); border-bottom: 1px solid var(--border); }
   thead th { position: sticky; top: 0; z-index: 5; background: var(--surface2); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
-  .date-header { padding: 8px 4px 6px; text-align: center; min-width: 76px; }
-  .date-dow { font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px; }
-  .date-num { font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; color: var(--text); display: block; }
-  .date-mon { font-size: 9px; color: var(--text-muted); display: block; margin-top: 1px; }
+  .date-header { padding: 8px 4px 6px; text-align: center; min-width: 80px; }
+  .date-dow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 2px; }
+  .date-num { font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600; color: var(--text); display: block; }
+  .date-mon { font-size: 10px; color: var(--text-dim); display: block; margin-top: 1px; }
   .date-header.today .date-num { color: var(--green); }
 
-  .shift-section-row td { padding: 5px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .shift-section-row td { padding: 5px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
   .shift-section-row.day-section td { background: rgba(212,160,23,0.08); color: #d4a017; border-left: 3px solid #d4a017; }
   .shift-section-row.night-section td { background: rgba(26,58,92,0.5); color: #7aa8d4; border-left: 3px solid #7aa8d4; }
   .shift-section-row td.role-col { background: inherit; }
 
-  .role-cell-inner { padding: 0 10px 0 14px; height: 44px; border-right: 2px solid var(--border); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+  .role-cell-inner { padding: 0 10px 0 14px; height: 50px; border-right: 2px solid var(--border); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 4px; }
   .role-cell-inner.day-row { border-left: 3px solid rgba(212,160,23,0.4); }
   .role-cell-inner.night-row { border-left: 3px solid rgba(122,168,212,0.4); }
-  .role-name-wrap { flex: 1; min-width: 0; }
-  .role-name { font-size: 11px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-  .role-req { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--text-muted); }
-  .remove-role-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 2px 4px; line-height: 1; border-radius: 3px; opacity: 0; transition: opacity 0.15s, color 0.15s; flex-shrink: 0; }
+  .role-name-wrap { flex: 1; min-width: 0; cursor: pointer; }
+  .role-name-wrap:hover .role-name { color: var(--green); }
+  .role-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; transition: color 0.15s; }
+  .role-req { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+  .req-edit { background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 36px; padding: 1px 4px; border-radius: 3px; font-size: 11px; font-family: 'IBM Plex Mono', monospace; text-align: center; }
+  .req-edit:focus { outline: 1px solid var(--green); }
+  .remove-role-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 2px 4px; line-height: 1; border-radius: 3px; opacity: 0; transition: opacity 0.15s, color 0.15s; flex-shrink: 0; }
   tr:hover .remove-role-btn { opacity: 1; }
   .remove-role-btn:hover { color: var(--red); }
 
-  .slot-cell { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 3px; cursor: pointer; min-width: 76px; transition: filter 0.1s; }
+  .slot-cell { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 3px; cursor: pointer; min-width: 80px; transition: filter 0.1s; }
   .slot-cell:hover { filter: brightness(1.3); }
   .slot-cell.readonly { cursor: default; }
   .slot-cell.readonly:hover { filter: none; }
-  .slot-inner { border-radius: 4px; height: 38px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
-  .slot-count { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; }
-  .slot-label { font-size: 9px; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.7; }
+  .slot-inner { border-radius: 4px; height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
+  .slot-count { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }
+  .slot-label { font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.75; }
+  .slot-draft-indicator { font-size: 9px; color: var(--draft); opacity: 0.85; }
   .slot-inner.full { background: rgba(0,166,81,0.13); border: 1px solid rgba(0,166,81,0.32); }
   .slot-inner.full .slot-count { color: var(--full); }
   .slot-inner.partial { background: rgba(212,160,23,0.1); border: 1px solid rgba(212,160,23,0.28); }
@@ -105,75 +102,86 @@
   .slot-inner.empty { background: rgba(224,82,82,0.08); border: 1px solid rgba(224,82,82,0.22); }
   .slot-inner.empty .slot-count { color: var(--empty); }
 
-  /* LOADING */
   .loading-overlay { position: absolute; inset: 0; background: rgba(13,17,23,0.85); display: flex; align-items: center; justify-content: center; z-index: 50; flex-direction: column; gap: 12px; transition: opacity 0.2s; }
   .loading-overlay.hidden { opacity: 0; pointer-events: none; }
   .spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.08em; }
+  .loading-text { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 0.08em; }
 
-  /* SUMMARY BAR */
   .summary-bar { padding: 6px 20px; background: var(--surface); border-top: 1px solid var(--border); display: flex; gap: 20px; flex-shrink: 0; align-items: center; }
-  .summary-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-dim); }
+  .summary-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-dim); }
   .summary-dot { width: 7px; height: 7px; border-radius: 50%; }
 
-  /* DRAWER */
   .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
   .drawer-overlay.open { opacity: 1; pointer-events: all; }
   .drawer { position: fixed; right: 0; top: 0; bottom: 0; width: var(--drawer-width); background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.22s cubic-bezier(0.4,0,0.2,1); z-index: 201; }
   .drawer.open { transform: translateX(0); }
   .drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--navy); flex-shrink: 0; position: relative; }
-  .drawer-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-  .drawer-meta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 0.06em; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .shift-badge { padding: 1px 7px; border-radius: 3px; font-size: 9px; font-weight: 600; }
+  .drawer-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+  .drawer-meta { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.06em; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .shift-badge { padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 600; }
   .shift-badge.day { background: rgba(212,160,23,0.3); color: #d4a017; }
   .shift-badge.night { background: rgba(26,58,92,0.8); color: #7aa8d4; }
-  .site-badge { background: var(--surface3); border: 1px solid var(--border); color: var(--text-dim); padding: 1px 7px; border-radius: 3px; font-size: 9px; }
-  .drawer-close { position: absolute; top: 14px; right: 16px; background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 18px; line-height: 1; padding: 4px; border-radius: 4px; }
+  .site-badge { background: var(--surface3); border: 1px solid var(--border); color: var(--text-dim); padding: 2px 8px; border-radius: 3px; font-size: 10px; }
+  .drawer-close { position: absolute; top: 14px; right: 16px; background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 20px; line-height: 1; padding: 4px; border-radius: 4px; }
   .drawer-close:hover { color: var(--text); background: var(--surface2); }
   .drawer-body { flex: 1; overflow-y: auto; padding: 16px; }
 
-  .drawer-section-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; margin-top: 16px; }
+  .drawer-section-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; margin-top: 16px; }
   .drawer-section-label:first-child { margin-top: 0; }
 
-  .person-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 5px; margin-bottom: 4px; background: var(--surface2); border: 1px solid var(--border); }
-  .person-row.assigned { border-color: rgba(0,166,81,0.3); background: rgba(0,166,81,0.06); }
+  .assigned-card { background: var(--surface2); border: 1px solid rgba(0,166,81,0.2); border-radius: 6px; padding: 12px; margin-bottom: 8px; }
+  .assigned-card.draft { border-color: rgba(122,168,212,0.25); background: rgba(26,58,92,0.12); }
+  .assigned-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .assigned-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .assigned-sub { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted); display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .draft-badge { background: rgba(122,168,212,0.15); border: 1px solid rgba(122,168,212,0.3); color: var(--draft); padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+  .confirmed-badge { background: rgba(0,166,81,0.15); border: 1px solid rgba(0,166,81,0.3); color: var(--green); padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; }
 
-  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: var(--green); flex-shrink: 0; }
+  .date-range-editor { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .date-range-editor label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 3px; }
+  .date-range-editor input { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 4px; font-size: 13px; width: 100%; }
+  .date-range-editor input:focus { outline: 1px solid var(--green); }
+
+  .avail-windows { font-size: 12px; color: var(--text-dim); margin-bottom: 10px; padding: 7px 10px; background: var(--surface3); border-radius: 4px; border: 1px solid var(--border); line-height: 1.5; }
+  .avail-windows strong { color: var(--green); }
+  .avail-remaining { color: var(--yellow); }
+
+  .card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .person-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 5px; margin-bottom: 5px; background: var(--surface2); border: 1px solid var(--border); }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: var(--green); flex-shrink: 0; }
   .person-info { flex: 1; min-width: 0; }
-  .person-name { font-size: 12px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .person-sub { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); display: flex; gap: 5px; margin-top: 2px; flex-wrap: wrap; align-items: center; }
-  .night-badge { background: rgba(26,58,92,0.8); border: 1px solid var(--navy-light); color: #7aa8d4; padding: 0 5px; border-radius: 3px; font-size: 9px; font-weight: 600; }
-  .role-tag { background: var(--surface3); border: 1px solid var(--border); color: var(--text-muted); padding: 0 5px; border-radius: 3px; font-size: 9px; }
+  .person-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .person-sub { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted); display: flex; gap: 5px; margin-top: 3px; flex-wrap: wrap; align-items: center; }
+  .avail-range-tag { background: rgba(0,166,81,0.1); border: 1px solid rgba(0,166,81,0.2); color: #6dcc99; padding: 1px 6px; border-radius: 3px; font-size: 10px; }
+  .night-badge { background: rgba(26,58,92,0.8); border: 1px solid var(--navy-light); color: #7aa8d4; padding: 0 6px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+  .role-tag { background: var(--surface3); border: 1px solid var(--border); color: var(--text-dim); padding: 0 6px; border-radius: 3px; font-size: 10px; }
 
-  .assign-btn { background: var(--green); color: #fff; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; flex-shrink: 0; }
-  .assign-btn:hover { background: var(--green-dim); }
-  .assign-btn:disabled { background: var(--surface3); color: var(--text-muted); cursor: not-allowed; }
-  .remove-btn { background: transparent; color: var(--text-muted); border: 1px solid var(--border); padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; white-space: nowrap; transition: all 0.15s; flex-shrink: 0; }
-  .remove-btn:hover { color: var(--red); border-color: var(--red); }
-  .remove-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn { padding: 5px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.15s; border: none; flex-shrink: 0; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-green { background: var(--green); color: #fff; }
+  .btn-green:hover:not(:disabled) { background: var(--green-dim); }
+  .btn-outline { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+  .btn-outline:hover:not(:disabled) { color: var(--red); border-color: var(--red); }
+  .btn-confirm { background: rgba(0,166,81,0.15); color: var(--green); border: 1px solid rgba(0,166,81,0.3); }
+  .btn-confirm:hover:not(:disabled) { background: rgba(0,166,81,0.25); }
+  .btn-navy { background: rgba(26,58,92,0.5); color: #7aa8d4; border: 1px solid var(--navy-light); }
+  .btn-navy:hover:not(:disabled) { background: var(--navy); }
 
-  /* IC detail card */
-  .detail-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 10px 12px; margin-bottom: 6px; }
-  .detail-card-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
-  .detail-field { font-size: 11px; }
-  .detail-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 1px; }
+  .detail-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 12px; margin-bottom: 8px; }
+  .detail-card-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin-bottom: 10px; }
+  .detail-field { font-size: 12px; }
+  .detail-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 2px; }
   .detail-value { color: var(--text); }
   .detail-value a { color: var(--green); text-decoration: none; }
   .detail-value a:hover { text-decoration: underline; }
-  .detail-value.empty { color: var(--text-muted); font-style: italic; }
-
-  /* Inline edit (IC) */
-  .inline-select { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 3px 8px; border-radius: 4px; font-size: 11px; font-family: 'IBM Plex Sans', sans-serif; width: 100%; cursor: pointer; }
+  .inline-select { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 4px; font-size: 12px; font-family: 'IBM Plex Sans', sans-serif; width: 100%; cursor: pointer; }
   .inline-select:focus { outline: 1px solid var(--green); }
-  .save-btn { margin-top: 8px; background: var(--green); color: #fff; border: none; padding: 4px 14px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-  .save-btn:hover { background: var(--green-dim); }
-  .save-btn:disabled { background: var(--surface3); color: var(--text-muted); cursor: not-allowed; }
 
-  .empty-state { text-align: center; padding: 20px 0; color: var(--text-muted); font-size: 12px; }
+  .empty-state { text-align: center; padding: 28px 0; color: var(--text-muted); font-size: 13px; }
 
-  /* SCROLLBARS */
   .grid-wrapper::-webkit-scrollbar { width: 8px; height: 8px; }
   .grid-wrapper::-webkit-scrollbar-track { background: var(--bg); }
   .grid-wrapper::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
@@ -198,7 +206,7 @@
 <div id="error-bar" class="error-bar"></div>
 <div id="ic-banner" class="ic-banner"><span>&#128274; Read-only view. You can edit Hotel and Role Assigned for your site.</span></div>
 
-<div class="site-tabs" id="site-tabs">
+<div class="site-tabs">
   <button class="site-tab active" id="tab-Kingston"    onclick="setSite('Kingston',this)">Kingston</button>
   <button class="site-tab"        id="tab-Kapuskasing" onclick="setSite('Kapuskasing',this)">Kapuskasing</button>
   <button class="site-tab"        id="tab-Timmins"     onclick="setSite('Timmins',this)">Timmins</button>
@@ -212,6 +220,7 @@
     <div class="legend-item"><div class="legend-dot" style="background:var(--full)"></div>Full</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--partial)"></div>Partial</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--empty)"></div>Gap</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--draft)"></div>Draft</div>
   </div>
 </div>
 
@@ -244,88 +253,42 @@
 <script>
 const WORKER = 'https://evacscheduling.loomex-it.workers.dev';
 
-// =============================================================
-// ROLE CATALOGUE
-// =============================================================
-const ALL_ROLES = [
-  { id: 'ic',          name: 'Incident Commander',     req: 1 },
-  { id: 'dep_ic',      name: 'Deputy IC',              req: 1 },
-  { id: 'ops_chief',   name: 'Operations Chief',       req: 1 },
-  { id: 'log_chief',   name: 'Logistics Chief',        req: 1 },
-  { id: 'fin_admin',   name: 'Finance/Admin Chief',    req: 1 },
-  { id: 'evac_coord',  name: 'Evacuee Coordinator',    req: 2 },
-  { id: 'reg_lead',    name: 'Registration Lead',      req: 2 },
-  { id: 'health_lead', name: 'Health & Wellness Lead', req: 1 },
-  { id: 'transport',   name: 'Transport Coordinator',  req: 1 },
-  { id: 'comm_lead',   name: 'Communications Lead',    req: 1 },
-  { id: 'admin',       name: 'Admin Support',          req: 2 },
-];
-
-let activeRoles = ALL_ROLES.map(r => r.id);
-
-// =============================================================
-// STATE
-// =============================================================
-let currentUser  = null; // { email, role, cities }
+let currentUser  = null;
 let contractors  = [];
 let availability = [];
 let assignments  = [];
 let hotels       = [];
+let allRoles     = [];
+let activeRoles  = [];
+let roleReqs     = {};
 let currentSite  = 'Kingston';
 let weekOffset   = 0;
 let drawerState  = null;
-let cfJwt        = null;
 
 const BASE_DATE = new Date('2026-03-24T00:00:00');
 const TODAY_STR = new Date().toISOString().slice(0, 10);
 const DOW = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-// =============================================================
-// API HELPERS
-// =============================================================
-function getJwt() {
-  // Cloudflare Access injects this cookie automatically after login
-  const match = document.cookie.match(/CF_Authorization=([^;]+)/);
-  return match ? match[1] : '';
-}
-
 async function api(path, options = {}) {
   const res = await fetch(WORKER + path, {
     ...options,
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
   return data;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-// =============================================================
-// INIT
-// =============================================================
 async function init() {
   setLoading(true, 'Signing in...');
   try {
     currentUser = await api('/me');
     applyUserRole();
+    await loadRoles();
     await loadData();
   } catch (err) {
-    // If 401, Cloudflare Access will redirect to login automatically
     if (err.message.includes('401') || err.message.includes('Unauthorized')) {
       document.getElementById('loading-text').textContent = 'Redirecting to login...';
     } else {
@@ -340,24 +303,30 @@ function applyUserRole() {
   const pill = document.getElementById('role-pill');
   pill.textContent = currentUser.role === 'scheduler' ? 'SCHEDULER' : 'IC';
   pill.className   = 'role-pill ' + currentUser.role;
-
   if (currentUser.role === 'ic') {
-    document.getElementById('role-bar').style.display   = 'none';
-    document.getElementById('ic-banner').style.display  = 'flex';
-    // Lock tabs to allowed cities only
+    document.getElementById('role-bar').style.display  = 'none';
+    document.getElementById('ic-banner').style.display = 'flex';
     ['Kingston','Kapuskasing','Timmins'].forEach(city => {
       const tab = document.getElementById('tab-' + city);
-      if (!currentUser.cities.includes(city)) {
-        tab.disabled = true;
-      }
+      if (tab && !currentUser.cities?.includes(city)) tab.disabled = true;
     });
-    // Set first allowed city
-    if (currentUser.cities.length > 0) {
+    if (currentUser.cities?.length > 0) {
       currentSite = currentUser.cities[0];
       document.querySelectorAll('.site-tab').forEach(t => t.classList.remove('active'));
-      const activeTab = document.getElementById('tab-' + currentSite);
-      if (activeTab) activeTab.classList.add('active');
+      const at = document.getElementById('tab-' + currentSite);
+      if (at) at.classList.add('active');
     }
+  }
+}
+
+async function loadRoles() {
+  try {
+    allRoles    = await api('/roles');
+    activeRoles = [...allRoles];
+    allRoles.forEach(r => { if (!roleReqs[r]) roleReqs[r] = 1; });
+    populateRolePicker();
+  } catch (err) {
+    showError('Could not load roles: ' + err.message);
   }
 }
 
@@ -367,20 +336,18 @@ async function loadData() {
     const dates = getWeekDates();
     const start = dateStr(dates[0]);
     const end   = dateStr(dates[6]);
-
-    const [ctrs, avail, assigns, htls] = await Promise.all([
-      api('/contractors'),
+    const [avail, assigns, htls] = await Promise.all([
       api(`/availability?start=${start}&end=${end}`),
       api(`/assignments?location=${encodeURIComponent(currentSite)}&start=${start}&end=${end}`),
-      api(`/hotels?city=${encodeURIComponent(currentSite)}`),
+      api(`/hotels?city=${encodeURIComponent(currentSite)}`).catch(() => []),
     ]);
-
-    contractors  = ctrs;
+    // Also load contractors if not yet loaded
+    if (contractors.length === 0) {
+      contractors = await api('/contractors');
+    }
     availability = avail;
     assignments  = assigns;
     hotels       = htls;
-
-    populateRolePicker();
     renderGrid();
     if (drawerState) renderDrawer();
   } catch (err) {
@@ -390,11 +357,13 @@ async function loadData() {
   }
 }
 
-// =============================================================
-// HELPERS
-// =============================================================
-function dateStr(d)  { return d.toISOString().slice(0, 10); }
+function dateStr(d) { return d.toISOString().slice(0, 10); }
 function isInRange(ds, s, e) { return ds >= s && ds <= e; }
+function formatDateShort(ds) {
+  if (!ds) return '-';
+  const d = new Date(ds + 'T00:00:00');
+  return `${MON[d.getMonth()]} ${d.getDate()}`;
+}
 
 function getWeekDates() {
   return Array.from({ length: 7 }, (_, i) => {
@@ -404,20 +373,50 @@ function getWeekDates() {
   });
 }
 
-function isAvailable(contractor, ds, shift) {
+function getAvailDates(contractor) {
+  const avail = availability.find(a =>
+    a.contractorRef === contractor.recordId || a.contractorRef === contractor.contractorId
+  );
+  if (!avail) return [];
+  const dates = [];
+  for (const w of avail.windows) {
+    let cur = new Date(w.start + 'T00:00:00');
+    const end = new Date(w.end + 'T00:00:00');
+    while (cur <= end) { dates.push(dateStr(cur)); cur.setDate(cur.getDate() + 1); }
+  }
+  return dates;
+}
+
+function getAssignedDates(contractorRecordId) {
+  return assignments
+    .filter(a => a.contractorRecordId === contractorRecordId)
+    .flatMap(a => {
+      const dates = [];
+      let cur = new Date(a.startDate + 'T00:00:00');
+      const end = new Date(a.endDate + 'T00:00:00');
+      while (cur <= end) { dates.push(dateStr(cur)); cur.setDate(cur.getDate() + 1); }
+      return dates;
+    });
+}
+
+function isAvailableOn(contractor, ds, shift) {
   if (shift === 'night' && !contractor.nightOk) return false;
   const avail = availability.find(a =>
-    a.contractorRef === contractor.recordId ||
-    a.contractorRef === contractor.contractorId
+    a.contractorRef === contractor.recordId || a.contractorRef === contractor.contractorId
   );
   if (!avail) return false;
   return avail.windows.some(w => isInRange(ds, w.start, w.end));
 }
 
-function getAssignedOn(site, roleId, shift, ds) {
-  const roleName = ALL_ROLES.find(r => r.id === roleId)?.name || roleId;
+function getRemainingAvailDates(contractor) {
+  const allAvail = getAvailDates(contractor);
+  const assigned = new Set(getAssignedDates(contractor.recordId));
+  return allAvail.filter(d => !assigned.has(d));
+}
+
+function getAssignedOn(site, roleName, shift, ds) {
   return assignments.filter(a =>
-    a.location    === site &&
+    a.location     === site &&
     a.roleAssigned === roleName &&
     a.shift        === (shift === 'day' ? 'Day' : 'Night') &&
     isInRange(ds, a.startDate, a.endDate)
@@ -426,56 +425,75 @@ function getAssignedOn(site, roleId, shift, ds) {
 
 function showError(msg) {
   const bar = document.getElementById('error-bar');
-  bar.textContent  = msg;
-  bar.style.display = 'block';
+  bar.textContent = msg; bar.style.display = 'block';
   setTimeout(() => { bar.style.display = 'none'; }, 7000);
 }
 
 function setLoading(on, msg = '') {
-  const el = document.getElementById('loading-overlay');
-  el.classList.toggle('hidden', !on);
+  document.getElementById('loading-overlay').classList.toggle('hidden', !on);
   if (msg) document.getElementById('loading-text').textContent = msg;
 }
 
-// =============================================================
-// ROLE PICKER (scheduler only)
-// =============================================================
 function populateRolePicker() {
   if (currentUser?.role !== 'scheduler') return;
-  const sel  = document.getElementById('role-picker');
-  const avail = ALL_ROLES.filter(r => !activeRoles.includes(r.id));
-  sel.innerHTML = avail.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
-  sel.disabled  = avail.length === 0;
+  const sel   = document.getElementById('role-picker');
+  const avail = allRoles.filter(r => !activeRoles.includes(r));
+  sel.innerHTML = avail.length
+    ? avail.map(r => `<option value="${r}">${r}</option>`).join('')
+    : '<option disabled>All roles added</option>';
+  sel.disabled = avail.length === 0;
 }
 
 function addRoleToGrid() {
   const val = document.getElementById('role-picker').value;
   if (val && !activeRoles.includes(val)) {
     activeRoles.push(val);
+    if (!roleReqs[val]) roleReqs[val] = 1;
     populateRolePicker();
     renderGrid();
   }
 }
 
-function removeRoleFromGrid(roleId) {
-  activeRoles = activeRoles.filter(id => id !== roleId);
+function removeRoleFromGrid(roleName) {
+  activeRoles = activeRoles.filter(r => r !== roleName);
   populateRolePicker();
   renderGrid();
 }
 
-// =============================================================
-// RENDER GRID
-// =============================================================
+function updateReq(roleName, val) {
+  const n = parseInt(val);
+  if (!isNaN(n) && n > 0) { roleReqs[roleName] = n; renderGrid(); }
+}
+
+function toggleReqEdit(roleName, shift) {
+  if (currentUser?.role !== 'scheduler') return;
+  const id = CSS.escape(`req-input-${roleName}-${shift}`);
+  const lid = CSS.escape(`req-label-${roleName}-${shift}`);
+  const input = document.getElementById(`req-input-${roleName}-${shift}`);
+  const label = document.getElementById(`req-label-${roleName}-${shift}`);
+  if (!input || !label) return;
+  label.style.display = 'none';
+  input.style.display = 'inline-block';
+  input.focus(); input.select();
+}
+
+function hideReqEdit(roleName, shift) {
+  const input = document.getElementById(`req-input-${roleName}-${shift}`);
+  const label = document.getElementById(`req-label-${roleName}-${shift}`);
+  if (!input || !label) return;
+  label.textContent   = `Req: ${roleReqs[roleName] || 1}/shift`;
+  label.style.display = 'inline';
+  input.style.display = 'none';
+}
+
 function renderGrid() {
-  const dates  = getWeekDates();
+  const dates = getWeekDates();
   const d0 = dates[0], d6 = dates[6];
   document.getElementById('week-label').textContent =
     `${MON[d0.getMonth()].toUpperCase()} ${d0.getDate()} \u2013 ${MON[d6.getMonth()].toUpperCase()} ${d6.getDate()}, ${d6.getFullYear()}`;
 
-  const roles     = activeRoles.map(id => ALL_ROLES.find(r => r.id === id)).filter(Boolean);
   const isIC      = currentUser?.role === 'ic';
   const cellClass = isIC ? 'slot-cell readonly' : 'slot-cell';
-  const clickFn   = (roleId, ds, shift) => isIC ? `openDrawerIC('${roleId}','${ds}','${shift}')` : `openDrawer('${roleId}','${ds}','${shift}')`;
 
   let html = '<thead><tr>';
   html += `<th class="role-header-cell role-col">POSITION</th>`;
@@ -489,7 +507,7 @@ function renderGrid() {
   }
   html += '</tr></thead><tbody>';
 
-  let total = 0, filled = 0, gaps = 0;
+  let total = 0, filled = 0, gaps = 0, drafts = 0;
 
   for (const shift of ['day', 'night']) {
     html += `<tr class="shift-section-row ${shift}-section">
@@ -498,39 +516,55 @@ function renderGrid() {
       </td>
     </tr>`;
 
-    for (const role of roles) {
+    for (const roleName of activeRoles) {
+      const req      = roleReqs[roleName] || 1;
+      const rId      = roleName.replace(/[^a-zA-Z0-9]/g, '_');
+      const clickFn  = isIC
+        ? `openDrawerIC(this.dataset.role, this.dataset.date, this.dataset.shift)`
+        : `openDrawer(this.dataset.role, this.dataset.date, this.dataset.shift)`;
+
       html += '<tr>';
       html += `<td class="role-col">
         <div class="role-cell-inner ${shift}-row">
-          <div class="role-name-wrap">
-            <span class="role-name">${role.name}</span>
-            <span class="role-req">Req: ${role.req}/shift</span>
+          <div class="role-name-wrap" onclick="toggleReqEdit(${JSON.stringify(roleName)},${JSON.stringify(shift)})">
+            <span class="role-name">${roleName}</span>
+            <div class="role-req">
+              <span id="req-label-${rId}-${shift}">Req: ${req}/shift</span>
+              <input type="number" id="req-input-${rId}-${shift}" class="req-edit" value="${req}" min="1" max="20"
+                style="display:none"
+                onchange="updateReq(${JSON.stringify(roleName)}, this.value)"
+                onblur="hideReqEdit(${JSON.stringify(rId)},${JSON.stringify(shift)})"
+                onclick="event.stopPropagation()">
+            </div>
           </div>
-          ${!isIC ? `<button class="remove-role-btn" onclick="removeRoleFromGrid('${role.id}')" title="Remove">&#215;</button>` : ''}
+          ${!isIC ? `<button class="remove-role-btn" onclick="removeRoleFromGrid(${JSON.stringify(roleName)})" title="Remove">&#215;</button>` : ''}
         </div>
       </td>`;
 
       for (const d of dates) {
-        const ds       = dateStr(d);
-        const assigned = getAssignedOn(currentSite, role.id, shift, ds);
-        const count    = assigned.length;
-        const req      = role.req;
+        const ds         = dateStr(d);
+        const assigned   = getAssignedOn(currentSite, roleName, shift, ds);
+        const count      = assigned.length;
+        const draftCount = assigned.filter(a => !a.confirmed).length;
         total++;
         if (count >= req) filled++;
         else if (count === 0) gaps++;
+        if (draftCount > 0) drafts++;
         const status = count >= req ? 'full' : count > 0 ? 'partial' : 'empty';
         const label  = count >= req ? 'staffed' : count > 0 ? 'partial' : 'gap';
 
-        html += `<td class="${cellClass}" onclick="${clickFn(role.id, ds, shift)}">
+        html += `<td class="${cellClass}" data-role="${roleName.replace(/"/g,'&quot;')}" data-date="${ds}" data-shift="${shift}" onclick="${clickFn}">
           <div class="slot-inner ${status}">
             <span class="slot-count">${count}/${req}</span>
             <span class="slot-label">${label}</span>
+            ${draftCount > 0 ? `<span class="slot-draft-indicator">${draftCount} draft</span>` : ''}
           </div>
         </td>`;
       }
       html += '</tr>';
     }
   }
+
   html += '</tbody>';
   document.getElementById('sched-grid').innerHTML = html;
 
@@ -539,17 +573,13 @@ function renderGrid() {
     <div class="summary-item"><div class="summary-dot" style="background:var(--full)"></div>${filled} fully staffed</div>
     <div class="summary-item"><div class="summary-dot" style="background:var(--partial)"></div>${partial} partial</div>
     <div class="summary-item"><div class="summary-dot" style="background:var(--empty)"></div>${gaps} gaps</div>
-    <div class="summary-item" style="margin-left:auto;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text-muted)">
-      ${currentSite} &nbsp;|&nbsp; ${roles.length} positions
-    </div>
+    <div class="summary-item"><div class="summary-dot" style="background:var(--draft)"></div>${drafts} with drafts</div>
+    <div class="summary-item" style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-muted)">${currentSite} &nbsp;|&nbsp; ${activeRoles.length} positions</div>
   `;
 }
 
-// =============================================================
-// SCHEDULER DRAWER
-// =============================================================
-function openDrawer(roleId, ds, shift) {
-  drawerState = { roleId, dateStr: ds, shift };
+function openDrawer(roleName, ds, shift) {
+  drawerState = { roleName, dateStr: ds, shift };
   renderDrawer();
   document.getElementById('drawer').classList.add('open');
   document.getElementById('drawer-overlay').classList.add('open');
@@ -557,42 +587,64 @@ function openDrawer(roleId, ds, shift) {
 
 function renderDrawer() {
   if (!drawerState) return;
-  const { roleId, dateStr: ds, shift } = drawerState;
-  const role   = ALL_ROLES.find(r => r.id === roleId);
-  const d      = new Date(ds + 'T00:00:00');
+  const { roleName, dateStr: ds, shift } = drawerState;
+  const d   = new Date(ds + 'T00:00:00');
+  const req = roleReqs[roleName] || 1;
 
-  document.getElementById('drawer-title').textContent = role.name;
+  document.getElementById('drawer-title').textContent = roleName;
   document.getElementById('drawer-meta').innerHTML = `
     <span>${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}</span>
     <span class="shift-badge ${shift}">${shift.toUpperCase()} SHIFT</span>
     <span class="site-badge">${currentSite}</span>
   `;
 
-  const assignedRecs = getAssignedOn(currentSite, roleId, shift, ds);
-  const assignedIds  = assignedRecs.map(a => a.contractorRecordId);
-  const availCtrs    = contractors.filter(c =>
-    isAvailable(c, ds, shift) && !assignedIds.includes(c.recordId)
-  );
+  const assignedRecs = getAssignedOn(currentSite, roleName, shift, ds);
+  const assignedIds  = new Set(assignedRecs.map(a => a.contractorRecordId));
 
-  let html = `<div class="drawer-section-label">Assigned (${assignedRecs.length}/${role.req})</div>`;
+  const availCtrs = contractors.filter(c => {
+    if (!isAvailableOn(c, ds, shift)) return false;
+    if (assignedIds.has(c.recordId)) return false;
+    const assignedDates = new Set(getAssignedDates(c.recordId));
+    return !assignedDates.has(ds);
+  });
+
+  let html = `<div class="drawer-section-label">Assigned (${assignedRecs.length}/${req})</div>`;
+
   if (assignedRecs.length === 0) {
     html += `<div class="empty-state">No one assigned</div>`;
   } else {
     for (const rec of assignedRecs) {
-      const c = contractors.find(x => x.recordId === rec.contractorRecordId);
+      const c         = contractors.find(x => x.recordId === rec.contractorRecordId);
       if (!c) continue;
-      const hotelLabel = rec.hotel ? `<span class="role-tag">&#127968; ${rec.hotel}</span>` : '';
-      html += `<div class="person-row assigned">
-        <div class="avatar">${c.initials}</div>
-        <div class="person-info">
-          <div class="person-name">${c.name}</div>
-          <div class="person-sub">
-            <span class="role-tag">${c.contractorRole || '-'}</span>
-            ${c.nightOk ? '<span class="night-badge">NIGHTS OK</span>' : ''}
-            ${hotelLabel}
+      const remaining = getRemainingAvailDates(c);
+      const isDraft   = !rec.confirmed;
+      const rid       = rec.recordId;
+
+      html += `<div class="assigned-card ${isDraft ? 'draft' : ''}">
+        <div class="assigned-card-top">
+          <div class="avatar">${c.initials}</div>
+          <div style="flex:1;min-width:0">
+            <div class="assigned-name">${c.name}</div>
+            <div class="assigned-sub">
+              ${c.contractorRole ? `<span class="role-tag">${c.contractorRole.split(',')[0].trim()}</span>` : ''}
+              ${isDraft ? '<span class="draft-badge">DRAFT</span>' : '<span class="confirmed-badge">CONFIRMED</span>'}
+              ${c.nightOk ? '<span class="night-badge">NIGHTS OK</span>' : ''}
+            </div>
           </div>
         </div>
-        <button class="remove-btn" onclick="doRemove('${rec.recordId}', this)">Remove</button>
+        <div class="avail-windows">
+          Deployed: <strong>${formatDateShort(rec.startDate)} &rarr; ${formatDateShort(rec.endDate)}</strong>
+          ${remaining.length > 0 ? `&nbsp;&nbsp;<span class="avail-remaining">&#9650; ${remaining.length} day${remaining.length !== 1 ? 's' : ''} still available</span>` : ''}
+        </div>
+        <div class="date-range-editor">
+          <div><label>Start Date</label><input type="date" id="start-${rid}" value="${rec.startDate}"></div>
+          <div><label>End Date</label><input type="date" id="end-${rid}" value="${rec.endDate}"></div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-navy" onclick="saveRange('${rid}',this)">Save Dates</button>
+          ${isDraft ? `<button class="btn btn-confirm" onclick="confirmAssignment('${rid}',this)">&#10003; Confirm</button>` : ''}
+          <button class="btn btn-outline" onclick="doRemove('${rid}',this)">Remove</button>
+        </div>
       </div>`;
     }
   }
@@ -602,18 +654,22 @@ function renderDrawer() {
     html += `<div class="empty-state">No contractors available for this date${shift === 'night' ? '/shift' : ''}</div>`;
   } else {
     for (const c of availCtrs) {
-      const hotelOpts = hotels.map(h => `<option value="${h.name}">${h.name}</option>`).join('');
-      html += `<div class="person-row" id="avrow-${c.recordId}">
+      const avail  = availability.find(a => a.contractorRef === c.recordId || a.contractorRef === c.contractorId);
+      const window = avail?.windows.find(w => isInRange(ds, w.start, w.end));
+      const remaining = getRemainingAvailDates(c);
+
+      html += `<div class="person-row">
         <div class="avatar">${c.initials}</div>
         <div class="person-info">
           <div class="person-name">${c.name}</div>
           <div class="person-sub">
-            <span class="role-tag">${c.contractorRole || '-'}</span>
-            ${c.nightOk ? '<span class="night-badge">NIGHTS OK</span>' : '<span style="color:var(--text-muted);font-size:10px">Day only</span>'}
+            ${c.contractorRole ? `<span class="role-tag">${c.contractorRole.split(',')[0].trim()}</span>` : ''}
+            ${c.nightOk ? '<span class="night-badge">NIGHTS OK</span>' : '<span style="color:var(--text-muted)">Day only</span>'}
+            ${window ? `<span class="avail-range-tag">${formatDateShort(window.start)}&ndash;${formatDateShort(window.end)}</span>` : ''}
+            ${remaining.length > 0 ? `<span style="color:var(--text-dim);font-size:10px">${remaining.length}d avail</span>` : ''}
           </div>
-          ${hotels.length > 0 ? `<select class="inline-select" id="hotel-${c.recordId}" style="margin-top:5px;max-width:200px"><option value="">Hotel (optional)</option>${hotelOpts}</select>` : ''}
         </div>
-        <button class="assign-btn" onclick="doAssign('${c.recordId}', this)">Assign</button>
+        <button class="btn btn-green" onclick="doAssign('${c.recordId}','${window?.start || ds}','${window?.end || ds}',this)">Assign</button>
       </div>`;
     }
   }
@@ -621,37 +677,28 @@ function renderDrawer() {
   document.getElementById('drawer-body').innerHTML = html;
 }
 
-async function doAssign(contractorRecordId, btn) {
+async function doAssign(contractorRecordId, autoStart, autoEnd, btn) {
   btn.disabled = true; btn.textContent = '...';
-  const { roleId, dateStr: ds, shift } = drawerState;
-  const roleName  = ALL_ROLES.find(r => r.id === roleId)?.name || roleId;
-  const hotelSel  = document.getElementById(`hotel-${contractorRecordId}`);
-  const hotel     = hotelSel ? hotelSel.value : '';
-
+  const { roleName, dateStr: ds, shift } = drawerState;
   try {
     const result = await api('/assignments', {
       method: 'POST',
       body: JSON.stringify({
         contractorRecordId,
-        location:    currentSite,
-        startDate:   ds,
-        endDate:     ds,
+        location:     currentSite,
+        startDate:    autoStart,
+        endDate:      autoEnd,
         roleAssigned: roleName,
         shift:        shift === 'day' ? 'Day' : 'Night',
-        hotel,
       }),
     });
     assignments.push({
-      recordId:           result.id,
-      contractorRecordId,
-      location:           currentSite,
-      startDate:          ds,
-      endDate:            ds,
-      roleAssigned:       roleName,
-      shift:              shift === 'day' ? 'Day' : 'Night',
-      hotel,
-      status:             'Active',
-      confirmed:          false,
+      recordId: result.id, contractorRecordId,
+      location: currentSite, startDate: autoStart, endDate: autoEnd,
+      roleAssigned: roleName, shift: shift === 'day' ? 'Day' : 'Night',
+      status: 'Draft', confirmed: false,
+      hotel: '', travelRequired: false, travelArrival: '',
+      travelDeparture: '', travelBooked: false, bookingReference: '', travelNotes: '',
     });
     renderDrawer();
     renderGrid();
@@ -661,11 +708,46 @@ async function doAssign(contractorRecordId, btn) {
   }
 }
 
-async function doRemove(assignmentRecordId, btn) {
+async function saveRange(rid, btn) {
+  btn.disabled = true; btn.textContent = '...';
+  const startDate = document.getElementById('start-' + rid)?.value;
+  const endDate   = document.getElementById('end-'   + rid)?.value;
+  if (!startDate || !endDate) { btn.disabled = false; btn.textContent = 'Save Dates'; return; }
+  try {
+    await api(`/assignments/${rid}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ startDate, endDate, location: currentSite }),
+    });
+    const rec = assignments.find(a => a.recordId === rid);
+    if (rec) { rec.startDate = startDate; rec.endDate = endDate; }
+    btn.innerHTML = 'Saved &#10003;';
+    setTimeout(() => { btn.disabled = false; btn.innerHTML = 'Save Dates'; }, 1500);
+    renderGrid();
+  } catch (err) {
+    showError('Save failed: ' + err.message);
+    btn.disabled = false; btn.textContent = 'Save Dates';
+  }
+}
+
+async function confirmAssignment(rid, btn) {
   btn.disabled = true; btn.textContent = '...';
   try {
-    await api(`/assignments/${assignmentRecordId}`, { method: 'DELETE' });
-    assignments = assignments.filter(a => a.recordId !== assignmentRecordId);
+    await api(`/assignments/${rid}/confirm`, { method: 'POST' });
+    const rec = assignments.find(a => a.recordId === rid);
+    if (rec) { rec.confirmed = true; rec.status = 'Active'; }
+    renderDrawer();
+    renderGrid();
+  } catch (err) {
+    showError('Confirm failed: ' + err.message);
+    btn.disabled = false; btn.innerHTML = '&#10003; Confirm';
+  }
+}
+
+async function doRemove(rid, btn) {
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    await api(`/assignments/${rid}`, { method: 'DELETE' });
+    assignments = assignments.filter(a => a.recordId !== rid);
     renderDrawer();
     renderGrid();
   } catch (err) {
@@ -674,116 +756,79 @@ async function doRemove(assignmentRecordId, btn) {
   }
 }
 
-// =============================================================
-// IC DRAWER (read-only + hotel/role edits)
-// =============================================================
-function openDrawerIC(roleId, ds, shift) {
-  drawerState = { roleId, dateStr: ds, shift };
+function openDrawerIC(roleName, ds, shift) {
+  drawerState = { roleName, dateStr: ds, shift };
   renderDrawerIC();
   document.getElementById('drawer').classList.add('open');
   document.getElementById('drawer-overlay').classList.add('open');
 }
 
 function renderDrawerIC() {
-  const { roleId, dateStr: ds, shift } = drawerState;
-  const role  = ALL_ROLES.find(r => r.id === roleId);
-  const d     = new Date(ds + 'T00:00:00');
+  const { roleName, dateStr: ds, shift } = drawerState;
+  const d   = new Date(ds + 'T00:00:00');
+  const req = roleReqs[roleName] || 1;
 
-  document.getElementById('drawer-title').textContent = role.name;
+  document.getElementById('drawer-title').textContent = roleName;
   document.getElementById('drawer-meta').innerHTML = `
     <span>${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}</span>
     <span class="shift-badge ${shift}">${shift.toUpperCase()} SHIFT</span>
     <span class="site-badge">${currentSite}</span>
   `;
 
-  const assignedRecs = getAssignedOn(currentSite, roleId, shift, ds);
-  let html = `<div class="drawer-section-label">Assigned (${assignedRecs.length}/${role.req})</div>`;
+  const assignedRecs = getAssignedOn(currentSite, roleName, shift, ds);
+  const roleOpts     = allRoles.map(r => `<option value="${r}">${r}</option>`).join('');
+  const hotelOpts    = hotels.map(h => `<option value="${h.name}">${h.name}</option>`).join('');
 
+  let html = `<div class="drawer-section-label">Assigned (${assignedRecs.length}/${req})</div>`;
   if (assignedRecs.length === 0) {
     html += `<div class="empty-state">No one assigned to this slot</div>`;
   } else {
-    const roleOpts  = ALL_ROLES.map(r => `<option value="${r.name}">${r.name}</option>`).join('');
-    const hotelOpts = hotels.map(h => `<option value="${h.name}">${h.name}</option>`).join('');
-
     for (const rec of assignedRecs) {
       const c = contractors.find(x => x.recordId === rec.contractorRecordId);
       if (!c) continue;
       html += `<div class="detail-card">
         <div class="detail-card-name">
-          <div class="avatar" style="width:26px;height:26px;font-size:9px">${c.initials}</div>
+          <div class="avatar" style="width:28px;height:28px;font-size:10px">${c.initials}</div>
           ${c.name}
+          ${rec.confirmed ? '<span class="confirmed-badge">CONFIRMED</span>' : '<span class="draft-badge">DRAFT</span>'}
         </div>
         <div class="detail-grid">
-          <div class="detail-field">
-            <span class="detail-label">Phone</span>
-            <span class="detail-value">${c.phone ? `<a href="tel:${c.phone}">${c.phone}</a>` : '<span class="empty">-</span>'}</span>
-          </div>
-          <div class="detail-field">
-            <span class="detail-label">Email</span>
-            <span class="detail-value">${c.email ? `<a href="mailto:${c.email}">${c.email}</a>` : '<span class="empty">-</span>'}</span>
-          </div>
-          <div class="detail-field">
-            <span class="detail-label">Travel Arrival</span>
-            <span class="detail-value ${rec.travelArrival ? '' : 'empty'}">${rec.travelArrival || '-'}</span>
-          </div>
-          <div class="detail-field">
-            <span class="detail-label">Travel Departure</span>
-            <span class="detail-value ${rec.travelDeparture ? '' : 'empty'}">${rec.travelDeparture || '-'}</span>
-          </div>
-          <div class="detail-field">
-            <span class="detail-label">Booking Ref</span>
-            <span class="detail-value ${rec.bookingReference ? '' : 'empty'}">${rec.bookingReference || '-'}</span>
-          </div>
-          <div class="detail-field">
-            <span class="detail-label">Travel Booked</span>
-            <span class="detail-value">${rec.travelBooked ? '&#10003; Yes' : 'No'}</span>
-          </div>
-          ${rec.travelNotes ? `<div class="detail-field" style="grid-column:1/-1"><span class="detail-label">Travel Notes</span><span class="detail-value">${rec.travelNotes}</span></div>` : ''}
+          <div class="detail-field"><span class="detail-label">Phone</span><span class="detail-value">${c.phone ? `<a href="tel:${c.phone}">${c.phone}</a>` : '-'}</span></div>
+          <div class="detail-field"><span class="detail-label">Email</span><span class="detail-value">${c.email ? `<a href="mailto:${c.email}">${c.email}</a>` : '-'}</span></div>
+          <div class="detail-field"><span class="detail-label">Travel Arrival</span><span class="detail-value">${rec.travelArrival || '-'}</span></div>
+          <div class="detail-field"><span class="detail-label">Departure</span><span class="detail-value">${rec.travelDeparture || '-'}</span></div>
+          <div class="detail-field"><span class="detail-label">Booking Ref</span><span class="detail-value">${rec.bookingReference || '-'}</span></div>
+          <div class="detail-field"><span class="detail-label">Travel Booked</span><span class="detail-value">${rec.travelBooked ? '&#10003; Yes' : 'No'}</span></div>
         </div>
         <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div>
-            <span class="detail-label">Hotel</span>
-            <select class="inline-select" id="ic-hotel-${rec.recordId}">
-              <option value="">Not set</option>${hotelOpts}
-            </select>
-          </div>
-          <div>
-            <span class="detail-label">Role Assigned</span>
-            <select class="inline-select" id="ic-role-${rec.recordId}">
-              ${roleOpts}
-            </select>
-          </div>
+          <div><span class="detail-label">Hotel</span><select class="inline-select" id="ic-hotel-${rec.recordId}"><option value="">Not set</option>${hotelOpts}</select></div>
+          <div><span class="detail-label">Role Assigned</span><select class="inline-select" id="ic-role-${rec.recordId}">${roleOpts}</select></div>
         </div>
-        <button class="save-btn" onclick="doICEdit('${rec.recordId}', this)">Save Changes</button>
+        <div style="margin-top:10px"><button class="btn btn-green" onclick="doICEdit('${rec.recordId}',this)">Save Changes</button></div>
       </div>`;
-
-      // Set current values after render (deferred)
       setTimeout(() => {
-        const hs = document.getElementById(`ic-hotel-${rec.recordId}`);
-        const rs = document.getElementById(`ic-role-${rec.recordId}`);
-        if (hs && rec.hotel) hs.value = rec.hotel;
+        const hs = document.getElementById('ic-hotel-' + rec.recordId);
+        const rs = document.getElementById('ic-role-'  + rec.recordId);
+        if (hs && rec.hotel)        hs.value = rec.hotel;
         if (rs && rec.roleAssigned) rs.value = rec.roleAssigned;
       }, 0);
     }
   }
-
   document.getElementById('drawer-body').innerHTML = html;
 }
 
-async function doICEdit(assignmentRecordId, btn) {
+async function doICEdit(rid, btn) {
   btn.disabled = true; btn.textContent = 'Saving...';
-  const hotel       = document.getElementById(`ic-hotel-${assignmentRecordId}`)?.value || '';
-  const roleAssigned = document.getElementById(`ic-role-${assignmentRecordId}`)?.value || '';
-
+  const hotel        = document.getElementById('ic-hotel-' + rid)?.value || '';
+  const roleAssigned = document.getElementById('ic-role-'  + rid)?.value || '';
   try {
-    await api(`/assignments/${assignmentRecordId}`, {
+    await api(`/assignments/${rid}`, {
       method: 'PATCH',
       body: JSON.stringify({ hotel, roleAssigned, location: currentSite }),
     });
-    // Update local state
-    const rec = assignments.find(a => a.recordId === assignmentRecordId);
+    const rec = assignments.find(a => a.recordId === rid);
     if (rec) { rec.hotel = hotel; rec.roleAssigned = roleAssigned; }
-    btn.textContent = 'Saved &#10003;';
+    btn.innerHTML = 'Saved &#10003;';
     setTimeout(() => { btn.disabled = false; btn.innerHTML = 'Save Changes'; }, 2000);
   } catch (err) {
     showError('Save failed: ' + err.message);
@@ -791,17 +836,11 @@ async function doICEdit(assignmentRecordId, btn) {
   }
 }
 
-// =============================================================
-// SHARED DRAWER CLOSE
-// =============================================================
 function closeDrawer() {
   document.getElementById('drawer').classList.remove('open');
   document.getElementById('drawer-overlay').classList.remove('open');
 }
 
-// =============================================================
-// CONTROLS
-// =============================================================
 function setSite(site, btn) {
   currentSite = site;
   document.querySelectorAll('.site-tab').forEach(b => b.classList.remove('active'));
@@ -809,14 +848,8 @@ function setSite(site, btn) {
   loadData();
 }
 
-function shiftWeek(delta) {
-  weekOffset += delta;
-  loadData();
-}
+function shiftWeek(delta) { weekOffset += delta; loadData(); }
 
-// =============================================================
-// START
-// =============================================================
 init();
 </script>
 </body>
