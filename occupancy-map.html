@@ -200,6 +200,8 @@
     clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
     transition: opacity 0.2s;
   }
+  /* Cards on clickable (host) pins pass clicks through to the pin handler */
+  .site-pin.clickable .pin-card { pointer-events: all; cursor: pointer; }
   /* Card opens ABOVE the pin */
   .pin-card.above {
     left: 50%; top: auto;
@@ -428,6 +430,57 @@
   .btn-save:hover { background:var(--teal-400); }
   .btn-cancel { background:transparent; border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.5); font-family:'Epilogue',sans-serif; font-size:0.875rem; font-weight:700; text-transform:uppercase; padding:0.75rem 1.25rem; border-radius:6px; cursor:pointer; transition:all 0.2s; }
   .btn-cancel:hover { border-color:rgba(255,255,255,0.3); color:#fff; }
+
+  /* ── HOTEL BREAKDOWN MODAL ── */
+  .hotel-modal-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.8); z-index:150;
+    backdrop-filter:blur(8px);
+    align-items:center; justify-content:center;
+  }
+  .hotel-modal-overlay.open { display:flex; }
+  .hotel-modal {
+    background:var(--navy-800);
+    border:1px solid rgba(255,255,255,0.1);
+    border-top:3px solid var(--teal-500);
+    border-radius:10px; padding:1.5rem;
+    width:520px; max-width:96vw; max-height:90vh; overflow-y:auto;
+  }
+  .hotel-modal::-webkit-scrollbar { width:4px; }
+  .hotel-modal::-webkit-scrollbar-thumb { background:rgba(47,152,121,0.3); border-radius:2px; }
+  .hotel-modal-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:1.25rem; }
+  .hotel-modal-title { font-family:'Epilogue',sans-serif; font-size:1.1rem; font-weight:900; text-transform:uppercase; letter-spacing:-0.01em; color:#fff; }
+  .hotel-modal-sub { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:rgba(255,255,255,0.35); letter-spacing:0.08em; text-transform:uppercase; margin-top:3px; }
+  .hotel-modal-close { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.5); width:28px; height:28px; border-radius:4px; cursor:pointer; font-size:14px; flex-shrink:0; transition:all 0.2s; display:flex; align-items:center; justify-content:center; }
+  .hotel-modal-close:hover { background:rgba(255,255,255,0.12); color:#fff; }
+  .hotel-section-label { font-family:'Epilogue',sans-serif; font-size:0.65rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:0.5rem; padding-bottom:0.4rem; border-bottom:1px solid rgba(255,255,255,0.06); }
+  .hotel-row {
+    display:grid; grid-template-columns:1fr auto auto;
+    align-items:center; gap:0.75rem;
+    padding:0.6rem 0.75rem;
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:6px; margin-bottom:0.4rem;
+  }
+  .hotel-row-name { font-family:'Epilogue',sans-serif; font-size:0.85rem; font-weight:700; color:#fff; }
+  .hotel-row-bar { margin-top:4px; height:3px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden; }
+  .hotel-row-bar-fill { height:100%; border-radius:2px; }
+  .hotel-row-count { font-family:'JetBrains Mono',monospace; font-size:1.1rem; font-weight:700; color:var(--host-green); text-align:right; white-space:nowrap; }
+  .hotel-row-cap { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:rgba(255,255,255,0.35); text-align:right; white-space:nowrap; }
+  .hotel-modal-loomi { display:flex; align-items:center; gap:6px; margin-top:1rem; padding-top:0.75rem; border-top:1px solid rgba(255,255,255,0.06); }
+  .hotel-modal-loomi-badge { font-family:'JetBrains Mono',monospace; font-size:0.58rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:2px 6px; border-radius:3px; background:rgba(47,152,121,0.1); border:1px solid rgba(47,152,121,0.2); color:rgba(47,152,121,0.5); }
+  .hotel-modal-loomi-text { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:rgba(255,255,255,0.2); }
+  /* Drill-down cursor on clickable pins */
+  .site-pin.clickable { cursor:pointer; }
+  .site-pin.clickable .pin-dot::after { border-color:rgba(255,255,255,0.25); }
+  .pin-drill { font-size:8px; font-family:'JetBrains Mono',monospace; color:rgba(255,255,255,0.35); letter-spacing:0.04em; margin-top:3px; }
+  /* Hotel sub-rows in admin modal */
+  .hotel-admin-section { margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid rgba(255,255,255,0.06); }
+  .hotel-admin-label { font-size:0.58rem; font-weight:600; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem; font-family:'JetBrains Mono',monospace; }
+  .hotel-admin-row { display:grid; grid-template-columns:1fr 90px 90px; gap:0.4rem; align-items:center; margin-bottom:0.35rem; }
+  .hotel-admin-name { font-size:0.75rem; color:rgba(255,255,255,0.6); font-family:'DM Sans',sans-serif; padding-left:2px; }
+  .form-input-sm { width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:4px; color:#fff; font-family:'JetBrains Mono',monospace; font-size:0.8rem; padding:5px 8px; outline:none; transition:border-color 0.2s; }
+  .form-input-sm:focus { border-color:var(--teal-500); }
 </style>
 </head>
 <body>
@@ -505,9 +558,25 @@
   </div>
 </div>
 
+<!-- ── HOTEL BREAKDOWN MODAL ── -->
+<div class="hotel-modal-overlay" id="hotel-modal">
+  <div class="hotel-modal">
+    <div class="hotel-modal-header">
+      <div>
+        <div class="hotel-modal-title" id="hotel-modal-title">Site Breakdown</div>
+        <div class="hotel-modal-sub" id="hotel-modal-sub">Occupancy by Property</div>
+      </div>
+      <button class="hotel-modal-close" onclick="closeHotelModal()">✕</button>
+    </div>
+    <div id="hotel-modal-body"></div>
+    <div class="hotel-modal-loomi">
+      <span class="hotel-modal-loomi-badge">LOOMI</span>
+      <span class="hotel-modal-loomi-text">Manual entry — will sync from LOOMI / SharePoint Evacuees list when integrated</span>
+    </div>
+  </div>
+</div>
 <script>
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// SITE DATA — edit x/y (0–100) to reposition pins
 // x = left-to-right %, y = top-to-bottom %
 // To add a new Loomex host site:
 //   { id:'cityname', name:'City Name', type:'host', count:0, capacity:0, phone:'705-000-0000', x:00.0, y:00.0 }
@@ -532,7 +601,7 @@ const sites = [
     count: 0, capacity: 0,
     phone: '705-740-3989',
     x: 47.0, y: 46.0,
-    cardDir: 'right'
+    cardDir: 'below'
   },
   {
     id: 'kingston', name: 'Kingston', type: 'host-kingston',
@@ -549,23 +618,57 @@ const sites = [
   {
     id: 'niagara-falls', name: 'Niagara Falls', type: 'partner',
     phone: '519-791-9088',
-    x: 56.0, y: 69.0,
+    x: 62.0, y: 74.0,
     cardDir: 'left'
   },
   {
     id: 'cochrane', name: 'Cochrane', type: 'partner',
     phone: '705-272-6758',
-    x: 43.0, y: 42.0,
-    cardDir: 'above'
+    x: 50.0, y: 35.0,
+    cardDir: 'left'
   }
 ];
 
-let lastUpdated = null;
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// HOTEL / PROPERTY DATA
+// Totals are independent of these — staff enter both separately.
+// To rename a hotel: update the 'name' field below.
+// To add a property: copy a row and give it a unique id.
+//
+// LOOMI INTEGRATION PATH (when ready):
+//   1. Power Automate aggregates SharePoint Evacuees list by PropertyName + SiteID
+//   2. Pushes to this JSONBin via Cloudflare Worker (or directly)
+//   3. Replace hotels block in loadFromBin() with:
+//      const hotelRes = await fetch('https://your-worker.workers.dev/kash-hotels');
+//      mergeHotels(await hotelRes.json());
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const hotels = {
+  kapuskasing: [
+    { id: 'kap-1', name: 'Hotel 1', count: 0, capacity: 0 },
+    { id: 'kap-2', name: 'Hotel 2', count: 0, capacity: 0 },
+    { id: 'kap-3', name: 'Hotel 3', count: 0, capacity: 0 },
+    { id: 'kap-4', name: 'Hotel 4', count: 0, capacity: 0 },
+    { id: 'kap-5', name: 'Hotel 5', count: 0, capacity: 0 },
+  ],
+  timmins: [
+    { id: 'tim-1', name: 'Hotel 1', count: 0, capacity: 0 },
+    { id: 'tim-2', name: 'Hotel 2', count: 0, capacity: 0 },
+    { id: 'tim-3', name: 'Hotel 3', count: 0, capacity: 0 },
+    { id: 'tim-4', name: 'Hotel 4', count: 0, capacity: 0 },
+  ],
+  kingston: [
+    { id: 'kin-1', name: 'DoubleTree', count: 0, capacity: 0 },
+    { id: 'kin-2', name: 'Home2Suites', count: 0, capacity: 0 },
+  ],
+  'kingston-west': [
+    { id: 'kinw-1', name: 'Quality Inn', count: 0, capacity: 0 },
+  ],
+};
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // JSONBIN CONFIG
 const BIN_ID  = '69a09bfdd0ea881f40dca468';
-const API_KEY = '$2a$10$bhTfRtne8PNq7ihmCzHrJ.oZUTqNnrZEl.bzV0Po9Q17rMsvkU2zq';
+const API_KEY = '$2a$10$yix8gE4u8dK1HPdVeiQZauXduGGWkuQ3pkgbMl4nBVXEzbMsi2ogK';
 const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
 async function loadFromBin() {
@@ -584,6 +687,17 @@ async function loadFromBin() {
         site.capacity = saved.capacity || 0;
       }
     });
+    // Hydrate hotel data if present
+    if (data.hotels) {
+      Object.keys(data.hotels).forEach(siteId => {
+        if (hotels[siteId]) {
+          data.hotels[siteId].forEach(saved => {
+            const h = hotels[siteId].find(h => h.id === saved.id);
+            if (h) { h.count = saved.count || 0; h.capacity = saved.capacity || 0; }
+          });
+        }
+      });
+    }
     lastUpdated = data.lastUpdated || null;
     renderAll();
   } catch(e) {
@@ -595,7 +709,13 @@ async function loadFromBin() {
 async function saveToBin() {
   const payload = {
     lastUpdated: lastUpdated,
-    sites: sites.map(s => ({ id: s.id, count: s.count || 0, capacity: s.capacity || 0 }))
+    sites: sites.map(s => ({ id: s.id, count: s.count || 0, capacity: s.capacity || 0 })),
+    hotels: Object.fromEntries(
+      Object.keys(hotels).map(siteId => [
+        siteId,
+        hotels[siteId].map(h => ({ id: h.id, count: h.count || 0, capacity: h.capacity || 0 }))
+      ])
+    )
   };
   try {
     const res = await fetch(BIN_URL, {
@@ -633,12 +753,17 @@ function renderPins() {
 
     const pin = document.createElement('div');
     pin.className = 'site-pin type-' + (site.type === 'host-kingston' ? 'kingston' : site.type);
+    // Host sites are clickable for hotel breakdown
+    if (site.type === 'host' || site.type === 'host-kingston') {
+      pin.classList.add('clickable');
+      pin.addEventListener('click', () => openHotelModal(site.id));
+    }
     pin.style.left = site.x + '%';
     pin.style.top  = site.y + '%';
 
     const dir = site.cardDir || 'right';
     const cardClass = dir === 'above' ? 'above' : dir === 'below' ? 'below' : dir === 'left' ? 'left' : '';
-    const phoneHTML = site.phone ? `<a class="pin-phone" href="tel:${site.phone}">${site.phone}</a>` : '';
+    const phoneHTML = site.phone ? `<a class="pin-phone" href="tel:${site.phone}" onclick="event.stopPropagation()">${site.phone}</a>` : '';
 
     let cardHTML = '';
 
@@ -660,7 +785,7 @@ function renderPins() {
     } else if (site.type === 'host-kingston') {
       const k0 = sites.find(s => s.id === 'kingston');
       const k1 = sites.find(s => s.id === 'kingston-west');
-      const p0 = k0.phone ? `<a class="pin-dual-phone" href="tel:${k0.phone}">${k0.phone}</a>` : '';
+      const p0 = k0.phone ? `<a class="pin-dual-phone" href="tel:${k0.phone}" onclick="event.stopPropagation()">${k0.phone}</a>` : '';
       cardHTML = `
         <div class="pin-card ${cardClass}" style="border-left-color:var(--host-green);min-width:200px">
           <div class="pin-city" style="margin-bottom:5px">Kingston Area</div>
@@ -688,6 +813,7 @@ function renderPins() {
           <div class="pin-count green">${site.count.toLocaleString()}</div>
           <div class="pin-cap">${site.capacity} avail · ${pct}%</div>
           ${phoneHTML}
+          <div class="pin-drill">▸ tap for breakdown</div>
         </div>`;
     }
 
@@ -807,6 +933,68 @@ function renderTimestamp() {
 
 function renderAll() { renderPins(); renderSidebar(); renderTimestamp(); }
 
+// ── HOTEL BREAKDOWN MODAL ──
+function openHotelModal(siteId) {
+  const site = sites.find(s => s.id === siteId);
+  if (!site) return;
+
+  // Kingston pin opens breakdown for both Kingston + Kingston West
+  const isKingston = site.type === 'host-kingston';
+  const title = isKingston ? 'Kingston Area' : site.name;
+  document.getElementById('hotel-modal-title').textContent = title;
+  document.getElementById('hotel-modal-sub').textContent = 'Occupancy by Property';
+
+  const body = document.getElementById('hotel-modal-body');
+  body.innerHTML = '';
+
+  const siteIds = isKingston ? ['kingston', 'kingston-west'] : [siteId];
+
+  siteIds.forEach(sid => {
+    const s = sites.find(x => x.id === sid);
+    const props = hotels[sid];
+    if (!props || !props.length) return;
+
+    if (isKingston) {
+      const secLabel = document.createElement('div');
+      secLabel.className = 'hotel-section-label';
+      secLabel.style.marginTop = '0.75rem';
+      secLabel.textContent = s.name;
+      body.appendChild(secLabel);
+    }
+
+    props.forEach(h => {
+      const pct = (h.count + h.capacity) ? Math.min(100, Math.round(h.count / (h.count + h.capacity) * 100)) : 0;
+      const fc = pct > 85 ? '#C0392B' : pct > 60 ? '#D9860F' : '#2F9879';
+      const row = document.createElement('div');
+      row.className = 'hotel-row';
+      row.innerHTML = `
+        <div>
+          <div class="hotel-row-name">${h.name}</div>
+          <div class="hotel-row-bar"><div class="hotel-row-bar-fill" style="width:${pct}%;background:${fc};"></div></div>
+        </div>
+        <div style="text-align:right;">
+          <div class="hotel-row-count">${h.count.toLocaleString()}</div>
+          <div class="hotel-row-cap">evacuees</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="hotel-row-count" style="color:rgba(255,255,255,0.5);font-size:0.95rem;">${h.capacity}</div>
+          <div class="hotel-row-cap">avail</div>
+        </div>`;
+      body.appendChild(row);
+    });
+  });
+
+  document.getElementById('hotel-modal').classList.add('open');
+}
+
+function closeHotelModal() {
+  document.getElementById('hotel-modal').classList.remove('open');
+}
+
+document.getElementById('hotel-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeHotelModal();
+});
+
 // ── ADMIN MODAL ──
 function openAdmin() {
   const container = document.getElementById('form-blocks');
@@ -814,6 +1002,26 @@ function openAdmin() {
   sites.filter(s => s.type === 'host' || s.type === 'host-kingston').forEach(site => {
     const block = document.createElement('div');
     block.className = 'form-block';
+
+    // Hotel sub-rows for this site (if any)
+    let hotelRowsHTML = '';
+    const siteHotels = hotels[site.id];
+    if (siteHotels && siteHotels.length) {
+      const hotelInputs = siteHotels.map(h => `
+        <div class="hotel-admin-row">
+          <div class="hotel-admin-name">${h.name}</div>
+          <input class="form-input-sm" type="number" min="0" id="hc-${h.id}" value="${h.count}" placeholder="0" title="Evacuees">
+          <input class="form-input-sm" type="number" min="0" id="hk-${h.id}" value="${h.capacity}" placeholder="0" title="Available">
+        </div>`).join('');
+      hotelRowsHTML = `
+        <div class="hotel-admin-section">
+          <div class="hotel-admin-label" style="display:grid;grid-template-columns:1fr 90px 90px;gap:.4rem;margin-bottom:.25rem;">
+            <span>Property</span><span style="text-align:center;">Evacuees</span><span style="text-align:center;">Available</span>
+          </div>
+          ${hotelInputs}
+        </div>`;
+    }
+
     block.innerHTML = `
       <div class="form-block-title">
         <div class="form-block-dot" style="background:var(--host-green)"></div>
@@ -822,14 +1030,15 @@ function openAdmin() {
       </div>
       <div class="form-fields">
         <div class="form-field">
-          <label>Total Evacuees</label>
+          <label>Total Evacuees (Site)</label>
           <input class="form-input" type="number" min="0" id="fc-${site.id}" value="${site.count}" placeholder="0">
         </div>
         <div class="form-field">
-          <label>Available Capacity</label>
+          <label>Available Capacity (Site)</label>
           <input class="form-input" type="number" min="0" id="fk-${site.id}" value="${site.capacity}" placeholder="0">
         </div>
-      </div>`;
+      </div>
+      ${hotelRowsHTML}`;
     container.appendChild(block);
   });
   document.getElementById('admin-modal').classList.add('open');
@@ -843,6 +1052,16 @@ function saveAdmin() {
     const k = document.getElementById('fk-' + site.id);
     if (c) site.count    = parseInt(c.value) || 0;
     if (k) site.capacity = parseInt(k.value) || 0;
+    // Save hotel fields
+    const siteHotels = hotels[site.id];
+    if (siteHotels) {
+      siteHotels.forEach(h => {
+        const hc = document.getElementById('hc-' + h.id);
+        const hk = document.getElementById('hk-' + h.id);
+        if (hc) h.count    = parseInt(hc.value) || 0;
+        if (hk) h.capacity = parseInt(hk.value) || 0;
+      });
+    }
   });
   lastUpdated = new Date().toISOString();
   closeAdmin();
