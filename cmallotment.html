@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>CM Shopping Allotment - LOOMI</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:  #00A651;
+      --navy:   #1a3a5c;
+      --grey:   #6D6E71;
+      --warn:   #E8A317;
+    }
+
+    body { font-family: Arial, sans-serif; background: #f0f2f5; min-height: 100vh; }
+
+    /* ---- HEADER ---- */
+    .page-header {
+      background: var(--navy); color: white; padding: 14px 20px;
+      display: flex; align-items: center; gap: 12px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .logo {
+      background: var(--green); width: 34px; height: 34px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 15px; flex-shrink: 0;
+    }
+    .page-header h1 { font-size: 15px; line-height: 1.2; }
+    .hub-badge {
+      margin-left: auto; background: var(--green);
+      padding: 4px 12px; border-radius: 12px; font-size: 12px;
+      font-weight: bold; white-space: nowrap;
+    }
+
+    /* ---- SCREENS ---- */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ---- AUTH SCREEN ---- */
+    .auth-wrap {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 24px; background: var(--navy);
+    }
+    .auth-card {
+      background: white; border-radius: 12px;
+      padding: 32px 24px; width: 100%; max-width: 360px;
+    }
+    .auth-brand { text-align: center; margin-bottom: 28px; }
+    .auth-icon {
+      width: 56px; height: 56px; background: var(--green); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 22px; font-weight: bold;
+      margin: 0 auto 12px;
+    }
+    .auth-brand h2 { font-size: 18px; color: var(--navy); margin-bottom: 4px; }
+    .auth-brand p  { font-size: 13px; color: var(--grey); }
+    .auth-input {
+      width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 8px;
+      font-size: 22px; letter-spacing: 6px; text-align: center; margin-bottom: 10px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .auth-input:focus { border-color: var(--green); }
+    .auth-error { color: #c0392b; font-size: 13px; text-align: center; margin-bottom: 10px; display: none; }
+    .btn-primary {
+      width: 100%; padding: 14px; background: var(--green); color: white;
+      border: none; border-radius: 8px; font-size: 16px;
+      font-weight: bold; cursor: pointer;
+    }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ---- FORM WRAP ---- */
+    .form-wrap { max-width: 640px; margin: 0 auto; padding: 16px; }
+
+    /* ---- CARDS ---- */
+    .card {
+      background: white; border-radius: 10px; padding: 16px;
+      margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .card-title {
+      font-size: 12px; font-weight: bold; color: var(--navy);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0;
+    }
+
+    /* ---- FORM FIELDS ---- */
+    label { display: block; font-size: 12px; font-weight: bold; color: var(--grey); margin-bottom: 4px; }
+    input[type="text"], input[type="number"] {
+      width: 100%; padding: 11px 14px; border: 1.5px solid #e0e0e0;
+      border-radius: 7px; font-size: 15px; outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: var(--green); }
+
+    /* ---- STATS BAR ---- */
+    .stats-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .stat { background: #f7f7f7; border-radius: 7px; padding: 10px; text-align: center; }
+    .stat .num { font-size: 22px; font-weight: bold; color: var(--navy); }
+    .stat .lbl { font-size: 10px; color: var(--grey); text-transform: uppercase; margin-top: 2px; }
+
+    /* ---- FILTER TABS ---- */
+    .filter-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+    .filter-tab {
+      flex: 1; padding: 7px 4px; background: #f0f0f0; border: none;
+      border-radius: 6px; font-size: 12px; font-weight: bold;
+      cursor: pointer; color: #555; transition: all 0.15s;
+    }
+    .filter-tab.active { background: var(--navy); color: white; }
+
+    /* ---- SEARCH ---- */
+    .search-wrap { position: relative; margin-bottom: 10px; }
+    .search-wrap input { padding-left: 36px; }
+    .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #aaa; font-size: 15px; pointer-events: none; }
+
+    /* ---- EVACUEE LIST ---- */
+    .evacuee-list {
+      max-height: 380px; overflow-y: auto;
+      border: 1.5px solid #e8e8e8; border-radius: 8px;
+    }
+    .ev-item {
+      display: flex; align-items: center; padding: 11px 13px;
+      border-bottom: 1px solid #f0f0f0; cursor: pointer;
+      transition: background 0.12s; gap: 11px;
+    }
+    .ev-item:last-child { border-bottom: none; }
+    .ev-item.selected  { background: #e8f5ee; }
+    .ev-item.warning   { background: #fffde7; }
+    .ev-item.maxed     { opacity: 0.55; cursor: not-allowed; }
+    .ev-item:not(.maxed):hover { background: #f5fffe; }
+
+    .ev-check {
+      width: 22px; height: 22px; border: 2px solid #ccc; border-radius: 5px;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: white; transition: all 0.15s;
+    }
+    .ev-item.selected .ev-check { background: var(--green); border-color: var(--green); }
+
+    .ev-info { flex: 1; min-width: 0; }
+    .ev-name { font-size: 14px; font-weight: bold; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ev-id   { font-size: 11px; color: var(--grey); margin-top: 1px; }
+
+    /* progress bar per evacuee */
+    .ev-meter { width: 56px; flex-shrink: 0; }
+    .ev-bar { height: 5px; background: #e0e0e0; border-radius: 3px; overflow: hidden; }
+    .ev-bar-fill { height: 100%; border-radius: 3px; }
+    .fill-ok   { background: var(--green); }
+    .fill-warn { background: var(--warn); }
+    .fill-max  { background: #e74c3c; }
+    .ev-bar-amt { font-size: 10px; color: var(--grey); text-align: right; margin-top: 2px; }
+
+    .ev-badge {
+      font-size: 11px; font-weight: bold; padding: 3px 7px;
+      border-radius: 10px; flex-shrink: 0; white-space: nowrap;
+    }
+    .badge-ok   { background: #e8f5ee; color: #00A651; }
+    .badge-warn { background: #fff8e1; color: #c8810a; }
+    .badge-max  { background: #fce4e4; color: #c0392b; }
+
+    .ev-empty { text-align: center; color: var(--grey); font-size: 13px; padding: 32px 16px; }
+
+    /* ---- LINE ITEMS ---- */
+    .line-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid #f5f5f5;
+    }
+    .line-item:last-child { border-bottom: none; }
+    .line-name {
+      flex: 1; font-size: 14px; font-weight: bold; color: var(--navy);
+      min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .line-remain { font-size: 11px; color: var(--grey); flex-shrink: 0; }
+    .line-amount { width: 100px; flex-shrink: 0; }
+    .line-amount input { text-align: right; font-weight: bold; padding: 9px 10px; }
+    .line-amount input.over { border-color: #e74c3c; }
+
+    /* ---- UPLOAD ---- */
+    .upload-zone {
+      border: 2px dashed #ccc; border-radius: 8px; padding: 28px 16px;
+      text-align: center; cursor: pointer; transition: all 0.2s;
+    }
+    .upload-zone:hover, .upload-zone.drag { border-color: var(--green); background: #f0faf5; }
+    .upload-zone.has-file { border-color: var(--green); background: #e8f5ee; }
+    .upload-zone input[type="file"] { display: none; }
+    .upload-icon { font-size: 30px; margin-bottom: 6px; }
+    .upload-text { font-size: 13px; color: #555; }
+    .upload-filename { font-size: 13px; font-weight: bold; color: var(--green); margin-top: 6px; }
+
+    /* ---- PROGRESS ---- */
+    .progress-wrap {
+      display: none; background: white; border-radius: 10px;
+      padding: 20px; margin-bottom: 14px; text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .progress-wrap.active { display: block; }
+    .progress-label { font-size: 14px; color: var(--navy); margin-bottom: 10px; font-weight: bold; }
+    .progress-bar { height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.4s; }
+
+    /* ---- SUBMIT BTN ---- */
+    .submit-btn {
+      width: 100%; padding: 15px; background: var(--green); color: white;
+      border: none; border-radius: 10px; font-size: 17px;
+      font-weight: bold; cursor: pointer; margin-top: 4px;
+    }
+    .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ---- SUCCESS ---- */
+    .success-wrap { text-align: center; padding: 32px 16px; }
+    .success-icon { font-size: 52px; margin-bottom: 14px; }
+    .success-wrap h2 { color: var(--green); font-size: 22px; margin-bottom: 6px; }
+    .success-wrap p  { color: var(--grey); font-size: 14px; margin-bottom: 22px; }
+    .success-table {
+      background: #f7f7f7; border-radius: 8px; padding: 16px;
+      text-align: left; margin-bottom: 20px;
+    }
+    .success-table table { width: 100%; font-size: 13px; border-collapse: collapse; }
+    .success-table td { padding: 5px 0; }
+    .success-table td:last-child { text-align: right; font-weight: bold; color: var(--navy); }
+    .pdf-link { display: block; margin-bottom: 16px; color: var(--navy); font-size: 13px; font-weight: bold; }
+    .btn-reset {
+      width: 100%; padding: 14px; background: var(--navy); color: white;
+      border: none; border-radius: 8px; font-size: 16px;
+      font-weight: bold; cursor: pointer;
+    }
+
+    @media (max-width: 480px) {
+      .form-wrap { padding: 10px; }
+      .card { padding: 13px; }
+      .ev-meter { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ================================================================ -->
+<!-- AUTH SCREEN                                                       -->
+<!-- ================================================================ -->
+<div id="screen-auth" class="screen active">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="auth-icon">L</div>
+        <h2>CM Shopping Allotment</h2>
+        <p>Enter your hub access code to continue</p>
+      </div>
+      <input type="password" id="auth-pass" class="auth-input" placeholder="••••••••" autocomplete="off">
+      <div class="auth-error" id="auth-error">Incorrect code. Please try again.</div>
+      <button class="btn-primary" id="auth-btn" onclick="doAuth()">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- MAIN FORM SCREEN                                                  -->
+<!-- ================================================================ -->
+<div id="screen-form" class="screen">
+  <div class="page-header">
+    <div class="logo">L</div>
+    <h1>CM Shopping Allotment</h1>
+    <div class="hub-badge" id="hub-badge">-</div>
+  </div>
+
+  <div class="form-wrap">
+
+    <!-- Staff details -->
+    <div class="card">
+      <div class="card-title">Staff Details</div>
+      <label for="staff-name">Your Name</label>
+      <input type="text" id="staff-name" placeholder="Enter your full name">
+    </div>
+
+    <!-- Member selector -->
+    <div class="card">
+      <div class="card-title">Select Community Members</div>
+
+      <div class="stats-bar">
+        <div class="stat"><div class="num" id="stat-eligible">-</div><div class="lbl">Eligible</div></div>
+        <div class="stat"><div class="num" id="stat-warning">-</div><div class="lbl">Near Limit</div></div>
+        <div class="stat"><div class="num" id="stat-maxed">-</div><div class="lbl">Maxed Out</div></div>
+      </div>
+
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="setFilter('all', this)">All</button>
+        <button class="filter-tab" onclick="setFilter('eligible', this)">Eligible Only</button>
+        <button class="filter-tab" onclick="setFilter('warning', this)">Near Limit</button>
+      </div>
+
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="ev-search" placeholder="Search by name or ID..." oninput="renderEvacueeList()">
+      </div>
+
+      <div class="evacuee-list" id="evacuee-list">
+        <div class="ev-empty">Loading members...</div>
+      </div>
+    </div>
+
+    <!-- Amounts -->
+    <div class="card">
+      <div class="card-title">Purchase Amounts</div>
+      <div id="line-items">
+        <div class="ev-empty">Select members above to enter amounts</div>
+      </div>
+    </div>
+
+    <!-- Receipt upload -->
+    <div class="card">
+      <div class="card-title">Receipt</div>
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('receipt-file').click()">
+        <div class="upload-icon">📎</div>
+        <div class="upload-text">Tap to attach receipt (photo or PDF)</div>
+        <div class="upload-filename" id="upload-filename"></div>
+        <input type="file" id="receipt-file" accept="image/*,application/pdf" onchange="handleFileSelect(this)">
+      </div>
+    </div>
+
+    <!-- Progress indicator -->
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-label" id="progress-label">Uploading receipt...</div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="doSubmit()">Submit Allotment</button>
+    <div style="height: 32px;"></div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SUCCESS SCREEN                                                    -->
+<!-- ================================================================ -->
+<div id="screen-success" class="screen">
+  <div class="page-header">
+    <div class="logo">L</div>
+    <h1>CM Shopping Allotment</h1>
+    <div class="hub-badge" id="hub-badge-success">-</div>
+  </div>
+  <div class="form-wrap">
+    <div class="card">
+      <div class="success-wrap">
+        <div class="success-icon">✅</div>
+        <h2>Submission Complete</h2>
+        <p>Records saved and PDF summary generated.</p>
+        <div class="success-table" id="success-table"></div>
+        <a class="pdf-link" id="pdf-link" href="#" target="_blank" style="display:none;">View PDF Summary</a>
+        <button class="btn-reset" onclick="resetForm()">Submit Another Receipt</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- SCRIPT                                                            -->
+<!-- ================================================================ -->
+<script>
+const WORKER           = 'https://cmallotment.loomex-it.workers.dev'; // replace
+const ALLOTMENT_LIMIT  = 300;
+const WARN_THRESHOLD   = 250;
+
+let currentHub     = null;
+let evacuees       = [];
+let allotmentTotals = {}; // evacueeId -> total spent
+let selectedIds    = new Set();
+let receiptFile    = null;
+let currentFilter  = 'all';
+
+// ---- AUTH ----
+
+document.getElementById('auth-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doAuth();
+});
+
+async function doAuth() {
+  const pass = document.getElementById('auth-pass').value.trim();
+  if (!pass) return;
+  const btn = document.getElementById('auth-btn');
+  btn.disabled = true;
+  btn.textContent = 'Checking...';
+  document.getElementById('auth-error').style.display = 'none';
+
+  try {
+    const res  = await fetch(`${WORKER}/auth`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pass })
+    });
+    const data = await res.json();
+
+    if (data.hub) {
+      currentHub = data.hub;
+      const label = currentHub.charAt(0).toUpperCase() + currentHub.slice(1);
+      document.getElementById('hub-badge').textContent         = label;
+      document.getElementById('hub-badge-success').textContent = label;
+      showScreen('screen-form');
+      await loadData();
+    } else {
+      document.getElementById('auth-error').style.display = 'block';
+      btn.disabled    = false;
+      btn.textContent = 'Continue';
+    }
+  } catch (e) {
+    document.getElementById('auth-error').textContent    = 'Connection error. Try again.';
+    document.getElementById('auth-error').style.display = 'block';
+    btn.disabled    = false;
+    btn.textContent = 'Continue';
+  }
+}
+
+// ---- DATA LOAD ----
+
+async function loadData() {
+  document.getElementById('evacuee-list').innerHTML = '<div class="ev-empty">Loading members...</div>';
+
+  const [evRes, allRes] = await Promise.all([
+    fetch(`${WORKER}/evacuees?hub=${currentHub}`),
+    fetch(`${WORKER}/allotments?hub=${currentHub}`)
+  ]);
+
+  evacuees = await evRes.json();
+
+  const allotments = await allRes.json();
+  allotmentTotals = {};
+  for (const a of allotments) {
+    allotmentTotals[a.EvacueeID] = (allotmentTotals[a.EvacueeID] || 0) + (a.AmountSpent || 0);
+  }
+
+  updateStats();
+  renderEvacueeList();
+}
+
+function getStatus(evacueeId) {
+  const spent = allotmentTotals[evacueeId] || 0;
+  if (spent >= ALLOTMENT_LIMIT) return 'maxed';
+  if (spent >= WARN_THRESHOLD)  return 'warning';
+  return 'ok';
+}
+
+function getRemaining(evacueeId) {
+  return Math.max(0, ALLOTMENT_LIMIT - (allotmentTotals[evacueeId] || 0));
+}
+
+function updateStats() {
+  let eligible = 0, warning = 0, maxed = 0;
+  for (const ev of evacuees) {
+    const s = getStatus(ev.EvacueeID);
+    if (s === 'ok')      eligible++;
+    else if (s === 'warning') warning++;
+    else                 maxed++;
+  }
+  document.getElementById('stat-eligible').textContent = eligible;
+  document.getElementById('stat-warning').textContent  = warning;
+  document.getElementById('stat-maxed').textContent    = maxed;
+}
+
+// ---- EVACUEE LIST ----
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderEvacueeList();
+}
+
+function renderEvacueeList() {
+  const search = document.getElementById('ev-search').value.toLowerCase().trim();
+  const list   = document.getElementById('evacuee-list');
+
+  let filtered = evacuees.filter(ev => {
+    const name = `${ev.FirstName} ${ev.LastName}`.toLowerCase();
+    const id   = (ev.EvacueeID || '').toLowerCase();
+    if (search && !name.includes(search) && !id.includes(search)) return false;
+
+    const s = getStatus(ev.EvacueeID);
+    if (currentFilter === 'eligible' && s !== 'ok')      return false;
+    if (currentFilter === 'warning'  && s !== 'warning') return false;
+    return true;
+  });
+
+  // Sort: selected first, then alphabetical
+  filtered.sort((a, b) => {
+    const asel = selectedIds.has(a.EvacueeID) ? 0 : 1;
+    const bsel = selectedIds.has(b.EvacueeID) ? 0 : 1;
+    if (asel !== bsel) return asel - bsel;
+    return `${a.FirstName} ${a.LastName}`.localeCompare(`${b.FirstName} ${b.LastName}`);
+  });
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="ev-empty">No members found</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(ev => {
+    const status   = getStatus(ev.EvacueeID);
+    const spent    = allotmentTotals[ev.EvacueeID] || 0;
+    const pct      = Math.min(100, (spent / ALLOTMENT_LIMIT) * 100);
+    const isMaxed  = status === 'maxed';
+    const isSel    = selectedIds.has(ev.EvacueeID);
+    const fullName = `${ev.FirstName} ${ev.LastName}`;
+
+    const badgeClass = { ok: 'badge-ok', warning: 'badge-warn', maxed: 'badge-max' }[status];
+    const badgeText  = { ok: 'Eligible', warning: '⚠ Near Limit', maxed: '✗ Maxed' }[status];
+    const fillClass  = { ok: 'fill-ok',  warning: 'fill-warn',  maxed: 'fill-max'  }[status];
+
+    // Escape for inline onclick
+    const safeName = fullName.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const safeId   = (ev.EvacueeID || '').replace(/'/g, "\\'");
+
+    return `
+      <div class="ev-item ${status} ${isSel ? 'selected' : ''}"
+           onclick="${isMaxed ? '' : `toggleEvacuee('${safeId}', '${safeName}')`}">
+        <div class="ev-check">${isSel ? '✓' : ''}</div>
+        <div class="ev-info">
+          <div class="ev-name">${fullName}</div>
+          <div class="ev-id">ID: ${ev.EvacueeID || '-'}</div>
+        </div>
+        <div class="ev-meter">
+          <div class="ev-bar"><div class="ev-bar-fill ${fillClass}" style="width:${pct}%"></div></div>
+          <div class="ev-bar-amt">$${spent.toFixed(0)}/$${ALLOTMENT_LIMIT}</div>
+        </div>
+        <div class="ev-badge ${badgeClass}">${badgeText}</div>
+      </div>`;
+  }).join('');
+}
+
+function toggleEvacuee(evacueeId, name) {
+  if (selectedIds.has(evacueeId)) {
+    selectedIds.delete(evacueeId);
+  } else {
+    selectedIds.add(evacueeId);
+  }
+  renderEvacueeList();
+  renderLineItems();
+}
+
+// ---- LINE ITEMS ----
+
+function renderLineItems() {
+  const container = document.getElementById('line-items');
+
+  if (selectedIds.size === 0) {
+    container.innerHTML = '<div class="ev-empty">Select members above to enter amounts</div>';
+    return;
+  }
+
+  // Preserve existing amounts
+  const existing = {};
+  document.querySelectorAll('.line-item').forEach(li => {
+    const input = li.querySelector('input[type="number"]');
+    if (input && input.value) existing[li.dataset.id] = input.value;
+  });
+
+  const selected = evacuees.filter(ev => selectedIds.has(ev.EvacueeID));
+
+  container.innerHTML = selected.map(ev => {
+    const fullName  = `${ev.FirstName} ${ev.LastName}`;
+    const remaining = getRemaining(ev.EvacueeID);
+    const val       = existing[ev.EvacueeID] || '';
+    return `
+      <div class="line-item" data-id="${ev.EvacueeID}">
+        <div class="line-name">${fullName}</div>
+        <div class="line-remain">max $${remaining.toFixed(2)}</div>
+        <div class="line-amount">
+          <input type="number" min="0.01" max="${remaining}" step="0.01"
+                 placeholder="$0.00" value="${val}"
+                 oninput="checkOver(this, '${ev.EvacueeID}')">
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function checkOver(input, evacueeId) {
+  const remaining = getRemaining(evacueeId);
+  const val = parseFloat(input.value);
+  if (!isNaN(val) && val > remaining) {
+    input.classList.add('over');
+  } else {
+    input.classList.remove('over');
+  }
+}
+
+// ---- FILE UPLOAD ----
+
+function handleFileSelect(input) {
+  if (input.files[0]) {
+    receiptFile = input.files[0];
+    document.getElementById('upload-filename').textContent = receiptFile.name;
+    document.getElementById('upload-zone').classList.add('has-file');
+  }
+}
+
+const uploadZone = document.getElementById('upload-zone');
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f) {
+    receiptFile = f;
+    document.getElementById('upload-filename').textContent = f.name;
+    uploadZone.classList.add('has-file');
+  }
+});
+
+// ---- SUBMIT ----
+
+async function doSubmit() {
+  const staffName = document.getElementById('staff-name').value.trim();
+  if (!staffName)         { alert('Please enter your name.'); return; }
+  if (selectedIds.size === 0) { alert('Please select at least one community member.'); return; }
+  if (!receiptFile)       { alert('Please attach a receipt.'); return; }
+
+  // Collect and validate line items
+  const members = [];
+  const lineItems = document.querySelectorAll('.line-item');
+  for (const li of lineItems) {
+    const input = li.querySelector('input[type="number"]');
+    const id    = li.dataset.id;
+    const val   = parseFloat(input.value);
+    if (!val || val <= 0) { alert('Enter a valid amount for all selected members.'); return; }
+    const remaining = getRemaining(id);
+    if (val > remaining)  { alert(`Amount exceeds remaining balance for one or more members.`); return; }
+    const ev = evacuees.find(e => e.EvacueeID === id);
+    members.push({
+      evacueeId: id,
+      name: `${ev.FirstName} ${ev.LastName}`,
+      amount: val
+    });
+  }
+
+  const submitBtn = document.getElementById('submit-btn');
+  submitBtn.disabled = true;
+  showProgress(true);
+
+  const submissionRef  = `ALLOT-${currentHub.toUpperCase().substring(0,3)}-${Date.now()}`;
+  const submissionDate = new Date().toLocaleDateString('en-CA', {
+    year: 'numeric', month: 'long', day: 'numeric'
+  });
+
+  try {
+    // 1. Upload receipt
+    setProgress('Uploading receipt...', 20);
+    const fd = new FormData();
+    fd.append('file', receiptFile);
+    fd.append('hub', currentHub);
+    fd.append('submissionRef', submissionRef);
+    const uploadRes  = await fetch(`${WORKER}/upload-receipt`, { method: 'POST', body: fd });
+    const uploadData = await uploadRes.json();
+    if (!uploadData.fullUrl) throw new Error('Receipt upload failed');
+    const receiptUrl = uploadData.fullUrl;
+
+    // 2. Create records
+    setProgress('Creating allotment records...', 45);
+    const records = members.map(m => ({
+      evacueeId:     m.evacueeId,
+      evacueeName:   m.name,
+      hubId:         currentHub,
+      amount:        m.amount,
+      receiptUrl,
+      submittedBy:   staffName,
+      submissionRef
+    }));
+    const recRes  = await fetch(`${WORKER}/allotments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ records })
+    });
+    const recData = await recRes.json();
+    const recordIds = recData.ids || [];
+
+    // 3. Generate PDF
+    setProgress('Generating PDF summary...', 70);
+    const pdfRes  = await fetch(`${WORKER}/generate-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ submissionRef, hub: currentHub, submittedBy: staffName, submissionDate, members, receiptUrl })
+    });
+    const pdfData = await pdfRes.json();
+    const pdfUrl  = pdfData.pdfUrl || null;
+
+    // 4. Patch PDF URL onto records
+    if (pdfUrl && recordIds.length) {
+      setProgress('Finalizing...', 90);
+      await fetch(`${WORKER}/allotments/pdf`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: recordIds, pdfUrl })
+      });
+    }
+
+    setProgress('Done!', 100);
+    setTimeout(() => showSuccess({ submissionRef, members, staffName, pdfUrl, submissionDate }), 400);
+
+  } catch (e) {
+    showProgress(false);
+    submitBtn.disabled = false;
+    alert('Submission failed: ' + e.message);
+  }
+}
+
+function setProgress(msg, pct) {
+  document.getElementById('progress-label').textContent      = msg;
+  document.getElementById('progress-fill').style.width       = pct + '%';
+}
+
+function showProgress(show) {
+  document.getElementById('progress-wrap').classList.toggle('active', show);
+}
+
+// ---- SUCCESS ----
+
+function showSuccess({ submissionRef, members, staffName, pdfUrl, submissionDate }) {
+  const total  = members.reduce((s, m) => s + m.amount, 0).toFixed(2);
+  const mRows  = members.map(m => `<tr><td>${m.name}</td><td>$${m.amount.toFixed(2)}</td></tr>`).join('');
+
+  document.getElementById('success-table').innerHTML = `
+    <table>
+      <tr><td>Reference</td><td>${submissionRef}</td></tr>
+      <tr><td>Date</td><td>${submissionDate}</td></tr>
+      <tr><td>Submitted by</td><td>${staffName}</td></tr>
+      <tr><td colspan="2"><hr style="border:none;border-top:1px solid #ddd;margin:5px 0"></td></tr>
+      ${mRows}
+      <tr><td><strong>Total</strong></td><td><strong>$${total}</strong></td></tr>
+    </table>`;
+
+  const pdfLink = document.getElementById('pdf-link');
+  if (pdfUrl) {
+    pdfLink.href    = pdfUrl;
+    pdfLink.style.display = 'block';
+  } else {
+    pdfLink.style.display = 'none';
+  }
+
+  showScreen('screen-success');
+}
+
+// ---- RESET ----
+
+function resetForm() {
+  selectedIds.clear();
+  receiptFile = null;
+  currentFilter = 'all';
+  document.getElementById('staff-name').value       = '';
+  document.getElementById('ev-search').value        = '';
+  document.getElementById('upload-filename').textContent = '';
+  document.getElementById('upload-zone').classList.remove('has-file');
+  document.getElementById('receipt-file').value     = '';
+  document.getElementById('submit-btn').disabled    = false;
+  document.querySelectorAll('.filter-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+  showProgress(false);
+  setProgress('', 0);
+  loadData(); // refresh totals
+  showScreen('screen-form');
+}
+
+// ---- UTILS ----
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
