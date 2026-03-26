@@ -314,9 +314,6 @@ async function api(path, options = {}) {
 
 
 
-  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-  return data;
-}
 
 // =============================================================
 // INIT
