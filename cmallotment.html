@@ -672,28 +672,24 @@ async function doSubmit() {
     const recData = await recRes.json();
     const recordIds = recData.ids || [];
 
-    // 3. Generate PDF
-    setProgress('Generating PDF summary...', 70);
-    const pdfRes  = await fetch(`${WORKER}/generate-pdf`, {
+    // 3. Show success immediately - fire PDF generation in background
+setProgress('Done!', 100);
+showSuccess({ submissionRef, members, staffName, pdfUrl: null, submissionDate });
+
+// PDF generates in background - no await
+fetch(`${WORKER}/generate-pdf`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ submissionRef, hub: currentHub, submittedBy: staffName, submissionDate, members, receiptUrl, receiptGraphPath: uploadData.graphPath })
+}).then(r => r.json()).then(pdfData => {
+  if (pdfData.pdfUrl && recordIds.length) {
+    fetch(`${WORKER}/allotments/pdf`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ submissionRef, hub: currentHub, submittedBy: staffName, submissionDate, members, receiptUrl, receiptGraphPath: uploadData.graphPath })
+      body: JSON.stringify({ ids: recordIds, pdfUrl: pdfData.pdfUrl })
     });
-    const pdfData = await pdfRes.json();
-    const pdfUrl  = pdfData.pdfUrl || null;
-
-    // 4. Patch PDF URL onto records
-    if (pdfUrl && recordIds.length) {
-      setProgress('Finalizing...', 90);
-      await fetch(`${WORKER}/allotments/pdf`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids: recordIds, pdfUrl })
-      });
-    }
-
-    setProgress('Done!', 100);
-    setTimeout(() => showSuccess({ submissionRef, members, staffName, pdfUrl, submissionDate }), 400);
+  }
+}).catch(() => {});
 
   } catch (e) {
     showProgress(false);
