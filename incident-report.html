@@ -351,7 +351,7 @@
       <input type="hidden" name="FolderName" id="folderName">
       <div class="field">
         <label>Activation ID</label>
-        <input type="text" name="ActivationID" value="2026-Kash-HubHost" readonly style="background:#f0f0f0;color:var(--grey);">
+        <input type="text" name="ActivationID" id="activationID" value="Loading..." readonly style="background:#f0f0f0;color:var(--grey);">
       </div>
     </div>
 
@@ -835,7 +835,20 @@
     document.getElementById('folderName').value = selected.dataset.folder || '';
   });
 
+  // ---- Dynamic activation loading ----
+  async function loadActivation() {
+    try {
+      const res = await fetch('https://loomi-data.loomex-it.workers.dev/activation');
+      const data = await res.json();
+      document.getElementById('activationID').value = data.activationID || 'Unknown';
+    } catch (e) {
+      document.getElementById('activationID').value = 'Unknown';
+      console.error('Could not load activation:', e);
+    }
+  }
+
   loadSites();
+  loadActivation();
 </script>
 </body>
 </html>
