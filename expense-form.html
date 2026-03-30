@@ -546,14 +546,6 @@
         </div>
       </div>
 
-      <div id="notice-kingston" class="site-notice">
-        <strong>Kingston Site</strong>
-        Breakfast and lunch are provided by catering and are not eligible for reimbursement. Only Dinner claims will be accepted.
-      </div>
-      <div id="notice-timmins" class="site-notice">
-        <strong>Timmins Site</strong>
-        Breakfast is provided by the Holiday Inn and is not eligible for reimbursement at this location.
-      </div>
     </div>
 
     <!-- SECTION 2: Expense Items -->
@@ -630,8 +622,7 @@
   function handleSiteChange() {
     const site = document.getElementById('site').value;
     document.getElementById('totalDisplay').innerHTML = '$0.00<span>CAD</span>';
-    document.getElementById('notice-kingston').style.display = site === 'Kingston' ? 'block' : 'none';
-    document.getElementById('notice-timmins').style.display  = site === 'Timmins'  ? 'block' : 'none';
+
     document.querySelectorAll('.expense-row').forEach(row => {
       const id = parseInt(row.id.replace('row-', ''));
       if (document.getElementById(`type-${id}`)?.value === 'meal') recalc(id);
@@ -802,19 +793,13 @@
       const actual   = parseFloat(document.getElementById(`f-actual-${id}`)?.value) || 0;
       const max      = MEAL_ALLOWANCES[period] || 0;
       const site     = document.getElementById('site').value;
-      const ineligible = period && (
-        (site === 'Kingston' && (period === 'Breakfast' || period === 'Lunch')) ||
-        (site === 'Timmins'  && period === 'Breakfast')
-      );
-      const claimed  = (period && actual > 0 && !ineligible) ? parseFloat(Math.min(actual, max).toFixed(2)) : 0;
-      const exceeded = period && actual > max && !ineligible;
+      const claimed  = (period && actual > 0) ? parseFloat(Math.min(actual, max).toFixed(2)) : 0;
+      const exceeded = period && actual > max;
       const claimedEl = document.getElementById(`f-claimed-${id}`);
       const excEl     = document.getElementById(`f-exceeded-${id}`);
-      if (claimedEl) claimedEl.value = ineligible ? '$0.00' : (period && actual > 0 ? `$${claimed.toFixed(2)}` : '');
+      if (claimedEl) claimedEl.value = (period && actual > 0) ? `$${claimed.toFixed(2)}` : '';
       if (excEl) {
-        if (ineligible) {
-          excEl.textContent = `Ineligible`; excEl.className = 'exceeded-badge exceeded-yes';
-        } else if (!period || actual === 0) {
+        if (!period || actual === 0) {
           excEl.textContent = '--'; excEl.className = 'exceeded-badge exceeded-na';
         } else if (exceeded) {
           excEl.textContent = 'Exceeded'; excEl.className = 'exceeded-badge exceeded-yes';
@@ -840,11 +825,7 @@
       const actual  = parseFloat(document.getElementById(`f-actual-${id}`)?.value) || 0;
       const max     = MEAL_ALLOWANCES[period] || 0;
       const site    = document.getElementById('site').value;
-      const ineligible = period && (
-        (site === 'Kingston' && (period === 'Breakfast' || period === 'Lunch')) ||
-        (site === 'Timmins'  && period === 'Breakfast')
-      );
-      return (period && actual > 0 && !ineligible) ? parseFloat(Math.min(actual, max).toFixed(2)) : 0;
+      return (period && actual > 0) ? parseFloat(Math.min(actual, max).toFixed(2)) : 0;
     }
     return parseFloat(document.getElementById(`f-amount-${id}`)?.value) || 0;
   }
@@ -950,11 +931,7 @@
         const actual     = parseFloat(document.getElementById(`f-actual-${id}`)?.value) || 0;
         const max        = MEAL_ALLOWANCES[period] || 0;
         const site       = document.getElementById('site').value;
-        const ineligible = !!(period && (
-          (site === 'Kingston' && (period === 'Breakfast' || period === 'Lunch')) ||
-          (site === 'Timmins'  && period === 'Breakfast')
-        ));
-        rows.push({ type, date, mealPeriod: period, mealsActual: actual, mealClaimed: value, exceeded: period && actual > max ? 'Y' : (period ? 'N' : '-'), mealIneligible: ineligible, value, receipts });
+        rows.push({ type, date, mealPeriod: period, mealsActual: actual, mealClaimed: value, exceeded: period && actual > max ? 'Y' : (period ? 'N' : '-'), value, receipts });
       } else if (type === 'mileage') {
         const km = parseFloat(document.getElementById(`f-km-${id}`)?.value) || 0;
         rows.push({ type, date, description: document.getElementById(`f-desc-${id}`)?.value || '', km, value, receipts });
@@ -1005,7 +982,7 @@
       setCell(`C${r}`, 'n', row.type === 'hotel'   ? row.value : 0);
       setCell(`D${r}`, 'n', row.type === 'rental'  ? row.value : 0);
       setCell(`E${r}`, 'n', row.type === 'mileage' ? row.value : 0);
-      setCell(`F${r}`, 'n', row.type === 'meal' ? (row.mealIneligible ? row.mealsActual : row.value) : 0);
+      setCell(`F${r}`, 'n', row.type === 'meal' ? row.value : 0);
       setCell(`G${r}`, 'n', 0);
       setCell(`H${r}`, 'n', row.type === 'misc' ? row.value : 0);
     }
