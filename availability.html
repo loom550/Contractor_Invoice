@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOOMI — Availability</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #00A651;
+  --green-dim: #007a3d;
+  --green-glow: rgba(0,166,81,.15);
+  --navy: #1a3a5c;
+  --navy-light: #234d75;
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1e2530;
+  --surface3: #252d38;
+  --border: #2a3340;
+  --text: #e6edf3;
+  --text-dim: #c0cad6;
+  --text-muted: #8fa3b8;
+  --red: #e05252;
+  --amber: #d4a017;
+  --draft: #7aa8d4;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* HEADER */
+.header {
+  background: var(--navy);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 52px;
+  border-bottom: 2px solid var(--green);
+}
+.logo { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: var(--green); letter-spacing: .12em; }
+.header-div { width: 1px; height: 24px; background: var(--navy-light); }
+.header-title { font-size: 13px; color: var(--text-dim); }
+.header-user { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #fff; }
+
+/* LOGIN */
+.login-wrap {
+  min-height: calc(100vh - 52px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+}
+.login-logo { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--green); letter-spacing: .12em; margin-bottom: 8px; }
+.login-title { font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.login-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.5; }
+.form-field { margin-bottom: 18px; }
+.form-field label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 6px; }
+.form-field input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: border-color .15s;
+}
+.form-field input:focus { outline: none; border-color: var(--green); }
+.form-field input::placeholder { color: var(--text-muted); }
+.login-btn {
+  width: 100%;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: background .15s;
+  margin-top: 8px;
+}
+.login-btn:hover { background: var(--green-dim); }
+.login-btn:disabled { opacity: .5; cursor: not-allowed; }
+.login-error { background: rgba(224,82,82,.1); border: 1px solid rgba(224,82,82,.3); color: var(--red); padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-top: 16px; display: none; }
+
+/* MAIN APP */
+.app-wrap { max-width: 780px; margin: 0 auto; padding: 32px 20px; }
+.welcome-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+.welcome-name { font-size: 20px; font-weight: 600; color: var(--text); }
+.welcome-act { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.logout-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 6px 14px; border-radius: 5px; font-size: 12px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; }
+.logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* LEGEND */
+.legend { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-dim); }
+.legend-dot { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+
+/* CALENDAR */
+.cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.cal-nav-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 32px; height: 32px; border-radius: 5px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+.cal-nav-btn:hover { border-color: var(--green); }
+.cal-month { font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: .06em; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+.cal-dow { text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: var(--text-muted); letter-spacing: .08em; padding: 6px 0; }
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all .1s;
+  position: relative;
+  user-select: none;
+}
+.cal-day.empty { cursor: default; }
+.cal-day.past { color: var(--text-muted); opacity: .4; cursor: default; }
+.cal-day.outside-activation { color: var(--text-muted); opacity: .3; cursor: default; }
+.cal-day.available {
+  background: rgba(0,166,81,.15);
+  border-color: rgba(0,166,81,.3);
+  color: var(--green);
+}
+.cal-day.available:hover { background: rgba(0,166,81,.25); }
+.cal-day.deployed {
+  background: rgba(26,58,92,.6);
+  border-color: var(--navy-light);
+  color: #7aa8d4;
+  cursor: pointer;
+}
+.cal-day.selecting {
+  background: rgba(212,160,23,.2);
+  border-color: rgba(212,160,23,.5);
+  color: var(--amber);
+}
+.cal-day.normal:not(.past):not(.outside-activation):hover {
+  background: var(--surface2);
+  border-color: var(--border);
+}
+.cal-day.today { font-weight: 700; }
+.cal-day.today::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+/* SAVE BAR */
+.save-bar {
+  display: none;
+  background: var(--surface2);
+  border: 1px solid rgba(212,160,23,.3);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-top: 20px;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.save-bar.visible { display: flex; }
+.save-bar-label { font-size: 13px; color: var(--text-dim); flex: 1; }
+.save-bar-label strong { color: var(--amber); }
+.save-btn { background: var(--green); color: #fff; border: none; padding: 8px 20px; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.save-btn:hover { background: var(--green-dim); }
+.cancel-btn { background: transparent; color: var(--text-muted); border: 1px solid var(--border); padding: 8px 16px; border-radius: 5px; font-size: 13px; cursor: pointer; }
+.cancel-btn:hover { color: var(--red); border-color: var(--red); }
+
+/* WINDOWS LIST */
+.windows-section { margin-top: 28px; }
+.section-title { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+.window-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+}
+.window-row.locked { border-color: rgba(26,58,92,.5); background: rgba(26,58,92,.15); }
+.window-dates { flex: 1; font-size: 13px; color: var(--text); }
+.window-dates .date-range { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.window-badge { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 3px; }
+.window-badge.avail { background: rgba(0,166,81,.15); color: var(--green); border: 1px solid rgba(0,166,81,.3); }
+.window-badge.locked { background: rgba(26,58,92,.5); color: #7aa8d4; border: 1px solid var(--navy-light); }
+.window-del { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; padding: 2px 6px; border-radius: 3px; }
+.window-del:hover { color: var(--red); }
+.empty-windows { text-align: center; padding: 20px; color: var(--text-muted); font-size: 13px; background: var(--surface); border: 1px dashed var(--border); border-radius: 6px; }
+
+/* DEPLOYMENT POPUP */
+.popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 200; display: none; align-items: center; justify-content: center; }
+.popup-overlay.open { display: flex; }
+.popup { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; max-width: 380px; width: 90%; }
+.popup-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+.popup-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 20px; }
+.popup-field { margin-bottom: 12px; }
+.popup-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: 3px; }
+.popup-value { font-size: 13px; color: var(--text); }
+.popup-locked-msg { background: rgba(224,82,82,.08); border: 1px solid rgba(224,82,82,.2); border-radius: 6px; padding: 12px; font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-top: 16px; }
+.popup-locked-msg a { color: var(--green); }
+
+/* ERROR/SUCCESS */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 20px; font-size: 13px; z-index: 300; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.toast.show { opacity: 1; }
+.toast.success { border-color: rgba(0,166,81,.4); color: var(--green); }
+.toast.error { border-color: rgba(224,82,82,.4); color: var(--red); }
+
+.loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 8px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">LOOMI</div>
+  <div class="header-div"></div>
+  <div class="header-title">Availability Portal</div>
+  <div class="header-user" id="header-user"></div>
+</div>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">LOOMEX RESPONSE &amp; READINESS</div>
+    <div class="login-title">Submit Your Availability</div>
+    <div class="login-sub">Enter the email address and Contractor ID you were provided to access your availability portal.</div>
+    <div class="form-field">
+      <label>Email Address</label>
+      <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="form-field">
+      <label>Contractor ID</label>
+      <input type="text" id="login-cid" placeholder="e.g. LOOMI-0042" autocomplete="off">
+    </div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-screen" style="display:none">
+  <div class="app-wrap">
+    <div class="welcome-bar">
+      <div>
+        <div class="welcome-name" id="welcome-name"></div>
+        <div class="welcome-act" id="welcome-act"></div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(0,166,81,.3);border:1px solid rgba(0,166,81,.5)"></div>Available</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(26,58,92,.6);border:1px solid #234d75"></div>Deployed</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(212,160,23,.2);border:1px solid rgba(212,160,23,.5)"></div>Selecting</div>
+    </div>
+
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="shiftMonth(-1)">&#8249;</button>
+      <div class="cal-month" id="cal-month-label"></div>
+      <button class="cal-nav-btn" onclick="shiftMonth(1)">&#8250;</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+
+    <div class="save-bar" id="save-bar">
+      <div class="save-bar-label">Selected: <strong id="save-bar-range"></strong></div>
+      <button class="cancel-btn" onclick="cancelSelection()">Cancel</button>
+      <button class="save-btn" onclick="saveSelection()">Save Availability</button>
+    </div>
+
+    <div class="windows-section">
+      <div class="section-title">Your Availability Windows</div>
+      <div id="windows-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DEPLOYMENT POPUP -->
+<div class="popup-overlay" id="popup-overlay" onclick="closePopup()">
+  <div class="popup" onclick="event.stopPropagation()">
+    <div class="popup-title">
+      <span>&#128274; Confirmed Deployment</span>
+      <button class="popup-close" onclick="closePopup()">&#10005;</button>
+    </div>
+    <div id="popup-body"></div>
+    <div class="popup-locked-msg">
+      Need to change your availability for this period? Contact <a href="mailto:eocstaffing@loomex.ca">eocstaffing@loomex.ca</a>.
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var WORKER = 'https://evacscheduling.loomex-it.workers.dev';
+var MON = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var MON_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+var auth = null; // {email, contractorId, name, recordId}
+var activation = null; // {title, startDate, endDate}
+var windows = []; // [{start, end}]
+var deployments = []; // [{startDate, endDate, location, travelRequired}]
+var today = new Date().toISOString().slice(0,10);
+var calYear = new Date().getFullYear();
+var calMonth = new Date().getMonth();
+var selecting = false;
+var selStart = null, selEnd = null;
+
+function dateStr(y,m,d){ return y+'-'+(m+1<10?'0':'')+(m+1)+'-'+(d<10?'0':'')+d; }
+function fmtDate(ds){ if(!ds)return '-'; var d=new Date(ds+'T00:00:00'); return MON_SHORT[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear(); }
+function isInRange(ds,s,e){ return ds>=s&&ds<=e; }
+function isAvailable(ds){ return windows.some(function(w){return isInRange(ds,w.start,w.end);}); }
+function isDeployed(ds){ return deployments.some(function(d){return isInRange(ds,d.startDate,d.endDate);}); }
+function getDeployment(ds){ return deployments.find(function(d){return isInRange(ds,d.startDate,d.endDate);}); }
+function isPast(ds){ return ds < today; }
+function isInActivation(ds){
+  if(!activation)return true;
+  var s=activation.startDate, e=activation.endDate||'2099-12-31';
+  return ds>=s&&ds<=e;
+}
+
+function showToast(msg, type){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type+' show';
+  setTimeout(function(){t.className='toast';},3000);
+}
+
+async function api(path, opts){
+  var res = await fetch(WORKER+path, Object.assign({headers:{'Content-Type':'application/json'}}, opts||{}));
+  var data = await res.json();
+  if(!res.ok) throw new Error(data.error||'HTTP '+res.status);
+  return data;
+}
+
+async function doLogin(){
+  var email = document.getElementById('login-email').value.trim().toLowerCase();
+  var cid = document.getElementById('login-cid').value.trim();
+  var errEl = document.getElementById('login-error');
+  var btn = document.getElementById('login-btn');
+  if(!email||!cid){ errEl.textContent='Please enter both fields.'; errEl.style.display='block'; return; }
+  btn.disabled=true; btn.innerHTML='<span class="loading-spinner"></span>Signing in...';
+  try{
+    var result = await api('/avail-auth',{method:'POST',body:JSON.stringify({email,contractorId:cid})});
+    if(!result.match){ errEl.textContent='No match found. Please check your email and Contractor ID.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='Sign In'; return; }
+    auth = {email, contractorId:cid, name:result.name, recordId:result.recordId};
+    localStorage.setItem('loomi_avail_auth', JSON.stringify(auth));
+    errEl.style.display='none';
+    await initApp();
+  }catch(e){ errEl.textContent='Error: '+e.message; errEl.style.display='block'; btn.disabled=false; btn.textContent='Sign In'; }
+}
+
+function doLogout(){
+  auth=null; localStorage.removeItem('loomi_avail_auth');
+  document.getElementById('login-screen').style.display='';
+  document.getElementById('app-screen').style.display='none';
+  document.getElementById('login-email').value='';
+  document.getElementById('login-cid').value='';
+  document.getElementById('login-btn').disabled=false;
+  document.getElementById('login-btn').textContent='Sign In';
+}
+
+async function initApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app-screen').style.display='block';
+  document.getElementById('header-user').textContent=auth.name;
+  document.getElementById('welcome-name').textContent='Hi, '+auth.name.split(' ')[0];
+  try{
+    activation = await api('/avail-activation');
+    document.getElementById('welcome-act').textContent=activation.title+' \u2013 Active Activation';
+    if(activation.startDate){
+      var d=new Date(activation.startDate+'T00:00:00');
+      calYear=d.getFullYear(); calMonth=d.getMonth();
+    }
+  }catch(e){}
+  await loadWindows();
+  renderCalendar();
+}
+
+async function loadWindows(){
+  try{
+    var data = await api('/avail-windows?email='+encodeURIComponent(auth.email)+'&contractorId='+encodeURIComponent(auth.contractorId));
+    windows = data.windows||[];
+    deployments = data.deployments||[];
+    renderWindowsList();
+  }catch(e){ showToast('Could not load availability: '+e.message,'error'); }
+}
+
+function renderCalendar(){
+  document.getElementById('cal-month-label').textContent = MON[calMonth]+' '+calYear;
+  var grid = document.getElementById('cal-grid');
+  // DOW headers
+  var html = DOW.map(function(d){return '<div class="cal-dow">'+d+'</div>';}).join('');
+  var firstDay = new Date(calYear, calMonth, 1).getDay();
+  var daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  // Empty cells
+  for(var i=0;i<firstDay;i++) html+='<div class="cal-day empty"></div>';
+  // Days
+  for(var d=1;d<=daysInMonth;d++){
+    var ds = dateStr(calYear, calMonth, d);
+    var cls = 'cal-day';
+    var deployed = isDeployed(ds);
+    var avail = isAvailable(ds);
+    var inAct = isInActivation(ds);
+    var past = isPast(ds);
+    var inSel = selecting && selStart && selEnd && ds>=Math.min(selStart,selEnd) && ds<=Math.max(selStart,selEnd);
+    if(ds===today) cls+=' today';
+    if(!inAct) cls+=' outside-activation';
+    else if(past) cls+=' past';
+    else if(deployed) cls+=' deployed';
+    else if(inSel) cls+=' selecting';
+    else if(avail) cls+=' available';
+    else cls+=' normal';
+    var onclick = '';
+    if(deployed) onclick = 'onDayClick(\''+ds+'\',true)';
+    else if(inAct&&!past) onclick = 'onDayClick(\''+ds+'\',false)';
+    html+='<div class="'+cls+'" onclick="'+onclick+'">'+d+'</div>';
+  }
+  grid.innerHTML=html;
+}
+
+function onDayClick(ds, isDeployed){
+  if(isDeployed){
+    var dep = getDeployment(ds);
+    if(dep) showDeploymentPopup(dep);
+    return;
+  }
+  if(!selecting){
+    selecting=true; selStart=ds; selEnd=ds;
+  } else {
+    selEnd=ds;
+    if(selEnd<selStart){ var tmp=selStart; selStart=selEnd; selEnd=tmp; }
+    // Check for deployed days in selection
+    var cur=new Date(selStart+'T00:00:00'), endD=new Date(selEnd+'T00:00:00');
+    while(cur<=endD){
+      var cds=cur.toISOString().slice(0,10);
+      if(isDeployed(cds)){ showToast('Selection overlaps a confirmed deployment','error'); cancelSelection(); return; }
+      cur.setDate(cur.getDate()+1);
+    }
+  }
+  updateSaveBar();
+  renderCalendar();
+}
+
+function updateSaveBar(){
+  var bar=document.getElementById('save-bar');
+  if(selecting&&selStart){
+    bar.classList.add('visible');
+    var label = selStart===selEnd ? fmtDate(selStart) : fmtDate(selStart)+' \u2013 '+fmtDate(selEnd);
+    document.getElementById('save-bar-range').textContent=label;
+  } else {
+    bar.classList.remove('visible');
+  }
+}
+
+function cancelSelection(){
+  selecting=false; selStart=null; selEnd=null;
+  updateSaveBar(); renderCalendar();
+}
+
+async function saveSelection(){
+  if(!selStart||!selEnd)return;
+  var btn=document.querySelector('.save-btn'); btn.disabled=true; btn.textContent='Saving...';
+  try{
+    await api('/avail-windows',{method:'POST',body:JSON.stringify({email:auth.email,contractorId:auth.contractorId,start:selStart,end:selEnd})});
+    showToast('Availability saved!','success');
+    cancelSelection();
+    await loadWindows();
+    renderCalendar();
+  }catch(e){ showToast(e.message,'error'); }
+  finally{ btn.disabled=false; btn.textContent='Save Availability'; }
+}
+
+function renderWindowsList(){
+  var el=document.getElementById('windows-list');
+  if(!windows.length&&!deployments.length){
+    el.innerHTML='<div class="empty-windows">No availability entered yet. Click days on the calendar to get started.</div>';
+    return;
+  }
+  // Merge windows and deployments into a sorted list
+  var items=[];
+  windows.forEach(function(w){ items.push({type:'avail',start:w.start,end:w.end}); });
+  deployments.forEach(function(d){ items.push({type:'deployed',start:d.startDate,end:d.endDate,location:d.location,travelRequired:d.travelRequired}); });
+  items.sort(function(a,b){return a.start.localeCompare(b.start);});
+  el.innerHTML=items.map(function(item){
+    if(item.type==='deployed'){
+      return '<div class="window-row locked">'+
+        '<div class="window-dates"><div>'+item.location+'</div><div class="date-range">'+fmtDate(item.start)+' \u2013 '+fmtDate(item.end)+(item.travelRequired?' \u2022 Travel arranged':'')+'</div></div>'+
+        '<span class="window-badge locked">DEPLOYED</span>'+
+        '</div>';
+    } else {
+      return '<div class="window-row">'+
+        '<div class="window-dates"><div>Available</div><div class="date-range">'+fmtDate(item.start)+' \u2013 '+fmtDate(item.end)+'</div></div>'+
+        '<span class="window-badge avail">AVAILABLE</span>'+
+        '<button class="window-del" onclick="deleteWindow(\''+item.start+'\',\''+item.end+'\')" title="Remove">&#215;</button>'+
+        '</div>';
+    }
+  }).join('');
+}
+
+async function deleteWindow(start, end){
+  if(!confirm('Remove availability '+fmtDate(start)+' \u2013 '+fmtDate(end)+'?'))return;
+  try{
+    await api('/avail-windows',{method:'DELETE',body:JSON.stringify({email:auth.email,contractorId:auth.contractorId,start,end})});
+    showToast('Availability removed','success');
+    await loadWindows(); renderCalendar();
+  }catch(e){ showToast(e.message,'error'); }
+}
+
+function showDeploymentPopup(dep){
+  var body=document.getElementById('popup-body');
+  body.innerHTML=
+    '<div class="popup-field"><span class="popup-label">Site</span><span class="popup-value">'+dep.location+'</span></div>'+
+    '<div class="popup-field"><span class="popup-label">Dates</span><span class="popup-value">'+fmtDate(dep.startDate)+' \u2013 '+fmtDate(dep.endDate)+'</span></div>'+
+    '<div class="popup-field"><span class="popup-label">Travel</span><span class="popup-value">'+(dep.travelRequired?'Travel arranged':'No travel required')+'</span></div>';
+  document.getElementById('popup-overlay').classList.add('open');
+}
+function closePopup(){ document.getElementById('popup-overlay').classList.remove('open'); }
+function shiftMonth(d){ calMonth+=d; if(calMonth<0){calMonth=11;calYear--;} if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
+
+// Enter key on login
+document.getElementById('login-cid').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+document.getElementById('login-email').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('login-cid').focus();});
+
+// Auto-restore session
+(function(){
+  var saved=localStorage.getItem('loomi_avail_auth');
+  if(saved){try{auth=JSON.parse(saved);initApp();}catch(e){localStorage.removeItem('loomi_avail_auth');}}
+})();
+</script>
+</body>
+</html>
