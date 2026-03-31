@@ -234,6 +234,16 @@ body {
 
 .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 8px; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.profile-section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+.profile-field label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: 5px; }
+.profile-field input { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 5px; font-size: 13px; font-family: 'IBM Plex Sans', sans-serif; }
+.profile-field input:focus { outline: none; border-color: var(--green); }
+.profile-field.full { grid-column: 1 / -1; }
+.profile-save-btn { background: var(--green); color: #fff; border: none; padding: 8px 20px; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.profile-save-btn:hover { background: var(--green-dim); }
+.profile-save-btn:disabled { opacity: .5; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -257,10 +267,25 @@ body {
     </div>
     <div class="form-field">
       <label>Contractor ID</label>
-      <input type="text" id="login-cid" placeholder="e.g. EVAC-CON-00000" autocomplete="off">
+      <input type="text" id="login-cid" placeholder="e.g. LOOMI-0042" autocomplete="off">
     </div>
     <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
     <div class="login-error" id="login-error"></div>
+    <div style="text-align:center;margin-top:16px">
+      <button onclick="showForgot()" style="background:none;border:none;color:var(--text-muted);font-size:12px;cursor:pointer;text-decoration:underline">Forgot your Contractor ID?</button>
+    </div>
+
+    <!-- FORGOT PANEL -->
+    <div id="forgot-panel" style="display:none;margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Forgot Contractor ID</div>
+      <div class="form-field">
+        <label>Your Email Address</label>
+        <input type="email" id="forgot-email" placeholder="you@example.com">
+      </div>
+      <button class="login-btn" id="forgot-btn" onclick="doForgot()">Send My Contractor ID</button>
+      <div class="login-error" id="forgot-error"></div>
+      <div id="forgot-success" style="display:none;background:rgba(0,166,81,.1);border:1px solid rgba(0,166,81,.3);color:var(--green);padding:10px 14px;border-radius:6px;font-size:13px;margin-top:12px">Check your email - your Contractor ID has been sent.</div>
+    </div>
   </div>
 </div>
 
@@ -273,6 +298,18 @@ body {
         <div class="welcome-act" id="welcome-act"></div>
       </div>
       <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+
+    <!-- PROFILE SECTION -->
+    <div class="profile-section" id="profile-section">
+      <div class="section-title" style="margin-bottom:14px">Your Information</div>
+      <div class="profile-grid">
+        <div class="profile-field"><label>Full Name</label><input type="text" id="prof-name" placeholder="Your name"></div>
+        <div class="profile-field"><label>Phone</label><input type="tel" id="prof-phone" placeholder="Phone number"></div>
+        <div class="profile-field full"><label>Address</label><input type="text" id="prof-address" placeholder="Street, City, Province, Postal Code"></div>
+        <div class="profile-field full"><label>Email</label><input type="email" id="prof-email" placeholder="Email address"></div>
+      </div>
+      <button class="profile-save-btn" id="prof-save-btn" onclick="saveProfile()">Save Changes</button>
     </div>
 
     <div class="legend">
@@ -310,14 +347,14 @@ body {
     </div>
     <div id="popup-body"></div>
     <div class="popup-locked-msg">
-      Need to change your availability for this period? Contact <a href="mailto:eocstaffing@loomex.ca">eocstaffing@loomex.ca</a>.
+      Need to change your availability for this period? Contact <a href="/cdn-cgi/l/email-protection#e98c868a9a9d888f8f80878ea9858686848c91c78a88"><span class="__cf_email__" data-cfemail="680d070b1b1c090e0e01060f28040707050d10460b09">[email&#160;protected]</span></a>.
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var WORKER = 'https://evacscheduling.loomex-it.workers.dev';
 var MON = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 var MON_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -386,6 +423,59 @@ function doLogout(){
   document.getElementById('login-btn').textContent='Sign In';
 }
 
+function showForgot(){
+  var p=document.getElementById('forgot-panel');
+  p.style.display=p.style.display==='none'?'block':'none';
+}
+
+async function doForgot(){
+  var email=document.getElementById('forgot-email').value.trim().toLowerCase();
+  var errEl=document.getElementById('forgot-error');
+  var btn=document.getElementById('forgot-btn');
+  var succ=document.getElementById('forgot-success');
+  if(!email){errEl.textContent='Please enter your email.';errEl.style.display='block';return;}
+  btn.disabled=true;btn.textContent='Sending...';errEl.style.display='none';succ.style.display='none';
+  try{
+    var result=await api('/avail-forgot',{method:'POST',body:JSON.stringify({email})});
+    if(result.sent){succ.style.display='block';}
+    else{errEl.textContent='No account found with that email address.';errEl.style.display='block';}
+  }catch(e){errEl.textContent='Error: '+e.message;errEl.style.display='block';}
+  finally{btn.disabled=false;btn.textContent='Send My Contractor ID';}
+}
+
+async function loadProfile(){
+  try{
+    var data=await api('/avail-profile?email='+encodeURIComponent(auth.email)+'&contractorId='+encodeURIComponent(auth.contractorId));
+    document.getElementById('prof-name').value=data.name||'';
+    document.getElementById('prof-phone').value=data.phone||'';
+    document.getElementById('prof-address').value=data.address||'';
+    document.getElementById('prof-email').value=data.email||'';
+  }catch(e){}
+}
+
+async function saveProfile(){
+  var btn=document.getElementById('prof-save-btn');
+  btn.disabled=true;btn.textContent='Saving...';
+  var newEmail=document.getElementById('prof-email').value.trim();
+  try{
+    await api('/avail-profile',{method:'PATCH',body:JSON.stringify({
+      email:auth.email,
+      contractorId:auth.contractorId,
+      name:document.getElementById('prof-name').value.trim(),
+      phone:document.getElementById('prof-phone').value.trim(),
+      address:document.getElementById('prof-address').value.trim(),
+      newEmail:newEmail,
+    })});
+    // Update local auth if email changed
+    if(newEmail&&newEmail!==auth.email){
+      auth.email=newEmail;
+      localStorage.setItem('loomi_avail_auth',JSON.stringify(auth));
+    }
+    showToast('Profile updated!','success');
+  }catch(e){showToast('Save failed: '+e.message,'error');}
+  finally{btn.disabled=false;btn.textContent='Save Changes';}
+}
+
 async function initApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app-screen').style.display='block';
@@ -400,6 +490,7 @@ async function initApp(){
     }
   }catch(e){}
   await loadWindows();
+  await loadProfile();
   renderCalendar();
 }
 
@@ -546,13 +637,4 @@ function shiftMonth(d){ calMonth+=d; if(calMonth<0){calMonth=11;calYear--;} if(c
 
 // Enter key on login
 document.getElementById('login-cid').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
-document.getElementById('login-email').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('login-cid').focus();});
-
-// Auto-restore session
-(function(){
-  var saved=localStorage.getItem('loomi_avail_auth');
-  if(saved){try{auth=JSON.parse(saved);initApp();}catch(e){localStorage.removeItem('loomi_avail_auth');}}
-})();
-</script>
-</body>
-</html>
+document.getElementById('login-email').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('login-c
