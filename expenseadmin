@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Repository -- Loomex Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #00A651; --green-dark: #007a3d; --green-light: #e8f5ee; --green-mid: #c8e6d4;
+      --navy: #1a3a5c; --grey-footer: #6D6E71; --grey-border: #d8dde3; --grey-bg: #f5f7fa;
+      --white: #ffffff; --text: #2c3e50; --text-muted: #6b7c93;
+      --error: #cc2936; --error-bg: #fdf0f0; --amber: #E8A317;
+      --shadow-card: 0 2px 8px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.04);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--grey-bg); color: var(--text); min-height: 100vh; padding: 32px 16px 64px; }
+    body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse at 20% 10%, rgba(0,166,81,0.06) 0%, transparent 50%); pointer-events: none; z-index: 0; }
+    .container { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+    .header { background: var(--navy); border-radius: 12px 12px 0 0; padding: 28px 36px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .header-left h1 { color: var(--white); font-size: 20px; font-weight: 700; }
+    .header-left p  { color: rgba(255,255,255,0.55); font-size: 13px; margin-top: 4px; }
+    .header-badge { background: var(--green); color: white; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 6px 12px; border-radius: 20px; white-space: nowrap; font-family: 'DM Mono', monospace; }
+    .card { background: var(--white); box-shadow: var(--shadow-card); }
+    .card-section { padding: 32px 36px; border-bottom: 1px solid #eef0f3; }
+
+    /* Login */
+    #loginView { max-width: 400px; margin: 60px auto; }
+    #loginView .card-section { border-radius: 12px; border: none; }
+    .login-title { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+    .login-sub   { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 12px; font-weight: 600; color: var(--navy); }
+    input[type="password"] {
+      border: 1.5px solid var(--grey-border); border-radius: 8px; padding: 10px 14px;
+      font-size: 14px; font-family: inherit; width: 100%; color: var(--text); background: var(--white);
+      transition: border-color 0.15s;
+    }
+    input[type="password"]:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(0,166,81,0.12); }
+    .btn-login {
+      width: 100%; margin-top: 16px; background: var(--navy); color: white; border: none; border-radius: 10px;
+      padding: 13px 24px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+      transition: background 0.15s; letter-spacing: -0.2px;
+    }
+    .btn-login:hover:not(:disabled) { background: #0f2640; }
+    .btn-login:disabled { background: #a0adb8; cursor: not-allowed; }
+    .login-error { font-size: 13px; color: var(--error); margin-top: 10px; min-height: 20px; }
+
+    /* Repository */
+    #repoView { display: none; }
+    .toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 20px 36px; border-bottom: 1px solid #eef0f3; background: #fafbfc; }
+    .toolbar input[type="text"] {
+      border: 1.5px solid var(--grey-border); border-radius: 8px; padding: 8px 14px;
+      font-size: 13px; font-family: inherit; width: 260px; color: var(--text);
+    }
+    .toolbar input[type="text"]:focus { outline: none; border-color: var(--green); }
+    .filter-btn {
+      padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: inherit; border: 1.5px solid var(--grey-border); background: white; color: var(--text-muted);
+      transition: all 0.12s;
+    }
+    .filter-btn.active { background: var(--navy); border-color: var(--navy); color: white; }
+    .filter-btn:hover:not(.active) { background: var(--grey-bg); }
+    .refresh-btn {
+      padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: inherit; border: 1.5px solid var(--green-mid); background: var(--green-light); color: var(--green-dark);
+      margin-left: auto;
+    }
+    .refresh-btn:hover { background: var(--green-mid); }
+    .count-badge { font-size: 12px; color: var(--text-muted); }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; padding: 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      background: var(--navy); color: rgba(255,255,255,0.8); padding: 10px 14px;
+      text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid #eef0f3; }
+    tbody tr:hover td { background: #fafbfc; }
+    td { padding: 11px 14px; vertical-align: middle; }
+    td.mono { font-family: 'DM Mono', monospace; font-size: 12px; }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .status-pending  { background: #fff8e1; color: #7a5200; }
+    .status-approved { background: var(--green-light); color: var(--green-dark); }
+    .status-rejected { background: #fef2f2; color: #9f1239; }
+    .sp-link { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; font-size: 11px; font-weight: 600; color: #1d4ed8; text-decoration: none; white-space: nowrap; }
+    .sp-link:hover { background: #dbeafe; }
+    .no-sp { color: var(--text-muted); font-size: 12px; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner-lg { width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: var(--navy); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 14px; }
+    .state-box { padding: 48px 36px; text-align: center; }
+    .state-box p { color: var(--text-muted); font-size: 14px; }
+
+    .page-footer { background: var(--grey-footer); border-radius: 0 0 12px 12px; padding: 14px 36px; text-align: center; }
+    .page-footer p { color: rgba(255,255,255,0.7); font-size: 12px; }
+
+    @media (max-width: 640px) {
+      body { padding: 0 0 48px; }
+      .header { padding: 20px; border-radius: 0; flex-wrap: wrap; }
+      .card { border-radius: 0; }
+      .card-section { padding: 24px 20px; }
+      .toolbar { padding: 16px 20px; }
+      .toolbar input[type="text"] { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginView">
+  <div class="card" style="border-radius:12px">
+    <div style="background:var(--navy);padding:24px 32px;border-radius:12px 12px 0 0;">
+      <div style="color:#fff;font-size:18px;font-weight:700;">Expense Repository</div>
+      <div style="color:rgba(255,255,255,0.5);font-size:13px;margin-top:4px;">The Loomex Group -- Admin Access</div>
+    </div>
+    <div class="card-section" style="border-radius:0 0 12px 12px">
+      <div class="field-group">
+        <label>Admin Password</label>
+        <input type="password" id="passwordInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()">
+      </div>
+      <div class="login-error" id="loginError"></div>
+      <button class="btn-login" id="loginBtn" onclick="login()">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<!-- REPOSITORY -->
+<div id="repoView">
+  <div class="container">
+    <div class="header">
+      <div class="header-left">
+        <h1>Expense Repository</h1>
+        <p>All submissions -- The Loomex Group</p>
+      </div>
+      <div class="header-badge">Admin</div>
+    </div>
+    <div class="card">
+      <div class="toolbar">
+        <input type="text" id="searchInput" placeholder="Search by name, report #, activation..." oninput="renderTable()">
+        <button class="filter-btn active" id="f-all"      onclick="setFilter('all')">All</button>
+        <button class="filter-btn"        id="f-pending"  onclick="setFilter('pending')">Pending</button>
+        <button class="filter-btn"        id="f-approved" onclick="setFilter('approved')">Approved</button>
+        <button class="filter-btn"        id="f-rejected" onclick="setFilter('rejected')">Rejected</button>
+        <span class="count-badge" id="countBadge"></span>
+        <button class="refresh-btn" onclick="loadSubmissions()">&#8635; Refresh</button>
+      </div>
+
+      <div id="stateLoading" class="state-box">
+        <div class="spinner-lg"></div>
+        <p>Loading submissions...</p>
+      </div>
+      <div id="stateEmpty" class="state-box" style="display:none">
+        <p>No submissions match your filter.</p>
+      </div>
+      <div id="tableWrap" class="table-wrap" style="display:none">
+        <table>
+          <thead>
+            <tr>
+              <th>Report #</th>
+              <th>Contractor</th>
+              <th>Activation</th>
+              <th>Site</th>
+              <th>Period</th>
+              <th>Submitted</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Documents</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="page-footer">
+      <p>The Loomex Group Ltd -- Admin Portal -- For support contact eocadmin@loomex.ca</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const WORKER_URL = 'https://loomex-expense.loomex-it.workers.dev';
+  let sessionToken = null;
+  let sessionTs    = null;
+  let allData      = [];
+  let activeFilter = 'all';
+
+  // ── LOGIN ────────────────────────────────────────────────────────────────────
+  async function login() {
+    const pwd    = document.getElementById('passwordInput').value;
+    const btn    = document.getElementById('loginBtn');
+    const errEl  = document.getElementById('loginError');
+    errEl.textContent = '';
+    if (!pwd) { errEl.textContent = 'Please enter a password.'; return; }
+    btn.disabled = true; btn.textContent = 'Signing in...';
+    try {
+      const res = await fetch(`${WORKER_URL}/expense-admin-auth`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pwd })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.token) { errEl.textContent = 'Incorrect password.'; btn.disabled = false; btn.textContent = 'Sign In'; return; }
+      sessionToken = data.token;
+      sessionTs    = data.ts;
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('repoView').style.display  = 'block';
+      loadSubmissions();
+    } catch(e) {
+      errEl.textContent = 'Connection error. Try again.';
+      btn.disabled = false; btn.textContent = 'Sign In';
+    }
+  }
+
+  // ── LOAD ─────────────────────────────────────────────────────────────────────
+  async function loadSubmissions() {
+    document.getElementById('stateLoading').style.display = 'block';
+    document.getElementById('tableWrap').style.display    = 'none';
+    document.getElementById('stateEmpty').style.display   = 'none';
+    try {
+      const res = await fetch(`${WORKER_URL}/expense-admin-list`, {
+        headers: { 'Authorization': `Bearer ${sessionToken}:${sessionTs}` }
+      });
+      if (res.status === 401) { document.getElementById('loginView').style.display = 'block'; document.getElementById('repoView').style.display = 'none'; return; }
+      const data = await res.json();
+      allData = data.submissions || [];
+      document.getElementById('stateLoading').style.display = 'none';
+      renderTable();
+    } catch(e) {
+      document.getElementById('stateLoading').style.display = 'none';
+      document.getElementById('stateEmpty').style.display   = 'block';
+      document.getElementById('stateEmpty').querySelector('p').textContent = 'Failed to load submissions. Try refreshing.';
+    }
+  }
+
+  // ── FILTER ───────────────────────────────────────────────────────────────────
+  function setFilter(f) {
+    activeFilter = f;
+    ['all','pending','approved','rejected'].forEach(id => {
+      document.getElementById(`f-${id}`).classList.toggle('active', id === f);
+    });
+    renderTable();
+  }
+
+  // ── RENDER TABLE ─────────────────────────────────────────────────────────────
+  function renderTable() {
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    let rows = allData.filter(s => {
+      if (activeFilter !== 'all' && s.status !== activeFilter) return false;
+      if (!q) return true;
+      return (s.reportNumber || '').toLowerCase().includes(q)
+          || (s.contractorName || '').toLowerCase().includes(q)
+          || (s.activation || '').toLowerCase().includes(q)
+          || (s.site || '').toLowerCase().includes(q);
+    });
+
+    document.getElementById('countBadge').textContent = `${rows.length} submission${rows.length !== 1 ? 's' : ''}`;
+
+    if (rows.length === 0) {
+      document.getElementById('tableWrap').style.display  = 'none';
+      document.getElementById('stateEmpty').style.display = 'block';
+      document.getElementById('stateEmpty').querySelector('p').textContent = 'No submissions match your filter.';
+      return;
+    }
+    document.getElementById('tableWrap').style.display  = 'block';
+    document.getElementById('stateEmpty').style.display = 'none';
+
+    const statusHTML = { pending: '<span class="status-badge status-pending">⏳ Pending</span>', approved: '<span class="status-badge status-approved">✓ Approved</span>', rejected: '<span class="status-badge status-rejected">✗ Rejected</span>' };
+
+    document.getElementById('tableBody').innerHTML = rows.map(s => {
+      const submitted = s.submittedAt ? new Date(s.submittedAt).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+      const period    = s.periodStart && s.periodEnd ? `${s.periodStart} to ${s.periodEnd}` : '—';
+      const total     = s.total != null ? `$${parseFloat(s.total).toFixed(2)}` : '—';
+      const status    = statusHTML[s.status] || `<span class="status-badge">${s.status}</span>`;
+      const approvedBy = s.approvedBy ? `<br><span style="font-size:11px;color:var(--text-muted)">${s.approvedBy}</span>` : '';
+      const spLink    = s.spFolderUrl
+        ? `<a class="sp-link" href="${s.spFolderUrl}" target="_blank">&#128193; SharePoint</a>`
+        : `<span class="no-sp">—</span>`;
+      return `<tr>
+        <td class="mono">${s.reportNumber || '—'}</td>
+        <td><strong>${s.contractorName || '—'}</strong><br><span style="font-size:11px;color:var(--text-muted)">${s.contractorEmail || ''}</span></td>
+        <td>${s.activation || '—'}</td>
+        <td>${s.site || '—'}</td>
+        <td style="white-space:nowrap">${period}</td>
+        <td style="white-space:nowrap">${submitted}</td>
+        <td class="mono"><strong>${total}</strong></td>
+        <td>${status}${approvedBy}</td>
+        <td>${spLink}</td>
+      </tr>`;
+    }).join('');
+  }
+</script>
+</body>
+</html>
