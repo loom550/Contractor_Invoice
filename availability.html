@@ -560,6 +560,7 @@ function onDayClick(ds, isDeployedDay){
     if(dep) showDeploymentPopup(dep);
     return;
   }
+  if(isAvailable(ds)) return;
   if(!selecting){
     selecting=true; selStart=ds; selEnd=ds;
   } else {
