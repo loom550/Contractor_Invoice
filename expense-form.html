@@ -245,6 +245,32 @@
     .fields-meal     { grid-template-columns: 140px 150px 120px 120px 1fr; }
     .fields-mileage  { grid-template-columns: 150px 1fr 120px 130px; }
 
+    .hst-unconfirmed {
+      background: #fef9c3 !important;
+      border-color: #f59e0b !important;
+    }
+    .hst-confirm-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 42px;
+      background: none;
+      border: none;
+      color: #f59e0b;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0;
+      flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    .hst-confirm-btn:hover { color: #065f46; }
+    .hst-confirm-btn.confirmed { color: #6ee7b7; cursor: default; }
+    .hst-field-wrap {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
     .auto-field {
       background: #f0fdf4 !important;
       border-color: var(--green-mid) !important;
@@ -729,12 +755,15 @@
           <input type="text" id="f-desc-${id}" placeholder="${placeholder}">
         </div>
         <div class="field-group">
-          <label>Total Amount ($)</label>
+          <label>Amount ($)</label>
           <input type="number" id="f-amount-${id}" placeholder="0.00" step="0.01" min="0" oninput="recalcStandard(${id})">
         </div>
         <div class="field-group">
           <label>HST ($)</label>
-          <input type="number" id="f-hst-${id}" placeholder="0.00" step="0.01" min="0" class="auto-field" oninput="recalc(${id})">
+          <div class="hst-field-wrap">
+            <input type="number" id="f-hst-${id}" placeholder="0.00" step="0.01" min="0" class="auto-field hst-unconfirmed" oninput="confirmHst(${id})">
+            <button type="button" class="hst-confirm-btn" id="f-hst-confirm-${id}" onclick="confirmHst(${id}, true)" title="Confirm HST amount">&#10003;</button>
+          </div>
         </div>
       </div>`;
   }
@@ -799,15 +828,32 @@
     updateTotal();
   }
 
+  // ---- HST CONFIRM ----
+  const hstConfirmed = {};
+  function confirmHst(id, explicit = false) {
+    const hstEl  = document.getElementById(`f-hst-${id}`);
+    const btnEl  = document.getElementById(`f-hst-confirm-${id}`);
+    if (!hstEl) return;
+    hstConfirmed[id] = true;
+    hstEl.classList.remove('hst-unconfirmed');
+    if (btnEl) { btnEl.classList.add('confirmed'); btnEl.textContent = '✓'; }
+    recalc(id);
+  }
+
   // ---- RECALC STANDARD (hotel/rental/misc) -- auto-fills HST at 13% ----
   function recalcStandard(id) {
     const amount = parseFloat(document.getElementById(`f-amount-${id}`)?.value) || 0;
     const hstEl = document.getElementById(`f-hst-${id}`);
+    const btnEl = document.getElementById(`f-hst-confirm-${id}`);
     if (hstEl && amount > 0) {
       hstEl.value = parseFloat((amount * 0.13).toFixed(2));
     } else if (hstEl) {
       hstEl.value = '';
     }
+    // Reset confirmation when amount changes
+    hstConfirmed[id] = false;
+    if (hstEl) hstEl.classList.add('hst-unconfirmed');
+    if (btnEl) { btnEl.classList.remove('confirmed'); btnEl.textContent = '✓'; }
     recalc(id);
   }
 
@@ -951,6 +997,18 @@
   }
 
   // ---- COLLECT ROWS ----
+  function allHstConfirmed() {
+    for (const rowEl of document.querySelectorAll('.expense-row')) {
+      const id = parseInt(rowEl.id.replace('row-', ''));
+      const type = document.getElementById(`type-${id}`)?.value;
+      if (type === 'hotel' || type === 'rental' || type === 'misc') {
+        const amount = parseFloat(document.getElementById(`f-amount-${id}`)?.value) || 0;
+        if (amount > 0 && !hstConfirmed[id]) return false;
+      }
+    }
+    return true;
+  }
+
   async function collectRows() {
     const rows = [];
     for (const rowEl of document.querySelectorAll('.expense-row')) {
@@ -1106,6 +1164,10 @@
     }
     if (!hasSig) {
       showStatus('Please draw your signature before submitting.', 'error');
+      return false;
+    }
+    if (!allHstConfirmed()) {
+      showStatus('Please review and confirm the HST amount on each highlighted expense item before submitting.', 'error');
       return false;
     }
     return true;
