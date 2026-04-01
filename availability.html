@@ -308,7 +308,7 @@ body {
         <div class="profile-field"><label>Full Name</label><input type="text" id="prof-name" placeholder="Your name"></div>
         <div class="profile-field"><label>Phone</label><input type="tel" id="prof-phone" placeholder="Phone number"></div>
         <div class="profile-field full"><label>Address</label><input type="text" id="prof-address" placeholder="Street, City, Province, Postal Code"></div>
-        <div class="profile-field full"><label>Email</label><input type="email" id="prof-email" placeholder="Email address" readonly style="opacity:.6;cursor:default"></div>
+        <div class="profile-field full"><label>Email</label><input type="email" id="prof-email" placeholder="Email address"></div>
       </div>
       <button class="profile-save-btn" id="prof-save-btn">Save Changes</button>
     </div>
@@ -458,6 +458,7 @@ async function loadProfile(){
 async function saveProfile(){
   var btn=document.getElementById('prof-save-btn');
   btn.disabled=true;btn.textContent='Saving...';
+  var newEmail=document.getElementById('prof-email').value.trim();
   try{
     await api('/avail-profile',{method:'PATCH',body:JSON.stringify({
       email:auth.email,
@@ -465,7 +466,13 @@ async function saveProfile(){
       name:document.getElementById('prof-name').value.trim(),
       phone:document.getElementById('prof-phone').value.trim(),
       address:document.getElementById('prof-address').value.trim(),
+      newEmail:newEmail,
     })});
+    // Update local auth if email changed
+    if(newEmail&&newEmail!==auth.email){
+      auth.email=newEmail;
+      localStorage.setItem('loomi_avail_auth',JSON.stringify(auth));
+    }
     showToast('Profile updated!','success');
   }catch(e){showToast('Save failed: '+e.message,'error');}
   finally{btn.disabled=false;btn.textContent='Save Changes';}
@@ -548,7 +555,7 @@ function attachCalendarEvents(){
 }
 
 function onDayClick(ds, isDeployedDay){
-  if(isDeployed){
+  if(isDeployedDay){
     var dep = getDeployment(ds);
     if(dep) showDeploymentPopup(dep);
     return;
@@ -660,6 +667,13 @@ function shiftMonth(d){ calMonth+=d; if(calMonth<0){calMonth=11;calYear--;} if(c
   if(el('prof-save-btn')) el('prof-save-btn').addEventListener('click', saveProfile);
   if(el('popup-close-el')) el('popup-close-el').addEventListener('click', closePopup);
   if(el('popup-overlay')) el('popup-overlay').addEventListener('click', function(e){if(e.target===this)closePopup();});
+})();
+
+// Pre-fill contractor ID from URL param
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var cid = params.get('cid');
+  if(cid){ var el=document.getElementById('login-cid'); if(el)el.value=cid; }
 })();
 
 // Auto-restore session
