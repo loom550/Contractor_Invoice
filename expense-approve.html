@@ -717,7 +717,7 @@
       const tr = document.createElement('tr');
       tr.className = 'expense-row row-approved';
       tr.id = `erow-${i}`;
-      const isHstEligible = (r.type === 'hotel' || r.type === 'rental' || r.type === 'misc');
+      const isHstEligible = (r.type === 'hotel' || r.type === 'rental' || r.type === 'misc' || r.type === 'evacuee');
       const hstCell = isHstEligible
   ? `<span style="color:inherit; white-space: nowrap;">$<input type="number" class="hst-input" id="hst-${i}" value="${r.hst || 0}" step="0.01" min="0" oninput="rowDecisions[${i}].hst = parseFloat(this.value) || 0; renderSummaryGrid();"></span>`
   : `<span style="color:var(--text-muted)">—</span>`;
@@ -860,6 +860,7 @@
       let desc = row.description || '';
       if (row.type === 'meal')    desc = row.mealPeriod || '';
       if (row.type === 'mileage') desc = (row.description || '') + ' (' + row.km + ' km @ $0.59)';
+      if (row.type === 'evacuee') desc = row.evacueeCategory || '';
       setCell('B' + r, 's', desc);
 
       const val = parseFloat(row.value || 0);
@@ -867,10 +868,10 @@
       if (row.type === 'rental')  { setCell('D' + r, 'n', val); totalRental  += val; }
       if (row.type === 'mileage') { setCell('E' + r, 'n', val); totalMileage += val; }
       if (row.type === 'meal')    { setCell('F' + r, 'n', val); totalMeals   += val; }
-      if (row.type === 'misc')    { setCell('H' + r, 'n', val); totalMisc    += val; }
+      if (row.type === 'misc' || row.type === 'evacuee') { setCell('H' + r, 'n', val); totalMisc += val; }
 
       const hst = parseFloat(row.hst || 0);
-      if (['hotel','rental','misc'].includes(row.type)) {
+      if (['hotel','rental','misc','evacuee'].includes(row.type)) {
         setCell('G' + r, 'n', hst);
         totalHST += hst;
       }
@@ -910,12 +911,12 @@
     const approvedTotal = approvedRows.reduce((s, r) => s + parseFloat(r.value || 0), 0);
     const rejectedTotal = rejectedRows.reduce((s, r) => s + parseFloat(r.value || 0), 0);
 
-    const hstByType = { hotel: 0, rental: 0, misc: 0 };
+    const hstByType = { hotel: 0, rental: 0, misc: 0, evacuee: 0 };
     approvedRows.forEach(r => {
       if (hstByType[r.type] !== undefined) hstByType[r.type] += parseFloat(r.hst || 0);
     });
     const totalHST = Object.values(hstByType).reduce((s, v) => s + v, 0);
-    const TYPE_LABELS = { hotel: 'Hotel', meal: 'Meal', mileage: 'Mileage', rental: 'Rental Car', misc: 'Misc' };
+    const TYPE_LABELS = { hotel: 'Hotel', meal: 'Meal', mileage: 'Mileage', rental: 'Rental Car', misc: 'Misc', evacuee: 'Evacuee' };
 
     // PAGE 1: COVER ─────────────────────────────────────────────────────────────
     doc.setFillColor(26, 58, 92); doc.rect(0, 0, W, 22, 'F');
@@ -988,9 +989,10 @@
       doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(26,58,92);
       doc.text('HST BREAKOUT — Approved Items', MARGIN, y); y += 2;
       const hstBody = [];
-      if (hstByType.hotel  > 0) hstBody.push(['Hotel',      '$' + hstByType.hotel.toFixed(2)]);
-      if (hstByType.rental > 0) hstBody.push(['Rental Car', '$' + hstByType.rental.toFixed(2)]);
-      if (hstByType.misc   > 0) hstBody.push(['Misc',       '$' + hstByType.misc.toFixed(2)]);
+      if (hstByType.hotel   > 0) hstBody.push(['Hotel',       '$' + hstByType.hotel.toFixed(2)]);
+      if (hstByType.rental  > 0) hstBody.push(['Rental Car',  '$' + hstByType.rental.toFixed(2)]);
+      if (hstByType.misc    > 0) hstBody.push(['Misc',        '$' + hstByType.misc.toFixed(2)]);
+      if (hstByType.evacuee > 0) hstBody.push(['Evacuee',     '$' + hstByType.evacuee.toFixed(2)]);
       doc.autoTable({
         startY: y, head: [['Category', 'HST Amount']], body: hstBody,
         foot: [['Total HST', '$' + totalHST.toFixed(2)]],
