@@ -270,7 +270,7 @@ body {
       <label>Contractor ID</label>
       <input type="text" id="login-cid" placeholder="e.g. LOOMI-0042" autocomplete="off">
     </div>
-    <button class="login-btn" id="login-btn" id="login-btn-main">Sign In</button>
+    <button class="login-btn" id="login-btn-main">Sign In</button>
     <div class="login-error" id="login-error"></div>
     <div style="text-align:center;margin-top:16px">
       <button id="forgot-link-btn" style="background:none;border:none;color:var(--text-muted);font-size:12px;cursor:pointer;text-decoration:underline">Forgot your Contractor ID?</button>
@@ -635,6 +635,28 @@ function showDeploymentPopup(dep){
 }
 function closePopup(){ document.getElementById('popup-overlay').classList.remove('open'); }
 function shiftMonth(d){ calMonth+=d; if(calMonth<0){calMonth=11;calYear--;} if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
+
+// Wire up event listeners
+(function(){
+  var el=function(id){return document.getElementById(id);};
+  if(el('login-btn-main')) el('login-btn-main').addEventListener('click', doLogin);
+  if(el('forgot-link-btn')) el('forgot-link-btn').addEventListener('click', showForgot);
+  if(el('forgot-submit-btn')) el('forgot-submit-btn').addEventListener('click', doForgot);
+  if(el('logout-btn-el')) el('logout-btn-el').addEventListener('click', doLogout);
+  if(el('cal-prev')) el('cal-prev').addEventListener('click', function(){shiftMonth(-1);});
+  if(el('cal-next')) el('cal-next').addEventListener('click', function(){shiftMonth(1);});
+  if(el('save-sel-btn')) el('save-sel-btn').addEventListener('click', saveSelection);
+  if(el('cancel-sel-btn')) el('cancel-sel-btn').addEventListener('click', cancelSelection);
+  if(el('prof-save-el')) el('prof-save-el').addEventListener('click', saveProfile);
+  if(el('popup-close-el')) el('popup-close-el').addEventListener('click', closePopup);
+  if(el('popup-overlay')) el('popup-overlay').addEventListener('click', function(e){if(e.target===this)closePopup();});
+})();
+
+// Auto-restore session
+(function(){
+  var saved=localStorage.getItem('loomi_avail_auth');
+  if(saved){try{auth=JSON.parse(saved);initApp();}catch(e){localStorage.removeItem('loomi_avail_auth');}}
+})();
 
 // Enter key on login
 document.getElementById('login-cid').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
