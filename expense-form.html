@@ -1185,10 +1185,6 @@
       showStatus(`Date out of period range for expense item${outOfRangeRows.length > 1 ? 's' : ''}: <strong>${outOfRangeRows.join(', ')}</strong>`, 'error');
       return false;
     }
-    if (!allHstConfirmed()) {
-      showStatus('Please confirm the HST amount on all hotel, rental, misc, and evacuee expense items before submitting.', 'error');
-      return false;
-    }
     if (!hasSig) {
       showStatus('Please draw your signature before submitting.', 'error');
       return false;
