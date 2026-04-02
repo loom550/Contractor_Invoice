@@ -48,7 +48,6 @@
       z-index: 1;
     }
 
-    /* HEADER */
     .header {
       background: var(--navy);
       border-radius: 12px 12px 0 0;
@@ -58,17 +57,8 @@
       justify-content: space-between;
       gap: 16px;
     }
-    .header-left h1 {
-      color: var(--white);
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-    .header-left p {
-      color: rgba(255,255,255,0.5);
-      font-size: 13px;
-      margin-top: 4px;
-    }
+    .header-left h1 { color: var(--white); font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+    .header-left p { color: rgba(255,255,255,0.5); font-size: 13px; margin-top: 4px; }
 
     .eoc-login-btn {
       background: rgba(255,255,255,0.1);
@@ -82,39 +72,16 @@
       cursor: pointer;
       flex-shrink: 0;
       transition: all 0.15s;
-      letter-spacing: 0.2px;
     }
-    .eoc-login-btn:hover {
-      background: rgba(255,255,255,0.18);
-      color: var(--white);
-    }
-    .eoc-login-btn.authed {
-      background: rgba(0,166,81,0.25);
-      border-color: rgba(0,166,81,0.4);
-      color: #7ddb9e;
-    }
+    .eoc-login-btn:hover { background: rgba(255,255,255,0.18); color: var(--white); }
+    .eoc-login-btn.authed { background: rgba(0,166,81,0.25); border-color: rgba(0,166,81,0.4); color: #7ddb9e; }
 
-    /* CARD */
-    .card {
-      background: var(--white);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.04);
-    }
+    .card { background: var(--white); box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.04); }
 
-    /* INTRO */
-    .intro {
-      padding: 28px 36px 24px;
-      border-bottom: 1px solid #eef0f3;
-    }
-    .intro p {
-      font-size: 14px;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
+    .intro { padding: 28px 36px 24px; border-bottom: 1px solid #eef0f3; }
+    .intro p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
 
-    /* TOOLS LIST */
-    .tools-list {
-      padding: 16px 24px 24px;
-    }
+    .tools-list { padding: 16px 24px 24px; }
 
     .section-label {
       font-size: 11px;
@@ -128,12 +95,7 @@
       align-items: center;
       gap: 8px;
     }
-    .section-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--green-mid);
-    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--green-mid); }
     .section-label.navy-label { color: var(--navy); }
     .section-label.navy-label::after { background: #c5d3e0; }
 
@@ -155,216 +117,59 @@
       font-family: 'DM Sans', sans-serif;
     }
     .tool-card:last-child { margin-bottom: 0; }
-    .tool-card:hover {
-      border-color: var(--green);
-      box-shadow: 0 0 0 3px rgba(0,166,81,0.08);
-      transform: translateY(-1px);
-    }
-    .tool-card.navy-card:hover {
-      border-color: var(--navy);
-      box-shadow: 0 0 0 3px rgba(26,58,92,0.08);
-    }
+    .tool-card:hover { border-color: var(--green); box-shadow: 0 0 0 3px rgba(0,166,81,0.08); transform: translateY(-1px); }
+    .tool-card.navy-card:hover { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(26,58,92,0.08); }
 
-    .tool-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 20px;
-    }
+    .tool-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; }
     .icon-green { background: var(--green-light); }
     .icon-navy  { background: #e8eef5; }
 
     .tool-info { flex: 1; }
-    .tool-info h3 {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--navy);
-      margin-bottom: 3px;
-    }
-    .tool-info p {
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
+    .tool-info h3 { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+    .tool-info p { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
 
-    .tool-arrow {
-      color: var(--grey-border);
-      font-size: 18px;
-      flex-shrink: 0;
-      transition: color 0.15s, transform 0.15s;
-    }
+    .tool-arrow { color: var(--grey-border); font-size: 18px; flex-shrink: 0; transition: color 0.15s, transform 0.15s; }
     .tool-card:hover .tool-arrow { color: var(--green); transform: translateX(3px); }
     .tool-card.navy-card:hover .tool-arrow { color: var(--navy); }
 
-    .tool-badge {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      padding: 2px 7px;
-      border-radius: 4px;
-      margin-left: 8px;
-      vertical-align: middle;
-    }
+    .tool-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
     .badge-live { background: var(--green-light); color: var(--green-dark); }
     .badge-soon { background: #f3f4f6; color: #9ca3af; }
 
-    .tool-card.disabled {
-      opacity: 0.55;
-      cursor: default;
-      pointer-events: none;
-    }
+    .tool-card.disabled { opacity: 0.55; cursor: default; pointer-events: none; }
 
-    /* EOC STAFF SECTION */
-    #eocSection {
-      display: none;
-      border-top: 1px solid #eef0f3;
-      padding: 16px 24px 24px;
-    }
+    #eocSection { display: none; border-top: 1px solid #eef0f3; padding: 16px 24px 24px; }
     #eocSection.visible { display: block; }
 
-    .eoc-section-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 12px 0;
-      margin-bottom: 16px;
-    }
-    .eoc-section-header .section-label {
-      margin-bottom: 0;
-      padding: 0;
-      flex: 1;
-    }
-    .logout-btn {
-      font-size: 11px;
-      color: var(--text-muted);
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      padding: 4px 8px;
-      border-radius: 4px;
-      transition: all 0.15s;
-      flex-shrink: 0;
-    }
+    .eoc-section-header { display: flex; align-items: center; gap: 12px; padding: 12px 12px 0; margin-bottom: 16px; }
+    .eoc-section-header .section-label { margin-bottom: 0; padding: 0; flex: 1; }
+
+    .logout-btn { font-size: 11px; color: var(--text-muted); background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 4px 8px; border-radius: 4px; transition: all 0.15s; flex-shrink: 0; }
     .logout-btn:hover { color: #c0392b; background: #fdf0ef; }
 
-    /* FOOTER */
-    .page-footer {
-      background: var(--grey-footer);
-      border-radius: 0 0 12px 12px;
-      padding: 14px 36px;
-      text-align: center;
-    }
+    .page-footer { background: var(--grey-footer); border-radius: 0 0 12px 12px; padding: 14px 36px; text-align: center; }
     .page-footer p { color: rgba(255,255,255,0.6); font-size: 12px; }
 
-    /* MODALS */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 25, 40, 0.6);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      backdrop-filter: blur(2px);
-    }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,25,40,0.6); z-index: 100; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(2px); }
     .modal-overlay.open { display: flex; }
 
-    .modal {
-      background: var(--white);
-      border-radius: 12px;
-      width: 100%;
-      max-width: 720px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.2);
-      overflow: hidden;
-    }
-    .modal-header {
-      background: var(--navy);
-      padding: 18px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
+    .modal { background: var(--white); border-radius: 12px; width: 100%; max-width: 720px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 24px 64px rgba(0,0,0,0.2); overflow: hidden; }
+    .modal-header { background: var(--navy); padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
     .modal-header h2 { color: var(--white); font-size: 16px; font-weight: 700; }
     .modal-header p { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 2px; }
-    .modal-close {
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: var(--white);
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: background 0.15s;
-    }
+    .modal-close { background: rgba(255,255,255,0.1); border: none; color: var(--white); width: 32px; height: 32px; border-radius: 6px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
     .modal-close:hover { background: rgba(255,255,255,0.2); }
     .modal-body { flex: 1; overflow: hidden; min-height: 0; }
-    .modal-body iframe {
-      width: 100%;
-      height: 100%;
-      min-height: 540px;
-      border: none;
-      display: block;
-    }
+    .modal-body iframe { width: 100%; height: 100%; min-height: 540px; border: none; display: block; }
 
-    /* LOGIN MODAL */
     .login-modal { max-width: 400px; }
     .login-body { padding: 32px 28px; }
-    .login-body label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--navy);
-      margin-bottom: 8px;
-    }
-    .login-body input[type="password"] {
-      width: 100%;
-      padding: 11px 14px;
-      border: 1.5px solid var(--grey-border);
-      border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.15s;
-    }
+    .login-body label { display: block; font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
+    .login-body input[type="password"] { width: 100%; padding: 11px 14px; border: 1.5px solid var(--grey-border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); outline: none; transition: border-color 0.15s; }
     .login-body input[type="password"]:focus { border-color: var(--navy); }
-    .login-error {
-      font-size: 13px;
-      color: #c0392b;
-      margin-top: 10px;
-      display: none;
-    }
+    .login-error { font-size: 13px; color: #c0392b; margin-top: 10px; display: none; }
     .login-error.visible { display: block; }
-    .login-submit {
-      width: 100%;
-      margin-top: 20px;
-      padding: 12px;
-      background: var(--navy);
-      color: var(--white);
-      border: none;
-      border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
+    .login-submit { width: 100%; margin-top: 20px; padding: 12px; background: var(--navy); color: var(--white); border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
     .login-submit:hover { background: #0f2540; }
     .login-submit:disabled { opacity: 0.6; cursor: default; }
 
@@ -396,71 +201,70 @@
   <div class="card">
 
     <div class="intro">
-      <p>This portal provides tools for the activation as well as tools for contractors deployed under Loomex activations. <a href="/cdn-cgi/l/email-protection#11747e7270757c787f517d7e7e7c74693f7270" style="color:var(--green);font-weight:600"><span class="__cf_email__" data-cfemail="c8ada7aba9aca5a1a688a4a7a7a5adb0e6aba9">[email&#160;protected]</span></a>.</p>
+      <p>This portal provides tools for the activation as well as tools for contractors deployed under Loomex activations. Contact <strong style="color:var(--green)">eocadmin [at] loomex.ca</strong> for support.</p>
     </div>
 
     <div class="tools-list">
       <div class="section-label">EOC Tools</div>
 
       <a class="tool-card" href="https://tools.loomex.ca/occupancy-map">
-        <div class="tool-icon icon-green">🗺️</div>
+        <div class="tool-icon icon-green">&#128506;</div>
         <div class="tool-info">
           <h3>Occupancy Map <span class="tool-badge badge-live">Live</span></h3>
           <p>View real-time occupancy levels across active Loomex sites in Ontario.</p>
         </div>
-        <span class="tool-arrow">›</span>
+        <span class="tool-arrow">&#8250;</span>
       </a>
 
       <a class="tool-card" href="https://tools.loomex.ca/incident-report.html">
-        <div class="tool-icon icon-green">📋</div>
+        <div class="tool-icon icon-green">&#128203;</div>
         <div class="tool-info">
           <h3>Incident Report <span class="tool-badge badge-live">Live</span></h3>
           <p>Submit a report for incidents, injuries, or noteworthy events occurring at your site during the activation.</p>
         </div>
-        <span class="tool-arrow">›</span>
+        <span class="tool-arrow">&#8250;</span>
       </a>
 
       <a class="tool-card" href="https://tools.loomex.ca/203">
-        <div class="tool-icon icon-green">🏛️</div>
+        <div class="tool-icon icon-green">&#127963;</div>
         <div class="tool-info">
           <h3>ICS 203 <span class="tool-badge badge-live">Live</span></h3>
           <p>Live organization assignment list showing EOC section staffing by day. Auto-refreshes every 5 minutes.</p>
         </div>
-        <span class="tool-arrow">›</span>
+        <span class="tool-arrow">&#8250;</span>
       </a>
 
       <div class="section-label" style="margin-top: 8px;">Contractor Forms</div>
 
       <button class="tool-card" onclick="openAvailabilityModal()">
-        <div class="tool-icon icon-green">📅</div>
+        <div class="tool-icon icon-green">&#128197;</div>
         <div class="tool-info">
           <h3>Availability Form <span class="tool-badge badge-live">Live</span></h3>
           <p>Submit your availability for upcoming deployment periods.</p>
         </div>
-        <span class="tool-arrow">›</span>
+        <span class="tool-arrow">&#8250;</span>
       </button>
 
       <a class="tool-card" href="./expense-form.html">
-        <div class="tool-icon icon-green">🧾</div>
+        <div class="tool-icon icon-green">&#129534;</div>
         <div class="tool-info">
           <h3>Expense Report <span class="tool-badge badge-live">Live</span></h3>
-          <p>Submit expenses for hotel, meals, mileage, rental car, and miscellaneous items for EOC review and reimbursement. If you are unsure which form to use, or wish to use a paper/fillable form, contact your site IC or email <span class="__cf_email__" data-cfemail="e4818b878580898d8aa4888b8b89819cca8785">[email&#160;protected]</span></p>
+          <p>Submit expenses for hotel, meals, mileage, rental car, and miscellaneous items for EOC review and reimbursement. Contact your site IC or eocadmin [at] loomex.ca if unsure which form to use.</p>
         </div>
-        <span class="tool-arrow">›</span>
+        <span class="tool-arrow">&#8250;</span>
       </a>
 
       <a class="tool-card disabled" href="#">
-        <div class="tool-icon icon-navy">📄</div>
+        <div class="tool-icon icon-navy">&#128196;</div>
         <div class="tool-info">
           <h3>Invoice Submission <span class="tool-badge badge-soon">Coming Soon</span></h3>
           <p>Submit invoices for your hours for the current deployment period.</p>
         </div>
-        <span class="tool-arrow">›</span>
+        <span class="tool-arrow">&#8250;</span>
       </a>
 
     </div>
 
-    <!-- EOC STAFF GATED SECTION -->
     <div id="eocSection">
       <div class="eoc-section-header">
         <div class="section-label navy-label">EOC Staff Tools</div>
@@ -468,30 +272,30 @@
       </div>
 
       <a class="tool-card navy-card" href="https://evacscheduling.loomex-it.workers.dev">
-        <div class="tool-icon icon-navy">📆</div>
+        <div class="tool-icon icon-navy">&#128198;</div>
         <div class="tool-info">
           <h3>Scheduling</h3>
           <p>View and manage staff scheduling assignments across all active sites.</p>
         </div>
-        <span class="tool-arrow">›</span>
+        <span class="tool-arrow">&#8250;</span>
       </a>
 
       <a class="tool-card navy-card" href="https://tools.loomex.ca/expenseadmin.html">
-        <div class="tool-icon icon-navy">💼</div>
+        <div class="tool-icon icon-navy">&#128188;</div>
         <div class="tool-info">
           <h3>Expense Administration</h3>
           <p>Review, approve, and manage contractor expense submissions.</p>
         </div>
-        <span class="tool-arrow">›</span>
+        <span class="tool-arrow">&#8250;</span>
       </a>
 
       <a class="tool-card navy-card" href="https://tools.loomex.ca/siteperformance.html">
-        <div class="tool-icon icon-navy">📊</div>
+        <div class="tool-icon icon-navy">&#128202;</div>
         <div class="tool-info">
           <h3>Site Performance</h3>
           <p>Track key operational metrics and performance indicators across active hubs.</p>
         </div>
-        <span class="tool-arrow">›</span>
+        <span class="tool-arrow">&#8250;</span>
       </a>
 
     </div>
@@ -499,7 +303,7 @@
   </div>
 
   <div class="page-footer">
-    <p>The Loomex Group Ltd &mdash; Response and Readiness Division &mdash; For support contact <a href="mailto:eocadmin&#64;loomex.ca" style="color:var(--green);font-weight:600">eocadmin&#64;loomex.ca</a></p>
+    <p>The Loomex Group Ltd &mdash; Response and Readiness Division &mdash; For support contact eocadmin [at] loomex.ca</p>
   </div>
 
 </div>
@@ -539,72 +343,97 @@
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  const AUTH_KEY = 'eoc_authed';
-  // SHA-256 hash of the EOC password - generate with: crypto.subtle.digest then hex encode
-  // To update: run hashPassword('yournewpassword') in console and paste result below
-  const PW_HASH = 'e3c652f0ba0b4801205814f8b6bc49672c4c74e25b497770bb89b22cdeb4e951';
+<script>
+var AUTH_KEY = 'eoc_authed';
+var PW_HASH = 'e3c652f0ba0b4801205814f8b6bc49672c4c74e25b497770bb89b22cdeb4e951';
 
-  async function hashPassword(pw) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
-  window.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem(AUTH_KEY) === '1') showEocSection();
+function hashPassword(pw) {
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw)).then(function(buf) {
+    return Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
   });
+}
 
-  function handleEocLoginClick() {
-    if (localStorage.getItem(AUTH_KEY) === '1') {
-      document.getElementById('eocSection').scrollIntoView({ behavior: 'smooth' });
-    } else {
-      openModal('loginModal');
-      setTimeout(() => document.getElementById('eocPassword').focus(), 100);
-    }
+window.addEventListener('DOMContentLoaded', function() {
+  if (localStorage.getItem(AUTH_KEY) === '1') showEocSection();
+});
+
+function handleEocLoginClick() {
+  if (localStorage.getItem(AUTH_KEY) === '1') {
+    document.getElementById('eocSection').scrollIntoView({ behavior: 'smooth' });
+  } else {
+    openModal('loginModal');
+    setTimeout(function() { document.getElementById('eocPassword').focus(); }, 100);
   }
+}
 
-  async function submitEocLogin() {
-    const pw = document.getElementById('eocPassword').value;
-    if (!pw) return;
-    const btn = document.getElementById('loginSubmit');
-    const errEl = document.getElementById('loginError');
-    btn.disabled = true;
-    btn.textContent = 'Checking...';
-    errEl.classList.remove('visible');
-    const hash = await hashPassword(pw);
+function submitEocLogin() {
+  var pw = document.getElementById('eocPassword').value;
+  if (!pw) return;
+  var btn = document.getElementById('loginSubmit');
+  var errEl = document.getElementById('loginError');
+  btn.disabled = true;
+  btn.textContent = 'Checking...';
+  errEl.classList.remove('visible');
+  hashPassword(pw).then(function(hash) {
     if (hash === PW_HASH) {
       localStorage.setItem(AUTH_KEY, '1');
       closeModal('loginModal');
       document.getElementById('eocPassword').value = '';
       showEocSection();
-      setTimeout(() => document.getElementById('eocSection').scrollIntoView({ behavior: 'smooth' }), 150);
+      setTimeout(function() { document.getElementById('eocSection').scrollIntoView({ behavior: 'smooth' }); }, 150);
     } else {
       errEl.textContent = 'Incorrect password. Please try again.';
       errEl.classList.add('visible');
     }
     btn.disabled = false;
     btn.textContent = 'Sign In';
-  }
+  });
+}
 
-  function showEocSection() {
-    document.getElementById('eocSection').classList.add('visible');
-    const btn = document.getElementById('eocLoginBtn');
-    btn.textContent = '✓ EOC Staff';
-    btn.classList.add('authed');
-  }
+function showEocSection() {
+  document.getElementById('eocSection').classList.add('visible');
+  var btn = document.getElementById('eocLoginBtn');
+  btn.textContent = 'EOC Staff';
+  btn.classList.add('authed');
+}
 
-  function eocLogout() {
-    localStorage.removeItem(AUTH_KEY);
-    document.getElementById('eocSection').classList.remove('visible');
-    const btn = document.getElementById('eocLoginBtn');
-    btn.textContent = 'EOC Staff Login';
-    btn.classList.remove('authed');
-  }
+function eocLogout() {
+  localStorage.removeItem(AUTH_KEY);
+  document.getElementById('eocSection').classList.remove('visible');
+  var btn = document.getElementById('eocLoginBtn');
+  btn.textContent = 'EOC Staff Login';
+  btn.classList.remove('authed');
+}
 
-  function handlePasswordKey(e) { if (e.key === 'Enter') submitEocLogin(); }
+function handlePasswordKey(e) {
+  if (e.key === 'Enter') submitEocLogin();
+}
 
-  function openModal(id) {
-    document.getElementById(id).classList.add('open');
-    document.body.style.overflow = 'hidden';
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleOverlayClick(e, id) {
+  if (e.target === document.getElementById(id)) closeModal(id);
+}
+
+function openAvailabilityModal() {
+  openModal('availabilityModal');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal('availabilityModal');
+    closeModal('loginModal');
   }
-  function closeModal(id)
+});
+</script>
+
+</body>
+</html>
