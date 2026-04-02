@@ -193,6 +193,7 @@
     .badge-mileage { background: #d1fae5; color: #065f46; }
     .badge-rental  { background: #ede9fe; color: #5b21b6; }
     .badge-misc    { background: #f3f4f6; color: #374151; }
+    .badge-evacuee { background: #fef9c3; color: #854d0e; }
 
     .row-remove-btn {
       background: none;
@@ -214,7 +215,8 @@
       display: grid;
       gap: 12px;
     }
-    .fields-standard { grid-template-columns: 150px 1fr 140px; }
+    .fields-standard { grid-template-columns: 140px 1fr 110px 100px; }
+    .fields-evacuee  { grid-template-columns: 140px 1fr 110px 100px; }
     .fields-meal     { grid-template-columns: 150px 160px 130px 130px auto; }
     .fields-mileage  { grid-template-columns: 150px 1fr 120px 130px; }
 
@@ -474,6 +476,7 @@
       .fields-meal     { grid-template-columns: 1fr 1fr 1fr; }
       .fields-mileage  { grid-template-columns: 1fr 1fr; }
       .fields-standard { grid-template-columns: 1fr 1fr; }
+      .fields-evacuee  { grid-template-columns: 1fr 1fr; }
       .field-grid.cols-3 { grid-template-columns: 1fr 1fr; }
     }
   </style>
@@ -630,6 +633,7 @@
     mileage: { label: 'Mileage',    badgeCls: 'badge-mileage' },
     rental:  { label: 'Rental Car', badgeCls: 'badge-rental'  },
     misc:    { label: 'Misc',       badgeCls: 'badge-misc'    },
+    evacuee: { label: 'Evacuee',    badgeCls: 'badge-evacuee' },
   };
 
   function getDateAttrs() {
@@ -693,6 +697,28 @@
         </div>`;
     }
 
+    if (type === 'evacuee') {
+      return `
+        <div class="row-fields fields-evacuee">
+          <div class="field-group">
+            <label>Date</label>
+            <input type="date" id="f-date-${id}" ${da}>
+          </div>
+          <div class="field-group">
+            <label>Evacuee Category / Description</label>
+            <input type="text" id="f-evcat-${id}" placeholder="e.g. Clothing, Personal items, Prescriptions">
+          </div>
+          <div class="field-group">
+            <label>Amount ($)</label>
+            <input type="number" id="f-amount-${id}" placeholder="0.00" step="0.01" min="0" oninput="recalc(${id})">
+          </div>
+          <div class="field-group">
+            <label>HST ($)</label>
+            <input type="number" id="f-hst-${id}" placeholder="0.00" step="0.01" min="0" oninput="recalc(${id})">
+          </div>
+        </div>`;
+    }
+
     const placeholder = type === 'hotel' ? 'Hotel name / location' : type === 'rental' ? 'Rental company / vehicle' : 'Description';
     return `
       <div class="row-fields fields-standard">
@@ -707,6 +733,10 @@
         <div class="field-group">
           <label>Amount ($)</label>
           <input type="number" id="f-amount-${id}" placeholder="0.00" step="0.01" min="0" oninput="recalc(${id})">
+        </div>
+        <div class="field-group">
+          <label>HST ($)</label>
+          <input type="number" id="f-hst-${id}" placeholder="0.00" step="0.01" min="0" oninput="recalc(${id})">
         </div>
       </div>`;
   }
@@ -728,6 +758,7 @@
           <option value="mileage">Mileage</option>
           <option value="rental">Rental Car</option>
           <option value="misc">Misc</option>
+          <option value="evacuee">Evacuee Cost</option>
         </select>
         <span class="type-badge" id="badge-${id}"></span>
         <button class="row-remove-btn" onclick="removeRow(${id})" title="Remove item">
@@ -821,11 +852,17 @@
     return parseFloat(document.getElementById(`f-amount-${id}`)?.value) || 0;
   }
 
+  function getRowHst(id) {
+    const type = document.getElementById(`type-${id}`)?.value;
+    if (!['hotel','rental','misc','evacuee'].includes(type)) return 0;
+    return parseFloat(document.getElementById(`f-hst-${id}`)?.value) || 0;
+  }
+
   function updateTotal() {
     let total = 0;
     document.querySelectorAll('.expense-row').forEach(row => {
       const id = parseInt(row.id.replace('row-', ''));
-      total += getRowValue(id);
+      total += getRowValue(id) + getRowHst(id);
     });
     document.getElementById('totalDisplay').innerHTML = `$${total.toFixed(2)}<span>CAD</span>`;
   }
@@ -915,18 +952,21 @@
       const type = document.getElementById(`type-${id}`)?.value;
       if (!type) continue;
       const value    = getRowValue(id);
+      const hst      = getRowHst(id);
       const receipts = rowReceipts[id] || [];
       const date     = document.getElementById(`f-date-${id}`)?.value || '';
       if (type === 'meal') {
-        const period     = document.getElementById(`f-mealperiod-${id}`)?.value || '';
-        const actual     = parseFloat(document.getElementById(`f-actual-${id}`)?.value) || 0;
-        const max        = MEAL_ALLOWANCES[period] || 0;
-        rows.push({ type, date, mealPeriod: period, mealsActual: actual, mealClaimed: value, exceeded: period && actual > max ? 'Y' : (period ? 'N' : '-'), mealIneligible: false, value, receipts });
+        const period = document.getElementById(`f-mealperiod-${id}`)?.value || '';
+        const actual = parseFloat(document.getElementById(`f-actual-${id}`)?.value) || 0;
+        const max    = MEAL_ALLOWANCES[period] || 0;
+        rows.push({ type, date, mealPeriod: period, mealsActual: actual, mealClaimed: value, exceeded: period && actual > max ? 'Y' : (period ? 'N' : '-'), mealIneligible: false, value, hst: 0, receipts });
       } else if (type === 'mileage') {
         const km = parseFloat(document.getElementById(`f-km-${id}`)?.value) || 0;
-        rows.push({ type, date, description: document.getElementById(`f-desc-${id}`)?.value || '', km, value, receipts });
+        rows.push({ type, date, description: document.getElementById(`f-desc-${id}`)?.value || '', km, value, hst: 0, receipts });
+      } else if (type === 'evacuee') {
+        rows.push({ type, date, evacueeCategory: document.getElementById(`f-evcat-${id}`)?.value || '', amount: value, value, hst, receipts });
       } else {
-        rows.push({ type, date, description: document.getElementById(`f-desc-${id}`)?.value || '', amount: parseFloat(document.getElementById(`f-amount-${id}`)?.value) || 0, value, receipts });
+        rows.push({ type, date, description: document.getElementById(`f-desc-${id}`)?.value || '', amount: value, value, hst, receipts });
       }
     }
     return rows;
@@ -1064,7 +1104,7 @@
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>Building report...';
     try {
-      const total = parseFloat(rows.reduce((s, r) => s + r.value, 0).toFixed(2));
+      const total = parseFloat(rows.reduce((s, r) => s + r.value + (r.hst || 0), 0).toFixed(2));
       const formData = {
         contractorName:  document.getElementById('contractorName').value.trim(),
         contractorEmail: document.getElementById('contractorEmail').value.trim(),
