@@ -533,12 +533,13 @@ width: 100%;
           <select id="site" onchange="handleSiteChange()">
             <option value="">Select...</option>
             <option value="Kingston">Kingston</option>
+            <option value="Kingston West">Kingston West</option>
             <option value="Kapuskasing">Kapuskasing</option>
             <option value="Timmins">Timmins</option>
             <option value="EOC">EOC</option>
           </select>
         </div>
-         </div>
+        <input type="hidden" id="jobNumber" value="">
       <div style="margin-top:16px">
         <div class="field-group">
           <label>Submission Period <span class="req">*</span></label>
@@ -623,10 +624,20 @@ width: 100%;
   let rowCount = 0;
 
   // ---- SITE NOTICES ----
+  const JOB_NUMBERS = {
+    'Kapuskasing':   '900084',
+    'EOC':           '900085',
+    'Kingston':      '900086',
+    'Sault Ste Marie': '900087',
+    'Kingston West': '900088',
+    'Timmins':       '900093',
+  };
+
   function handleSiteChange() {
     const site = document.getElementById('site').value;
+    document.getElementById('jobNumber').value = JOB_NUMBERS[site] || '';
     document.getElementById('totalDisplay').innerHTML = '$0.00<span>CAD</span>';
-            document.querySelectorAll('.expense-row').forEach(row => {
+    document.querySelectorAll('.expense-row').forEach(row => {
       const id = parseInt(row.id.replace('row-', ''));
       if (document.getElementById(`type-${id}`)?.value === 'meal') recalc(id);
     });
@@ -1191,6 +1202,7 @@ width: 100%;
         site:            document.getElementById('site').value,
         periodStart:     document.getElementById('periodStart').value,
         periodEnd:       document.getElementById('periodEnd').value,
+        jobNumber:       document.getElementById('jobNumber').value || '',
         rows, total
       };
       const signatureBase64 = canvas.toDataURL('image/png');
