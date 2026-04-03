@@ -354,13 +354,7 @@
 
 <script>
 var AUTH_KEY = 'eoc_authed';
-var PW_HASH = 'cccf9594bbe788e33faca2a3d5662cf78b1182a72563ab435ee8ad050cc990ef';
-
-function hashPassword(pw) {
-  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw)).then(function(buf) {
-    return Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
-  });
-}
+var WORKER_URL = 'https://loomi-data.loomex-it.workers.dev/eoc-auth';
 
 window.addEventListener('DOMContentLoaded', function() {
   if (localStorage.getItem(AUTH_KEY) === '1') showEocSection();
@@ -383,8 +377,12 @@ function submitEocLogin() {
   btn.disabled = true;
   btn.textContent = 'Checking...';
   errEl.classList.remove('visible');
-  hashPassword(pw).then(function(hash) {
-    if (hash === PW_HASH) {
+  fetch(WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pw })
+  }).then(function(res) { return res.json(); }).then(function(data) {
+    if (data.ok) {
       localStorage.setItem(AUTH_KEY, '1');
       closeModal('loginModal');
       document.getElementById('eocPassword').value = '';
@@ -394,6 +392,11 @@ function submitEocLogin() {
       errEl.textContent = 'Incorrect password. Please try again.';
       errEl.classList.add('visible');
     }
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }).catch(function() {
+    errEl.textContent = 'Could not reach server. Please try again.';
+    errEl.classList.add('visible');
     btn.disabled = false;
     btn.textContent = 'Sign In';
   });
