@@ -216,7 +216,7 @@
       display: grid;
       gap: 12px;
     }
-    .fields-standard { grid-template-columns: 150px 1fr 140px 140px; }
+    .fields-standard { grid-template-columns: 150px 1fr 130px 130px 130px; }
     .fields-meal     { grid-template-columns: 130px 140px 120px 120px 120px; }
     .fields-mileage  { grid-template-columns: 150px 1fr 120px 130px; }
     .fields-evacuee  { grid-template-columns: 150px 1fr 140px 140px; }
@@ -767,13 +767,17 @@
           <input type="text" id="f-desc-${id}" placeholder="${placeholder}">
         </div>
         <div class="field-group">
-          <label>Total Amount (including HST) ($)</label>
+          <label>Subtotal ($)</label>
           <input type="number" id="f-amount-${id}" placeholder="0.00" step="0.01" min="0" oninput="recalc(${id})">
         </div>
         <div class="field-group">
           <label>HST (13%, auto)</label>
           <input type="number" id="f-hst-${id}" class="auto-field" step="0.01" min="0" placeholder="Auto" oninput="confirmHst(${id})" style="cursor:text;">
           <button type="button" class="hst-confirm-btn" id="f-hstbtn-${id}" onclick="confirmHst(${id})">&#10003; Confirm HST</button>
+        </div>
+        <div class="field-group">
+          <label>Total Amount ($)</label>
+          <input type="text" id="f-total-${id}" class="auto-field" readonly placeholder="Auto">
         </div>
       </div>`;
   }
@@ -893,6 +897,10 @@
   function confirmHst(id) {
     const btn = document.getElementById(`f-hstbtn-${id}`);
     if (btn) { btn.textContent = '✓ HST Confirmed'; btn.classList.add('confirmed'); }
+    const amount = parseFloat(document.getElementById(`f-amount-${id}`)?.value) || 0;
+    const hst = parseFloat(document.getElementById(`f-hst-${id}`)?.value) || 0;
+    const te = document.getElementById(`f-total-${id}`);
+    if (te) te.value = amount > 0 ? '$' + (amount + hst).toFixed(2) : '';
   }
 
   function recalc(id) {
@@ -932,6 +940,8 @@
       if (he) he.value = amount > 0 ? hst.toFixed(2) : '';
       const hb = document.getElementById(`f-hstbtn-${id}`);
       if (hb) { hb.textContent = '✓ Confirm HST'; hb.classList.remove('confirmed'); }
+      const te = document.getElementById(`f-total-${id}`);
+      if (te) te.value = amount > 0 ? '$' + (amount + hst).toFixed(2) : '';
     }
 
     updateTotal();
