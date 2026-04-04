@@ -23,99 +23,51 @@
     .header-badge { background: var(--green); color: white; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 6px 12px; border-radius: 20px; white-space: nowrap; font-family: 'DM Mono', monospace; }
     .card { background: var(--white); box-shadow: var(--shadow-card); }
     .card-section { padding: 32px 36px; border-bottom: 1px solid #eef0f3; }
-
-    /* Login */
     #loginView { max-width: 400px; margin: 60px auto; }
     #loginView .card-section { border-radius: 12px; border: none; }
     .field-group { display: flex; flex-direction: column; gap: 6px; }
     label { font-size: 12px; font-weight: 600; color: var(--navy); }
-    input[type="password"] {
-      border: 1.5px solid var(--grey-border); border-radius: 8px; padding: 10px 14px;
-      font-size: 14px; font-family: inherit; width: 100%; color: var(--text); background: var(--white);
-      transition: border-color 0.15s;
-    }
+    input[type="password"] { border: 1.5px solid var(--grey-border); border-radius: 8px; padding: 10px 14px; font-size: 14px; font-family: inherit; width: 100%; color: var(--text); background: var(--white); transition: border-color 0.15s; }
     input[type="password"]:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(0,166,81,0.12); }
-    .btn-login {
-      width: 100%; margin-top: 16px; background: var(--navy); color: white; border: none; border-radius: 10px;
-      padding: 13px 24px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
-      transition: background 0.15s; letter-spacing: -0.2px;
-    }
+    .btn-login { width: 100%; margin-top: 16px; background: var(--navy); color: white; border: none; border-radius: 10px; padding: 13px 24px; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.15s; letter-spacing: -0.2px; }
     .btn-login:hover:not(:disabled) { background: #0f2640; }
     .btn-login:disabled { background: #a0adb8; cursor: not-allowed; }
     .login-error { font-size: 13px; color: var(--error); margin-top: 10px; min-height: 20px; }
-
-    /* Repository */
     #repoView { display: none; }
     .toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 20px 36px; border-bottom: 1px solid #eef0f3; background: #fafbfc; }
-    .toolbar input[type="text"] {
-      border: 1.5px solid var(--grey-border); border-radius: 8px; padding: 8px 14px;
-      font-size: 13px; font-family: inherit; width: 260px; color: var(--text);
-    }
+    .toolbar input[type="text"] { border: 1.5px solid var(--grey-border); border-radius: 8px; padding: 8px 14px; font-size: 13px; font-family: inherit; width: 260px; color: var(--text); }
     .toolbar input[type="text"]:focus { outline: none; border-color: var(--green); }
-    .filter-btn {
-      padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
-      font-family: inherit; border: 1.5px solid var(--grey-border); background: white; color: var(--text-muted);
-      transition: all 0.12s;
-    }
+    .filter-btn { padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; border: 1.5px solid var(--grey-border); background: white; color: var(--text-muted); transition: all 0.12s; }
     .filter-btn.active { background: var(--navy); border-color: var(--navy); color: white; }
     .filter-btn:hover:not(.active) { background: var(--grey-bg); }
-    .refresh-btn {
-      padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
-      font-family: inherit; border: 1.5px solid var(--green-mid); background: var(--green-light); color: var(--green-dark);
-      margin-left: auto;
-    }
+    .refresh-btn { padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; border: 1.5px solid var(--green-mid); background: var(--green-light); color: var(--green-dark); margin-left: auto; }
     .refresh-btn:hover { background: var(--green-mid); }
     .count-badge { font-size: 12px; color: var(--text-muted); }
-
-    /* Table */
     .table-wrap { overflow-x: auto; padding: 0; }
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    thead th {
-      background: var(--navy); color: rgba(255,255,255,0.8); padding: 9px 10px;
-      text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; white-space: nowrap;
-    }
+    thead th { background: var(--navy); color: rgba(255,255,255,0.8); padding: 9px 10px; text-align: left; font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; white-space: nowrap; }
     tbody tr { border-bottom: 1px solid #eef0f3; }
     tbody tr:hover td { background: #fafbfc; }
     td { padding: 8px 10px; vertical-align: middle; white-space: nowrap; }
     td.mono { font-family: 'DM Mono', monospace; font-size: 11px; }
-
-    /* Status badges */
-    .status-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-    }
+    .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
     .status-pending          { background: #fff8e1; color: #7a5200; }
     .status-approved         { background: var(--green-light); color: var(--green-dark); }
     .status-rejected         { background: #fef2f2; color: #9f1239; }
     .status-finance-approved { background: #eff6ff; color: #1d4ed8; }
-
-    .btn-finance {
-      display: inline-block; margin-top: 5px; padding: 3px 8px;
-      border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer;
-      font-family: inherit; border: 1.5px solid #bfdbfe; background: #eff6ff; color: #1d4ed8;
-      transition: all 0.12s; white-space: nowrap;
-    }
+    .btn-finance { display: inline-block; margin-top: 5px; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; font-family: inherit; border: 1.5px solid #bfdbfe; background: #eff6ff; color: #1d4ed8; transition: all 0.12s; white-space: nowrap; }
     .btn-finance:hover { background: #dbeafe; }
-
-    .btn-delete {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 26px; height: 26px; border-radius: 6px; border: 1.5px solid #fecaca;
-      background: #fff5f5; color: #dc2626; font-size: 14px; font-weight: 700;
-      cursor: pointer; font-family: inherit; line-height: 1; transition: all 0.12s;
-    }
+    .btn-delete { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; border: 1.5px solid #fecaca; background: #fff5f5; color: #dc2626; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; line-height: 1; transition: all 0.12s; }
     .btn-delete:hover { background: #fee2e2; border-color: #dc2626; }
-
     .sp-link { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; font-size: 11px; font-weight: 600; color: #1d4ed8; text-decoration: none; white-space: nowrap; }
     .sp-link:hover { background: #dbeafe; }
     .no-sp { color: var(--text-muted); font-size: 12px; }
-
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner-lg { width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: var(--navy); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 14px; }
     .state-box { padding: 48px 36px; text-align: center; }
     .state-box p { color: var(--text-muted); font-size: 14px; }
     .page-footer { background: var(--grey-footer); border-radius: 0 0 12px 12px; padding: 14px 36px; text-align: center; }
     .page-footer p { color: rgba(255,255,255,0.7); font-size: 12px; }
-
     @media (max-width: 640px) {
       body { padding: 0 0 48px; }
       .header { padding: 20px; border-radius: 0; flex-wrap: wrap; }
@@ -128,7 +80,6 @@
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="loginView">
   <div class="card" style="border-radius:12px">
     <div style="background:var(--navy);padding:24px 32px;border-radius:12px 12px 0 0;">
@@ -146,7 +97,6 @@
   </div>
 </div>
 
-<!-- REPOSITORY -->
 <div id="repoView">
   <div class="container">
     <div class="header">
@@ -184,7 +134,8 @@
               <th>Site</th>
               <th>Period</th>
               <th>Submitted</th>
-              <th>Total</th>
+              <th>Claimed</th>
+              <th>Approved</th>
               <th>Status</th>
               <th>Documents</th>
               <th></th>
@@ -322,12 +273,15 @@
     };
 
     document.getElementById('tableBody').innerHTML = rows.map(s => {
-      const submitted  = s.submittedAt ? new Date(s.submittedAt).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
-      const period     = s.periodStart && s.periodEnd ? `${s.periodStart} to ${s.periodEnd}` : '—';
-      const total      = s.total != null ? `$${parseFloat(s.total).toFixed(2)}` : '—';
-      const status     = statusHTML[s.status] || `<span class="status-badge">${s.status}</span>`;
-      const approvedBy = s.approvedBy ? `<br><span style="font-size:11px;color:var(--text-muted)">${s.approvedBy}</span>` : '';
-      const financeBtn = s.status === 'approved'
+      const submitted    = s.submittedAt ? new Date(s.submittedAt).toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+      const period       = s.periodStart && s.periodEnd ? `${s.periodStart} to ${s.periodEnd}` : '—';
+      const claimed      = s.total != null ? `$${parseFloat(s.total).toFixed(2)}` : '—';
+      const approved     = s.approvedTotal != null
+        ? `<strong style="color:var(--green-dark);">$${parseFloat(s.approvedTotal).toFixed(2)}</strong>`
+        : `<span style="color:var(--text-muted);font-size:11px;">—</span>`;
+      const status       = statusHTML[s.status] || `<span class="status-badge">${s.status}</span>`;
+      const approvedBy   = s.approvedBy ? `<br><span style="font-size:11px;color:var(--text-muted)">${s.approvedBy}</span>` : '';
+      const financeBtn   = s.status === 'approved'
         ? `<br><button class="btn-finance" onclick="markFinanceApproved('${s.reportNumber}')">Mark Finance Approved</button>`
         : '';
       const spLink = s.spFolderUrl
@@ -340,7 +294,8 @@
         <td>${s.site || '—'}</td>
         <td>${period}</td>
         <td>${submitted}</td>
-        <td class="mono"><strong>${total}</strong></td>
+        <td class="mono">${claimed}</td>
+        <td class="mono">${approved}</td>
         <td style="white-space:normal;min-width:150px">${status}${approvedBy}${financeBtn}</td>
         <td>${spLink}</td>
         <td><button class="btn-delete" onclick="deleteReport('${s.reportNumber}')" title="Remove from tracker">&times;</button></td>
