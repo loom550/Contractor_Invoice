@@ -868,7 +868,7 @@ async function loadPending() {
   el.innerHTML = '<div class="state-box"><div class="big-icon">⏳</div>Loading…</div>';
 
   try {
-    const res  = await fetch(`${WORKER}/hr-pending?token=${sessionToken}`);
+    const res  = await fetch(`${WORKER}/hr-pending?token=${encodeURIComponent(sessionToken)}`);
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
 
@@ -1010,7 +1010,7 @@ async function doSearch() {
   res_el.innerHTML = '<div class="state-box"><div class="big-icon">🔍</div>Searching…</div>';
 
   try {
-    const res  = await fetch(`${WORKER}/hr-contractor?token=${sessionToken}&q=${encodeURIComponent(q)}`);
+    const res  = await fetch(`${WORKER}/hr-contractor?token=${encodeURIComponent(sessionToken)}&q=${encodeURIComponent(q)}`);
     const data = await res.json();
     if (!data.success) throw new Error(data.error);
 
