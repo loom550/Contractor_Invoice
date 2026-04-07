@@ -215,7 +215,7 @@ body {
 .window-del:hover { color: var(--red); }
 .empty-windows { text-align: center; padding: 20px; color: var(--text-muted); font-size: 13px; background: var(--surface); border: 1px dashed var(--border); border-radius: 6px; }
 
-/* DEPLOYMENT POPUP */
+/* POPUP */
 .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 200; display: none; align-items: center; justify-content: center; }
 .popup-overlay.open { display: flex; }
 .popup { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; max-width: 380px; width: 90%; }
@@ -227,8 +227,8 @@ body {
 .popup-locked-msg { background: rgba(224,82,82,.08); border: 1px solid rgba(224,82,82,.2); border-radius: 6px; padding: 12px; font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-top: 16px; }
 .popup-locked-msg a { color: var(--green); }
 
-/* ERROR/SUCCESS */
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 20px; font-size: 13px; z-index: 300; opacity: 0; transition: opacity .2s; pointer-events: none; }
+/* TOAST */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 20px; font-size: 13px; z-index: 300; opacity: 0; transition: opacity .2s; pointer-events: none; white-space: nowrap; }
 .toast.show { opacity: 1; }
 .toast.success { border-color: rgba(0,166,81,.4); color: var(--green); }
 .toast.error { border-color: rgba(224,82,82,.4); color: var(--red); }
@@ -236,25 +236,87 @@ body {
 .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 8px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* PROFILE */
 .profile-section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 24px; }
-.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .profile-field label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: 5px; }
-.profile-field input { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 5px; font-size: 13px; font-family: 'IBM Plex Sans', sans-serif; }
+.profile-field input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 13px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: border-color .15s;
+}
 .profile-field input:focus { outline: none; border-color: var(--green); }
 .profile-field.full { grid-column: 1 / -1; }
-.profile-save-btn { background: var(--green); color: #fff; border: none; padding: 8px 20px; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.profile-save-btn { background: var(--green); color: #fff; border: none; padding: 8px 20px; border-radius: 5px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 16px; }
 .profile-save-btn:hover { background: var(--green-dim); }
 .profile-save-btn:disabled { opacity: .5; cursor: not-allowed; }
-.profile-nights-wrap { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); margin-bottom: 16px; cursor: pointer; transition: border-color .15s, background .15s; }
+.profile-divider { height: 1px; background: var(--border); margin: 18px 0; }
+.profile-nights-wrap { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; transition: border-color .15s, background .15s; }
 .profile-nights-wrap:has(input:checked) { border-color: rgba(0,166,81,.4); background: rgba(0,166,81,.08); }
 .profile-nights-wrap input { accent-color: var(--green); width: 18px; height: 18px; cursor: pointer; flex-shrink: 0; }
 .profile-nights-label { font-size: 13px; color: var(--text-muted); cursor: pointer; transition: color .15s; }
 .profile-nights-wrap:has(input:checked) .profile-nights-label { color: var(--green); }
-.profile-loc-checks { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.profile-loc-checks { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
 .profile-loc-item { display: flex; align-items: center; gap: 5px; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
 .profile-loc-item input { accent-color: var(--green); cursor: pointer; }
 .profile-loc-item:has(input:checked) { border-color: rgba(0,166,81,.4); background: rgba(0,166,81,.08); color: var(--green); }
 .profile-sublabel { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; display: block; margin-bottom: 8px; }
+
+/* DOCUMENTS */
+.docs-section { margin-bottom: 28px; }
+.docs-note { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
+.docs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 540px) { .docs-grid { grid-template-columns: 1fr; } .profile-grid { grid-template-columns: 1fr; } }
+.doc-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; transition: border-color .2s, background .2s; }
+.doc-card.is-approved { border-color: rgba(0,166,81,.3); background: rgba(0,166,81,.04); }
+.doc-card.is-pending { border-color: rgba(212,160,23,.3); }
+.doc-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.doc-card-label { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.3; }
+.doc-badge { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; }
+.doc-badge.approved { background: rgba(0,166,81,.15); color: var(--green); border: 1px solid rgba(0,166,81,.3); }
+.doc-badge.pending { background: rgba(212,160,23,.12); color: var(--amber); border: 1px solid rgba(212,160,23,.3); }
+.doc-badge.na { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+.doc-upload-btn {
+  background: var(--surface2);
+  border: 1px dashed var(--border);
+  color: var(--text-dim);
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  transition: border-color .15s, color .15s;
+  width: 100%;
+  text-align: center;
+  display: block;
+}
+.doc-upload-btn:hover { border-color: var(--green); color: var(--green); }
+.doc-upload-hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; text-align: center; }
+.doc-locked-note { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.doc-locked-note a { color: var(--green); }
+.doc-uploading { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; justify-content: center; padding: 8px 0; }
+.no-dl-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.no-dl-wrap:has(input:checked) { border-color: rgba(212,160,23,.4); color: var(--amber); }
+.no-dl-wrap input { accent-color: var(--amber); cursor: pointer; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -285,8 +347,6 @@ body {
     <div style="text-align:center;margin-top:16px">
       <button id="forgot-link-btn" style="background:none;border:none;color:var(--text-muted);font-size:12px;cursor:pointer;text-decoration:underline">Forgot your Contractor ID?</button>
     </div>
-
-    <!-- FORGOT PANEL -->
     <div id="forgot-panel" style="display:none;margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
       <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Forgot Contractor ID</div>
       <div class="form-field">
@@ -314,26 +374,46 @@ body {
     <!-- PROFILE SECTION -->
     <div class="profile-section" id="profile-section">
       <div class="section-title" style="margin-bottom:14px">Your Information</div>
-      <div class="profile-grid">
-        <div class="profile-field"><label>Full Name <span style="color:var(--red)">*</span></label><input type="text" id="prof-name" placeholder="Your name"></div>
-<div class="profile-field"><label>Phone <span style="color:var(--red)">*</span></label><input type="tel" id="prof-phone" placeholder="Phone number"></div>
-<div class="profile-field full"><label>Address <span style="color:var(--red)">*</span></label><input type="text" id="prof-address" placeholder="Street, City, Province, Postal Code"></div>
-<div class="profile-field full"><label>Email <span style="color:var(--red)">*</span></label><input type="email" id="prof-email" placeholder="Email address"></div>
+      <div class="profile-grid" style="margin-bottom:14px">
+        <div class="profile-field"><label>Full Name <span style="color:var(--red)">*</span></label><input type="text" id="prof-name" placeholder="Your full name"></div>
+        <div class="profile-field"><label>Phone <span style="color:var(--red)">*</span></label><input type="tel" id="prof-phone" placeholder="Phone number"></div>
+        <div class="profile-field full"><label>Address <span style="color:var(--red)">*</span></label><input type="text" id="prof-address" placeholder="Street, City, Province, Postal Code"></div>
+        <div class="profile-field"><label>Email <span style="color:var(--red)">*</span></label><input type="email" id="prof-email" placeholder="Email address"></div>
+        <div class="profile-field"><label>Date of Birth <span style="color:var(--red)">*</span></label><input type="date" id="prof-dob"></div>
       </div>
-      <div style="margin-top:4px;margin-bottom:8px"><span class="profile-sublabel">Available for Night Shifts</span>
-      <div class="profile-nights-wrap"><input type="checkbox" id="prof-nights"><label class="profile-nights-label" for="prof-nights">I am available for night shifts (12hr)</label></div></div>
+
+      <div class="profile-divider"></div>
+      <span class="profile-sublabel">Emergency Contact</span>
+      <div class="profile-grid" style="margin-bottom:14px">
+        <div class="profile-field"><label>Contact Name <span style="color:var(--red)">*</span></label><input type="text" id="prof-emerg-name" placeholder="Full name"></div>
+        <div class="profile-field"><label>Contact Phone <span style="color:var(--red)">*</span></label><input type="tel" id="prof-emerg-phone" placeholder="Phone number"></div>
+      </div>
+
+      <div class="profile-divider"></div>
+      <span class="profile-sublabel">Available for Night Shifts</span>
+      <div class="profile-nights-wrap" style="margin-bottom:16px"><input type="checkbox" id="prof-nights"><label class="profile-nights-label" for="prof-nights">I am available for night shifts (12hr)</label></div>
       <span class="profile-sublabel">Preferred Deployment Locations</span>
       <div class="profile-loc-checks" id="prof-loc-checks"><span style="color:var(--text-muted);font-size:12px">Loading...</span></div>
       <button class="profile-save-btn" id="prof-save-btn">Save Changes</button>
     </div>
 
-    <div class="legend">
+    <!-- DOCUMENTS SECTION -->
+    <div class="docs-section">
+      <div class="section-title" style="margin-bottom:6px">Required Documents</div>
+      <div class="docs-note">Upload your certificates below. Each document is reviewed and approved by the Loomex team. Once approved it is locked. Contact <a href="mailto:eocstaffing@loomex.ca" style="color:var(--green)">eocstaffing@loomex.ca</a> if a correction is needed.</div>
+      <div class="docs-grid" id="docs-grid">
+        <div style="grid-column:1/-1;color:var(--text-muted);font-size:13px;padding:10px 0"><span class="loading-spinner"></span>Loading documents...</div>
+      </div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="legend" style="margin-top:4px">
       <div class="legend-item"><div class="legend-dot" style="background:rgba(0,166,81,.3);border:1px solid rgba(0,166,81,.5)"></div>Available</div>
       <div class="legend-item"><div class="legend-dot" style="background:rgba(26,58,92,.6);border:1px solid #234d75"></div>Deployed</div>
       <div class="legend-item"><div class="legend-dot" style="background:rgba(212,160,23,.2);border:1px solid rgba(212,160,23,.5)"></div>Selecting</div>
     </div>
 
-    <div class="cal-nav">
+    <div class="cal-nav" style="margin-top:20px">
       <button class="cal-nav-btn" id="cal-prev">&#8249;</button>
       <div class="cal-month" id="cal-month-label"></div>
       <button class="cal-nav-btn" id="cal-next">&#8250;</button>
@@ -354,7 +434,7 @@ body {
 </div>
 
 <!-- DEPLOYMENT POPUP -->
-<div class="popup-overlay" id="popup-overlay" id="popup-close-el">
+<div class="popup-overlay" id="popup-overlay">
   <div class="popup" id="popup-inner">
     <div class="popup-title">
       <span>&#128274; Confirmed Deployment</span>
@@ -362,7 +442,7 @@ body {
     </div>
     <div id="popup-body"></div>
     <div class="popup-locked-msg">
-      Need to change your availability for this period? Contact <a href="/cdn-cgi/l/email-protection#e98c868a9a9d888f8f80878ea9858686848c91c78a88"><span class="__cf_email__" data-cfemail="680d070b1b1c090e0e01060f28040707050d10460b09">[email&#160;protected]</span></a>.
+      Need to change your availability for this period? Contact <a href="mailto:eocstaffing@loomex.ca">eocstaffing@loomex.ca</a>.
     </div>
   </div>
 </div>
@@ -375,16 +455,28 @@ var MON = ['January','February','March','April','May','June','July','August','Se
 var MON_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-var auth = null; // {email, contractorId, name, recordId}
-var activation = null; // {title, startDate, endDate}
-var windows = []; // [{start, end}]
-var deployments = []; // [{startDate, endDate, location, travelRequired}]
+var auth = null;
+var activation = null;
+var windows = [];
+var deployments = [];
 var today = new Date().toISOString().slice(0,10);
 var _today = new Date();
 var calYear = _today.getFullYear();
 var calMonth = _today.getMonth();
 var selecting = false;
 var selStart = null, selEnd = null;
+var docStatus = {};   // { 'AODA Certificate': { approved: bool, uploaded: bool }, ... }
+var noDL = false;
+var uploading = {};   // { 'Driver\'s License': true } while in-flight
+
+var DOC_TYPES = [
+  { key: 'AODA Certificate',    label: 'AODA Certificate'    },
+  { key: 'MOL H&S Certificate', label: 'MOL H&S Certificate' },
+  { key: 'WHMIS Certificate',   label: 'WHMIS Certificate'   },
+  { key: "Driver's License",    label: "Driver's License",   hasDL: true },
+];
+
+// ── Utilities ────────────────────────────────────────────────────────────────
 
 function dateStr(y,m,d){ return y+'-'+(m+1<10?'0':'')+(m+1)+'-'+(d<10?'0':'')+d; }
 function fmtDate(ds){ if(!ds)return '-'; var d=new Date(ds+'T00:00:00'); return MON_SHORT[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear(); }
@@ -398,19 +490,22 @@ function isInActivation(ds){
   var s=activation.startDate, e=activation.endDate||'2099-12-31';
   return ds>=s&&ds<=e;
 }
-
+function escHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 function showToast(msg, type){
   var t=document.getElementById('toast');
   t.textContent=msg; t.className='toast '+type+' show';
-  setTimeout(function(){t.className='toast';},3000);
+  setTimeout(function(){t.className='toast';},3200);
 }
-
 async function api(path, opts){
   var res = await fetch(WORKER+path, Object.assign({headers:{'Content-Type':'application/json'}}, opts||{}));
   var data = await res.json();
   if(!res.ok) throw new Error(data.error||'HTTP '+res.status);
   return data;
 }
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
 
 async function doLogin(){
   var email = document.getElementById('login-email').value.trim().toLowerCase();
@@ -459,6 +554,8 @@ async function doForgot(){
   finally{btn.disabled=false;btn.textContent='Send My Contractor ID';}
 }
 
+// ── Profile ───────────────────────────────────────────────────────────────────
+
 async function loadProfile(){
   try{
     var data=await api('/avail-profile?email='+encodeURIComponent(auth.email)+'&contractorId='+encodeURIComponent(auth.contractorId));
@@ -466,16 +563,18 @@ async function loadProfile(){
     document.getElementById('prof-phone').value=data.phone||'';
     document.getElementById('prof-address').value=data.address||'';
     document.getElementById('prof-email').value=data.email||'';
+    document.getElementById('prof-dob').value=data.dob||'';
+    document.getElementById('prof-emerg-name').value=data.emergencyName||'';
+    document.getElementById('prof-emerg-phone').value=data.emergencyPhone||'';
     document.getElementById('prof-nights').checked=data.nightOk||false;
-    // Load location choices and render checkboxes
+    noDL=data.noDL||false;
     try{
       var opts=await api('/contractor-profile-options');
       var choices=opts.preferredLocationChoices||[];
       var prefLocs=data.preferredLocations||[];
-      var checksHtml=choices.map(function(l){
-        return '<label class="profile-loc-item"><input type="checkbox" value="'+l+'" '+(prefLocs.indexOf(l)>-1?'checked':'')+'>'+l+'</label>';
-      }).join('');
-      document.getElementById('prof-loc-checks').innerHTML=checksHtml||'<span style="color:var(--text-muted);font-size:12px">No options available</span>';
+      document.getElementById('prof-loc-checks').innerHTML=choices.map(function(l){
+        return '<label class="profile-loc-item"><input type="checkbox" value="'+escHtml(l)+'" '+(prefLocs.indexOf(l)>-1?'checked':'')+'>'+escHtml(l)+'</label>';
+      }).join('')||'<span style="color:var(--text-muted);font-size:12px">No options available</span>';
     }catch(e){document.getElementById('prof-loc-checks').innerHTML='<span style="color:var(--text-muted);font-size:12px">Could not load options</span>';}
   }catch(e){}
 }
@@ -483,37 +582,160 @@ async function loadProfile(){
 async function saveProfile(){
   var btn=document.getElementById('prof-save-btn');
   var name=document.getElementById('prof-name').value.trim();
-var phone=document.getElementById('prof-phone').value.trim();
-var address=document.getElementById('prof-address').value.trim();
-var email=document.getElementById('prof-email').value.trim();
-if(!name||!phone||!address||!email){
-  showToast('Please fill in all required fields before saving.','error');
-  return;
-}
-  btn.disabled=true;btn.textContent='Saving...';
-  var newEmail=document.getElementById('prof-email').value.trim();
+  var phone=document.getElementById('prof-phone').value.trim();
+  var address=document.getElementById('prof-address').value.trim();
+  var email=document.getElementById('prof-email').value.trim();
+  var dob=document.getElementById('prof-dob').value;
+  var emergName=document.getElementById('prof-emerg-name').value.trim();
+  var emergPhone=document.getElementById('prof-emerg-phone').value.trim();
+  if(!name||!phone||!address||!email||!dob||!emergName||!emergPhone){
+    showToast('Please fill in all required fields.','error');
+    return;
+  }
+  btn.disabled=true; btn.textContent='Saving...';
   try{
     var locs=[];
     document.querySelectorAll('#prof-loc-checks input:checked').forEach(function(cb){locs.push(cb.value);});
     await api('/avail-profile',{method:'PATCH',body:JSON.stringify({
-      email:auth.email,
-      contractorId:auth.contractorId,
-      name:document.getElementById('prof-name').value.trim(),
-      phone:document.getElementById('prof-phone').value.trim(),
-      address:document.getElementById('prof-address').value.trim(),
-      newEmail:newEmail,
-      nightOk:document.getElementById('prof-nights').checked,
-      preferredLocations:locs,
+      email: auth.email,
+      contractorId: auth.contractorId,
+      name: name,
+      phone: phone,
+      address: address,
+      newEmail: email,
+      dob: dob,
+      emergencyName: emergName,
+      emergencyPhone: emergPhone,
+      nightOk: document.getElementById('prof-nights').checked,
+      noDL: noDL,
+      preferredLocations: locs,
     })});
-    // Update local auth if email changed
-    if(newEmail&&newEmail!==auth.email){
-      auth.email=newEmail;
+    if(email && email !== auth.email){
+      auth.email=email;
       localStorage.setItem('loomi_avail_auth',JSON.stringify(auth));
     }
     showToast('Profile updated!','success');
-  }catch(e){showToast('Save failed: '+e.message,'error');}
-  finally{btn.disabled=false;btn.textContent='Save Changes';}
+  }catch(e){ showToast('Save failed: '+e.message,'error'); }
+  finally{ btn.disabled=false; btn.textContent='Save Changes'; }
 }
+
+// ── Documents ─────────────────────────────────────────────────────────────────
+
+async function loadDocs(){
+  try{
+    var data=await api('/avail-docs?email='+encodeURIComponent(auth.email)+'&contractorId='+encodeURIComponent(auth.contractorId));
+    docStatus=data.docs||{};
+  }catch(e){
+    docStatus={};
+  }
+}
+
+function renderDocs(){
+  var grid=document.getElementById('docs-grid');
+  if(!grid) return;
+
+  grid.innerHTML=DOC_TYPES.map(function(dt){
+    var st=docStatus[dt.key]||{approved:false,uploaded:false};
+    var isDL=!!dt.hasDL;
+    var isUp=!!uploading[dt.key];
+    var cardCls='doc-card'+(st.approved?' is-approved':(!st.approved&&st.uploaded)?' is-pending':'');
+    var badgeHtml='';
+    var bodyHtml='';
+
+    if(st.approved){
+      badgeHtml='<span class="doc-badge approved">&#10003; Approved</span>';
+      bodyHtml='<div class="doc-locked-note">Approved and locked. Contact <a href="mailto:eocstaffing@loomex.ca">eocstaffing@loomex.ca</a> if a correction is needed.</div>';
+    } else if(isDL && noDL){
+      badgeHtml='<span class="doc-badge na">N/A</span>';
+      bodyHtml='<div class="doc-locked-note">Marked as not applicable. Uncheck below to upload instead.</div>';
+    } else if(isUp){
+      bodyHtml='<div class="doc-uploading"><span class="loading-spinner"></span>Uploading...</div>';
+    } else if(st.uploaded){
+      badgeHtml='<span class="doc-badge pending">Pending Review</span>';
+      bodyHtml='<div class="doc-locked-note">Your document is awaiting review. Contact <a href="mailto:eocstaffing@loomex.ca">eocstaffing@loomex.ca</a> if you need to replace it.</div>';
+    } else {
+      bodyHtml='<button class="doc-upload-btn" data-doctype="'+escHtml(dt.key)+'">&#8679;&nbsp; Upload File</button>'
+        +'<div class="doc-upload-hint">PDF, JPG, or PNG &mdash; max 10 MB</div>';
+    }
+
+    // "I don't have one" toggle -- only for DL and only when not yet approved
+    var dlCheckHtml='';
+    if(isDL && !st.approved){
+      dlCheckHtml='<label class="no-dl-wrap"><input type="checkbox" id="no-dl-check" '+(noDL?'checked':'')+'>&nbsp;I do not have a driver\'s license</label>';
+    }
+
+    return '<div class="'+cardCls+'">'
+      +'<div class="doc-card-header">'
+        +'<span class="doc-card-label">'+escHtml(dt.label)+'</span>'
+        +badgeHtml
+      +'</div>'
+      +dlCheckHtml
+      +bodyHtml
+      +'</div>';
+  }).join('');
+
+  // Upload button listeners (event delegation-safe: re-attached after each render)
+  grid.querySelectorAll('.doc-upload-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      triggerUpload(btn.dataset.doctype);
+    });
+  });
+
+  // No-DL checkbox
+  var noDLCheck=document.getElementById('no-dl-check');
+  if(noDLCheck){
+    noDLCheck.addEventListener('change', function(){
+      noDL=this.checked;
+      renderDocs();
+      // Fire-and-forget immediate save so the value persists on reload
+      api('/avail-profile',{method:'PATCH',body:JSON.stringify({
+        email: auth.email,
+        contractorId: auth.contractorId,
+        noDL: noDL,
+      })}).catch(function(){});
+    });
+  }
+}
+
+function triggerUpload(docType){
+  var inp=document.createElement('input');
+  inp.type='file';
+  inp.accept='.pdf,.jpg,.jpeg,.png';
+  inp.style.display='none';
+  document.body.appendChild(inp);
+  inp.addEventListener('change', function(){
+    var file=inp.files&&inp.files[0];
+    document.body.removeChild(inp);
+    if(file) handleUpload(docType, file);
+  });
+  inp.click();
+}
+
+async function handleUpload(docType, file){
+  if(file.size > 10*1024*1024){ showToast('File too large (max 10 MB)','error'); return; }
+  uploading[docType]=true;
+  renderDocs();
+  try{
+    var fd=new FormData();
+    fd.append('email', auth.email);
+    fd.append('contractorId', auth.contractorId);
+    fd.append('docType', docType);
+    fd.append('file', file);
+    var res=await fetch(WORKER+'/avail-upload', {method:'POST', body:fd});
+    var data=await res.json();
+    if(!res.ok) throw new Error(data.error||'Upload failed');
+    if(!docStatus[docType]) docStatus[docType]={approved:false,uploaded:false};
+    docStatus[docType].uploaded=true;
+    showToast(docType+' uploaded!','success');
+  }catch(e){
+    showToast('Upload failed: '+e.message,'error');
+  }finally{
+    delete uploading[docType];
+    renderDocs();
+  }
+}
+
+// ── App init ──────────────────────────────────────────────────────────────────
 
 async function initApp(){
   document.getElementById('login-screen').style.display='none';
@@ -521,47 +743,46 @@ async function initApp(){
   document.getElementById('header-user').textContent=auth.name;
   document.getElementById('welcome-name').textContent='Hi, '+auth.name.split(' ')[0];
   try{
-    activation = await api('/avail-activation');
+    activation=await api('/avail-activation');
     document.getElementById('welcome-act').textContent=activation.title+' \u2013 Active Activation';
     if(activation.startDate){
       var actStart=new Date(activation.startDate+'T00:00:00');
-      var now=new Date();
-      // Only jump to activation start if it's in the future
-      if(actStart > now){ calYear=actStart.getFullYear(); calMonth=actStart.getMonth(); }
+      if(actStart>new Date()){ calYear=actStart.getFullYear(); calMonth=actStart.getMonth(); }
     }
   }catch(e){}
   await loadWindows();
-  await loadProfile();
+  await loadProfile();  // sets noDL
+  await loadDocs();     // sets docStatus
+  renderDocs();
   renderCalendar();
 }
 
+// ── Calendar ──────────────────────────────────────────────────────────────────
+
 async function loadWindows(){
   try{
-    var data = await api('/avail-windows?email='+encodeURIComponent(auth.email)+'&contractorId='+encodeURIComponent(auth.contractorId));
-    windows = data.windows||[];
-    deployments = data.deployments||[];
+    var data=await api('/avail-windows?email='+encodeURIComponent(auth.email)+'&contractorId='+encodeURIComponent(auth.contractorId));
+    windows=data.windows||[];
+    deployments=data.deployments||[];
     renderWindowsList();
   }catch(e){ showToast('Could not load availability: '+e.message,'error'); }
 }
 
 function renderCalendar(){
-  document.getElementById('cal-month-label').textContent = MON[calMonth]+' '+calYear;
-  var grid = document.getElementById('cal-grid');
-  // DOW headers
-  var html = DOW.map(function(d){return '<div class="cal-dow">'+d+'</div>';}).join('');
-  var firstDay = new Date(calYear, calMonth, 1).getDay();
-  var daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
-  // Empty cells
+  document.getElementById('cal-month-label').textContent=MON[calMonth]+' '+calYear;
+  var grid=document.getElementById('cal-grid');
+  var html=DOW.map(function(d){return '<div class="cal-dow">'+d+'</div>';}).join('');
+  var firstDay=new Date(calYear,calMonth,1).getDay();
+  var daysInMonth=new Date(calYear,calMonth+1,0).getDate();
   for(var i=0;i<firstDay;i++) html+='<div class="cal-day empty"></div>';
-  // Days
   for(var d=1;d<=daysInMonth;d++){
-    var ds = dateStr(calYear, calMonth, d);
-    var cls = 'cal-day';
-    var deployed = isDeployed(ds);
-    var avail = isAvailable(ds);
-    var inAct = isInActivation(ds);
-    var past = isPast(ds);
-    var inSel = selecting && selStart && selEnd && ds>=Math.min(selStart,selEnd) && ds<=Math.max(selStart,selEnd);
+    var ds=dateStr(calYear,calMonth,d);
+    var cls='cal-day';
+    var deployed=isDeployed(ds);
+    var avail=isAvailable(ds);
+    var inAct=isInActivation(ds);
+    var past=isPast(ds);
+    var inSel=selecting&&selStart&&selEnd&&ds>=Math.min(selStart,selEnd)&&ds<=Math.max(selStart,selEnd);
     if(ds===today) cls+=' today';
     if(!inAct) cls+=' outside-activation';
     else if(past) cls+=' past';
@@ -569,41 +790,33 @@ function renderCalendar(){
     else if(inSel) cls+=' selecting';
     else if(avail) cls+=' available';
     else cls+=' normal';
-    var data = '';
-    if(deployed) data = ' data-day="'+ds+'" data-deployed="1"';
-    else if(inAct&&!past) data = ' data-day="'+ds+'"';
-    html+='<div class="'+cls+'"'+data+'>'+d+'</div>';
+    var attrs='';
+    if(deployed) attrs=' data-day="'+ds+'" data-deployed="1"';
+    else if(inAct&&!past) attrs=' data-day="'+ds+'"';
+    html+='<div class="'+cls+'"'+attrs+'>'+d+'</div>';
   }
   grid.innerHTML=html;
   attachCalendarEvents();
 }
 
-// Calendar click delegation - attached after render
 function attachCalendarEvents(){
-  var grid = document.getElementById('cal-grid');
+  var grid=document.getElementById('cal-grid');
   if(!grid) return;
-  grid.onclick = function(e){
-    var day = e.target.closest('[data-day]');
+  grid.onclick=function(e){
+    var day=e.target.closest('[data-day]');
     if(!day) return;
-    var ds = day.dataset.day;
-    var dep = day.dataset.deployed === '1';
-    onDayClick(ds, dep);
+    onDayClick(day.dataset.day, day.dataset.deployed==='1');
   };
 }
 
 function onDayClick(ds, isDeployedDay){
-  if(isDeployedDay){
-    var dep = getDeployment(ds);
-    if(dep) showDeploymentPopup(dep);
-    return;
-  }
+  if(isDeployedDay){ var dep=getDeployment(ds); if(dep) showDeploymentPopup(dep); return; }
   if(isAvailable(ds)) return;
   if(!selecting){
     selecting=true; selStart=ds; selEnd=ds;
   } else {
     selEnd=ds;
     if(selEnd<selStart){ var tmp=selStart; selStart=selEnd; selEnd=tmp; }
-    // Check for deployed days in selection
     var cur=new Date(selStart+'T00:00:00'), endD=new Date(selEnd+'T00:00:00');
     while(cur<=endD){
       var cds=cur.toISOString().slice(0,10);
@@ -611,35 +824,29 @@ function onDayClick(ds, isDeployedDay){
       cur.setDate(cur.getDate()+1);
     }
   }
-  updateSaveBar();
-  renderCalendar();
+  updateSaveBar(); renderCalendar();
 }
 
 function updateSaveBar(){
   var bar=document.getElementById('save-bar');
   if(selecting&&selStart){
     bar.classList.add('visible');
-    var label = selStart===selEnd ? fmtDate(selStart) : fmtDate(selStart)+' \u2013 '+fmtDate(selEnd);
-    document.getElementById('save-bar-range').textContent=label;
+    document.getElementById('save-bar-range').textContent=selStart===selEnd?fmtDate(selStart):fmtDate(selStart)+' \u2013 '+fmtDate(selEnd);
   } else {
     bar.classList.remove('visible');
   }
 }
 
-function cancelSelection(){
-  selecting=false; selStart=null; selEnd=null;
-  updateSaveBar(); renderCalendar();
-}
+function cancelSelection(){ selecting=false; selStart=null; selEnd=null; updateSaveBar(); renderCalendar(); }
 
 async function saveSelection(){
-  if(!selStart||!selEnd)return;
+  if(!selStart||!selEnd) return;
   var btn=document.querySelector('.save-btn'); btn.disabled=true; btn.textContent='Saving...';
   try{
     await api('/avail-windows',{method:'POST',body:JSON.stringify({email:auth.email,contractorId:auth.contractorId,start:selStart,end:selEnd})});
     showToast('Availability saved!','success');
     cancelSelection();
-    await loadWindows();
-    renderCalendar();
+    await loadWindows(); renderCalendar();
   }catch(e){ showToast(e.message,'error'); }
   finally{ btn.disabled=false; btn.textContent='Save Availability'; }
 }
@@ -650,29 +857,28 @@ function renderWindowsList(){
     el.innerHTML='<div class="empty-windows">No availability entered yet. Click days on the calendar to get started.</div>';
     return;
   }
-  // Merge windows and deployments into a sorted list
   var items=[];
   windows.forEach(function(w){ items.push({type:'avail',start:w.start,end:w.end}); });
   deployments.forEach(function(d){ items.push({type:'deployed',start:d.startDate,end:d.endDate,location:d.location,travelRequired:d.travelRequired}); });
   items.sort(function(a,b){return a.start.localeCompare(b.start);});
   el.innerHTML=items.map(function(item){
     if(item.type==='deployed'){
-      return '<div class="window-row locked">'+
-        '<div class="window-dates"><div>'+item.location+'</div><div class="date-range">'+fmtDate(item.start)+' \u2013 '+fmtDate(item.end)+(item.travelRequired?' \u2022 Travel arranged':'')+'</div></div>'+
-        '<span class="window-badge locked">DEPLOYED</span>'+
-        '</div>';
+      return '<div class="window-row locked">'
+        +'<div class="window-dates"><div>'+escHtml(item.location)+'</div><div class="date-range">'+fmtDate(item.start)+' \u2013 '+fmtDate(item.end)+(item.travelRequired?' \u2022 Travel arranged':'')+'</div></div>'
+        +'<span class="window-badge locked">DEPLOYED</span>'
+        +'</div>';
     } else {
-      return '<div class="window-row">'+
-        '<div class="window-dates"><div>Available</div><div class="date-range">'+fmtDate(item.start)+' \u2013 '+fmtDate(item.end)+'</div></div>'+
-        '<span class="window-badge avail">AVAILABLE</span>'+
-        '<button class="window-del" onclick="deleteWindow(\''+item.start+'\',\''+item.end+'\')" title="Remove">&#215;</button>'+
-        '</div>';
+      return '<div class="window-row">'
+        +'<div class="window-dates"><div>Available</div><div class="date-range">'+fmtDate(item.start)+' \u2013 '+fmtDate(item.end)+'</div></div>'
+        +'<span class="window-badge avail">AVAILABLE</span>'
+        +'<button class="window-del" onclick="deleteWindow(\''+item.start+'\',\''+item.end+'\')" title="Remove">&#215;</button>'
+        +'</div>';
     }
   }).join('');
 }
 
 async function deleteWindow(start, end){
-  if(!confirm('Remove availability '+fmtDate(start)+' \u2013 '+fmtDate(end)+'?'))return;
+  if(!confirm('Remove availability '+fmtDate(start)+' \u2013 '+fmtDate(end)+'?')) return;
   try{
     await api('/avail-windows',{method:'DELETE',body:JSON.stringify({email:auth.email,contractorId:auth.contractorId,start,end})});
     showToast('Availability removed','success');
@@ -681,49 +887,45 @@ async function deleteWindow(start, end){
 }
 
 function showDeploymentPopup(dep){
-  var body=document.getElementById('popup-body');
-  body.innerHTML=
-    '<div class="popup-field"><span class="popup-label">Site</span><span class="popup-value">'+dep.location+'</span></div>'+
-    '<div class="popup-field"><span class="popup-label">Dates</span><span class="popup-value">'+fmtDate(dep.startDate)+' \u2013 '+fmtDate(dep.endDate)+'</span></div>'+
-    '<div class="popup-field"><span class="popup-label">Travel</span><span class="popup-value">'+(dep.travelRequired?'Travel arranged':'No travel required')+'</span></div>';
+  document.getElementById('popup-body').innerHTML=
+    '<div class="popup-field"><span class="popup-label">Site</span><span class="popup-value">'+escHtml(dep.location)+'</span></div>'
+    +'<div class="popup-field"><span class="popup-label">Dates</span><span class="popup-value">'+fmtDate(dep.startDate)+' \u2013 '+fmtDate(dep.endDate)+'</span></div>'
+    +'<div class="popup-field"><span class="popup-label">Travel</span><span class="popup-value">'+(dep.travelRequired?'Travel arranged':'No travel required')+'</span></div>';
   document.getElementById('popup-overlay').classList.add('open');
 }
 function closePopup(){ document.getElementById('popup-overlay').classList.remove('open'); }
 function shiftMonth(d){ calMonth+=d; if(calMonth<0){calMonth=11;calYear--;} if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
 
-// Wire up event listeners
+// ── Wire-up ───────────────────────────────────────────────────────────────────
+
 (function(){
   var el=function(id){return document.getElementById(id);};
-  if(el('login-btn-main')) el('login-btn-main').addEventListener('click', doLogin);
-  if(el('forgot-link-btn')) el('forgot-link-btn').addEventListener('click', showForgot);
-  if(el('forgot-submit-btn')) el('forgot-submit-btn').addEventListener('click', doForgot);
-  if(el('logout-btn-el')) el('logout-btn-el').addEventListener('click', doLogout);
-  if(el('cal-prev')) el('cal-prev').addEventListener('click', function(){shiftMonth(-1);});
-  if(el('cal-next')) el('cal-next').addEventListener('click', function(){shiftMonth(1);});
-  if(el('save-sel-btn')) el('save-sel-btn').addEventListener('click', saveSelection);
-  if(el('cancel-sel-btn')) el('cancel-sel-btn').addEventListener('click', cancelSelection);
-  if(el('prof-save-btn')) el('prof-save-btn').addEventListener('click', saveProfile);
-  if(el('popup-close-el')) el('popup-close-el').addEventListener('click', closePopup);
-  if(el('popup-overlay')) el('popup-overlay').addEventListener('click', function(e){if(e.target===this)closePopup();});
+  el('login-btn-main').addEventListener('click', doLogin);
+  el('forgot-link-btn').addEventListener('click', showForgot);
+  el('forgot-submit-btn').addEventListener('click', doForgot);
+  el('logout-btn-el').addEventListener('click', doLogout);
+  el('cal-prev').addEventListener('click', function(){shiftMonth(-1);});
+  el('cal-next').addEventListener('click', function(){shiftMonth(1);});
+  el('save-sel-btn').addEventListener('click', saveSelection);
+  el('cancel-sel-btn').addEventListener('click', cancelSelection);
+  el('prof-save-btn').addEventListener('click', saveProfile);
+  el('popup-close-el').addEventListener('click', closePopup);
+  el('popup-overlay').addEventListener('click', function(e){if(e.target===this)closePopup();});
+  el('login-email').addEventListener('keydown', function(e){if(e.key==='Enter')el('login-cid').focus();});
+  el('login-cid').addEventListener('keydown', function(e){if(e.key==='Enter')doLogin();});
 })();
 
-// Pre-fill contractor ID from URL param
+// Pre-fill CID from URL
 (function(){
-  var params = new URLSearchParams(window.location.search);
-  var cid = params.get('cid');
+  var cid=new URLSearchParams(window.location.search).get('cid');
   if(cid){ var el=document.getElementById('login-cid'); if(el)el.value=cid; }
 })();
 
 // Auto-restore session
 (function(){
   var saved=localStorage.getItem('loomi_avail_auth');
-  if(saved){try{auth=JSON.parse(saved);initApp();}catch(e){localStorage.removeItem('loomi_avail_auth');}}
+  if(saved){ try{ auth=JSON.parse(saved); initApp(); }catch(e){ localStorage.removeItem('loomi_avail_auth'); } }
 })();
-
-// Enter key on login
-document.getElementById('login-cid').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
-document.getElementById('login-email').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('login-cid').focus();});
-
 </script>
 </body>
 </html>
