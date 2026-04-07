@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CM Allotments Dashboard - LOOMI</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:  #1a3a5c;
+      --green: #00A651;
+      --teal:  #2f9879;
+      --lime:  #7dbe42;
+      --warn:  #E8A317;
+      --red:   #e74c3c;
+      --grey:  #6D6E71;
+      --light: #f0f2f5;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--light);
+      min-height: 100vh;
+      color: #222;
+    }
+
+    /* ---- AUTH ---- */
+    .auth-wrap {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: var(--navy); padding: 24px;
+    }
+    .auth-card {
+      background: white; border-radius: 12px;
+      padding: 36px 28px; width: 100%; max-width: 360px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .auth-icon {
+      width: 52px; height: 52px; background: var(--green);
+      border-radius: 10px; display: flex; align-items: center;
+      justify-content: center; color: white; font-size: 22px;
+      font-weight: bold; margin: 0 auto 16px;
+    }
+    .auth-card h2 { text-align: center; color: var(--navy); font-size: 18px; margin-bottom: 4px; }
+    .auth-card p  { text-align: center; color: var(--grey); font-size: 13px; margin-bottom: 24px; }
+    .auth-input {
+      width: 100%; padding: 13px 16px; border: 2px solid #e0e0e0;
+      border-radius: 8px; font-size: 20px; letter-spacing: 4px;
+      text-align: center; margin-bottom: 10px; outline: none;
+    }
+    .auth-input:focus { border-color: var(--green); }
+    .auth-error { color: var(--red); font-size: 13px; text-align: center; margin-bottom: 10px; display: none; }
+    .auth-btn {
+      width: 100%; padding: 13px; background: var(--green); color: white;
+      border: none; border-radius: 8px; font-size: 16px;
+      font-weight: bold; cursor: pointer;
+    }
+
+    /* ---- SCREENS ---- */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ---- HEADER ---- */
+    .dash-header {
+      background: var(--navy); color: white;
+      padding: 14px 24px; display: flex; align-items: center;
+      gap: 14px; position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .logo {
+      background: var(--green); width: 34px; height: 34px;
+      border-radius: 6px; display: flex; align-items: center;
+      justify-content: center; font-weight: bold; font-size: 15px;
+      flex-shrink: 0;
+    }
+    .dash-header h1 { font-size: 15px; flex: 1; }
+    .refresh-badge {
+      font-size: 11px; color: rgba(255,255,255,0.6);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .refresh-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green); animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* ---- BODY ---- */
+    .dash-body { max-width: 960px; margin: 0 auto; padding: 20px 16px; }
+
+    /* ---- TOTAL BANNER ---- */
+    .total-banner {
+      background: var(--navy); border-radius: 12px;
+      padding: 20px 28px; margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .total-banner .lbl { color: rgba(255,255,255,0.7); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .total-banner .val { color: white; font-size: 32px; font-weight: bold; }
+    .total-banner .sub { color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 2px; }
+    .total-divider { width: 1px; height: 50px; background: rgba(255,255,255,0.15); }
+
+    /* ---- SUMMARY CARDS ---- */
+    .summary-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 12px; margin-bottom: 20px;
+    }
+    .sum-card {
+      background: white; border-radius: 10px; padding: 16px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      border-left: 4px solid transparent;
+    }
+    .sum-card.ok   { border-color: var(--green); }
+    .sum-card.warn { border-color: var(--warn); }
+    .sum-card.max  { border-color: var(--red); }
+    .sum-card .num { font-size: 36px; font-weight: bold; color: var(--navy); }
+    .sum-card .lbl { font-size: 12px; color: var(--grey); margin-top: 2px; }
+    .sum-card .pct { font-size: 11px; color: var(--grey); margin-top: 6px; }
+
+    /* ---- SECTION TITLE ---- */
+    .section-title {
+      font-size: 12px; font-weight: bold; color: var(--grey);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 10px; margin-top: 4px;
+    }
+
+    /* ---- HUB CARDS ---- */
+    .hub-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 14px; margin-bottom: 20px;
+    }
+    .hub-card {
+      background: white; border-radius: 10px; padding: 18px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+    .hub-card h3 {
+      font-size: 14px; color: var(--navy); font-weight: bold;
+      margin-bottom: 12px; padding-bottom: 10px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .hub-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .hub-stat .n { font-size: 24px; font-weight: bold; color: var(--navy); }
+    .hub-stat .l { font-size: 11px; color: var(--grey); }
+    .hub-total {
+      background: #f7f7f7; border-radius: 6px; padding: 8px 12px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px;
+    }
+    .hub-total span:last-child { font-weight: bold; color: var(--navy); }
+
+    /* ---- PROGRESS BAR ---- */
+    .prog-wrap { margin-top: 10px; }
+    .prog-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--grey); margin-bottom: 4px; }
+    .prog-bar { height: 5px; background: #e8e8e8; border-radius: 3px; overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 3px; background: var(--green); transition: width 0.6s ease; }
+
+    /* ---- LAST UPDATED ---- */
+    .last-updated {
+      text-align: center; font-size: 11px; color: var(--grey);
+      padding: 8px; margin-top: 4px;
+    }
+
+    /* ---- LOADING ---- */
+    .loading {
+      text-align: center; padding: 60px; color: var(--grey);
+    }
+    .spinner {
+      width: 32px; height: 32px; border: 3px solid #e0e0e0;
+      border-top-color: var(--green); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 600px) {
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .hub-grid     { grid-template-columns: 1fr; }
+      .total-banner { flex-direction: column; }
+      .total-divider { display: none; }
+    }
+    @media (max-width: 380px) {
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="screen-auth" class="screen active">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-icon">L</div>
+      <h2>CM Allotments Dashboard</h2>
+      <p>EOC access only</p>
+      <input type="password" id="auth-pass" class="auth-input" placeholder="••••••••" autocomplete="off">
+      <div class="auth-error" id="auth-error">Incorrect code.</div>
+      <button class="auth-btn" onclick="doAuth()">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="screen-dash" class="screen">
+  <div class="dash-header">
+    <div class="logo">L</div>
+    <h1>CM Allotments Dashboard &mdash; 2026-Kash-HubHost</h1>
+    <div class="refresh-badge">
+      <div class="refresh-dot"></div>
+      Live
+    </div>
+  </div>
+
+  <div class="dash-body">
+    <div id="dash-content">
+      <div class="loading">
+        <div class="spinner"></div>
+        Loading data...
+      </div>
+    </div>
+    <div class="last-updated" id="last-updated"></div>
+  </div>
+</div>
+
+<script>
+const WORKER          = 'https://cmallotment.loomex-it.workers.dev';
+const DASH_PASSWORD   = 'LoomexEOC550'; // replace
+const ALLOTMENT_LIMIT = 300;
+const WARN_THRESHOLD  = 250;
+const REFRESH_MS      = 60000;
+
+const HUB_LABELS = {
+  kingston:     'Kingston - DoubleTree',
+  kingstonwest: 'Kingston West - Quality Inn',
+  kapuskasing:  'Kapuskasing',
+  timmins:      'Timmins'
+};
+
+let refreshTimer = null;
+
+document.getElementById('auth-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doAuth();
+});
+
+function doAuth() {
+  const pass = document.getElementById('auth-pass').value.trim();
+  if (pass === DASH_PASSWORD) {
+    showScreen('screen-dash');
+    loadDashboard();
+    refreshTimer = setInterval(loadDashboard, REFRESH_MS);
+  } else {
+    document.getElementById('auth-error').style.display = 'block';
+  }
+}
+
+async function loadDashboard() {
+  try {
+    // Fetch all hubs in parallel
+    const hubs = Object.keys(HUB_LABELS);
+    const [evResults, allResults] = await Promise.all([
+      Promise.all(hubs.map(h => fetch(`${WORKER}/evacuees?hub=${h}`).then(r => r.json()))),
+      Promise.all(hubs.map(h => fetch(`${WORKER}/allotments?hub=${h}`).then(r => r.json())))
+    ]);
+
+    const hubData = hubs.map((hub, i) => {
+      const evacuees   = evResults[i] || [];
+      const allotments = allResults[i] || [];
+
+      // Build totals per evacuee
+      const totals = {};
+      for (const a of allotments) {
+        totals[a.EvacueeID] = (totals[a.EvacueeID] || 0) + (a.AmountSpent || 0);
+      }
+
+      const total    = evacuees.length;
+      let eligible   = 0, warning = 0, maxed = 0, shopped = 0;
+      let totalSpent = 0;
+
+      for (const ev of evacuees) {
+        const spent = totals[ev.EvacueeID] || 0;
+        totalSpent += spent;
+        if (spent >= ALLOTMENT_LIMIT)     { maxed++;    shopped++; }
+        else if (spent >= WARN_THRESHOLD) { warning++;  shopped++; }
+        else if (spent > 0)               { shopped++; eligible++; }
+        else                              { eligible++; }
+      }
+
+      return { hub, label: HUB_LABELS[hub], total, eligible, warning, maxed, shopped, totalSpent };
+    });
+
+    renderDashboard(hubData);
+  } catch (e) {
+    document.getElementById('dash-content').innerHTML =
+      `<div class="loading">Error loading data: ${e.message}</div>`;
+  }
+}
+
+function renderDashboard(hubData) {
+  const totalEvacuees = hubData.reduce((s, h) => s + h.total, 0);
+  const totalShopped  = hubData.reduce((s, h) => s + h.shopped, 0);
+  const totalMaxed    = hubData.reduce((s, h) => s + h.maxed, 0);
+  const totalWarning  = hubData.reduce((s, h) => s + h.warning, 0);
+  const totalEligible = hubData.reduce((s, h) => s + h.eligible, 0);
+  const totalSpent    = hubData.reduce((s, h) => s + h.totalSpent, 0);
+  const shoppedPct    = totalEvacuees > 0 ? Math.round((totalShopped / totalEvacuees) * 100) : 0;
+
+  const hubCards = hubData.map(h => {
+    const pct = h.total > 0 ? Math.round((h.shopped / h.total) * 100) : 0;
+    return `
+      <div class="hub-card">
+        <h3>${h.label}</h3>
+        <div class="hub-stats">
+          <div class="hub-stat"><div class="n">${h.eligible}</div><div class="l">Eligible</div></div>
+          <div class="hub-stat"><div class="n" style="color:var(--warn)">${h.warning}</div><div class="l">Near Limit</div></div>
+          <div class="hub-stat"><div class="n" style="color:var(--red)">${h.maxed}</div><div class="l">Maxed Out</div></div>
+          <div class="hub-stat"><div class="n">${h.total}</div><div class="l">Total Members</div></div>
+        </div>
+        <div class="hub-total">
+          <span>Total Spent</span>
+          <span>$${h.totalSpent.toFixed(2)}</span>
+        </div>
+        <div class="prog-wrap">
+          <div class="prog-label"><span>${h.shopped} of ${h.total} shopped</span><span>${pct}%</span></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('dash-content').innerHTML = `
+    <div class="total-banner">
+      <div>
+        <div class="lbl">Total Spent - All Hubs</div>
+        <div class="val">$${totalSpent.toFixed(2)}</div>
+        <div class="sub">${totalShopped} of ${totalEvacuees} members have shopped (${shoppedPct}%)</div>
+      </div>
+      <div class="total-divider"></div>
+      <div>
+        <div class="lbl">Budget Remaining</div>
+        <div class="val">$${Math.max(0, totalEvacuees * ALLOTMENT_LIMIT - totalSpent).toFixed(2)}</div>
+        <div class="sub">of $${(totalEvacuees * ALLOTMENT_LIMIT).toLocaleString()} total authorized</div>
+      </div>
+      <div class="total-divider"></div>
+      <div>
+        <div class="lbl">Allotment Used</div>
+        <div class="val">${totalMaxed}</div>
+        <div class="sub">members at $300 limit</div>
+      </div>
+    </div>
+
+    <div class="summary-grid">
+      <div class="sum-card ok">
+        <div class="num">${totalEligible}</div>
+        <div class="lbl">Eligible (under $250)</div>
+        <div class="pct">${totalEvacuees > 0 ? Math.round(totalEligible/totalEvacuees*100) : 0}% of members</div>
+      </div>
+      <div class="sum-card warn">
+        <div class="num">${totalWarning}</div>
+        <div class="lbl">Near Limit ($250-$299)</div>
+        <div class="pct">${totalEvacuees > 0 ? Math.round(totalWarning/totalEvacuees*100) : 0}% of members</div>
+      </div>
+      <div class="sum-card max">
+        <div class="num">${totalMaxed}</div>
+        <div class="lbl">Maxed Out ($300)</div>
+        <div class="pct">${totalEvacuees > 0 ? Math.round(totalMaxed/totalEvacuees*100) : 0}% of members</div>
+      </div>
+    </div>
+
+    <div class="section-title">By Hub</div>
+    <div class="hub-grid">${hubCards}</div>
+  `;
+
+  document.getElementById('last-updated').textContent =
+    'Last updated: ' + new Date().toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+</script>
+</body>
+</html>
