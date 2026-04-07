@@ -361,6 +361,12 @@
       </div>
     </div>
 
+   <div class="card" style="display:flex;align-items:center;gap:12px;padding:14px 16px;">
+      <input type="checkbox" id="paper-sig" style="width:22px;height:22px;cursor:pointer;accent-color:var(--navy);flex-shrink:0;">
+      <label for="paper-sig" style="font-size:13px;color:#444;cursor:pointer;margin:0;">
+        Signatures collected on paper - skip digital signatures
+      </label>
+    </div>
     <button class="submit-btn" id="continue-btn" onclick="goToSignatures()">Continue to Signatures</button>
     <div style="height: 32px;"></div>
   </div>
@@ -668,8 +674,13 @@ function goToSignatures() {
 
   pendingMembers = members;
   signatures = {};
-  buildSignatureCards(members);
-  showScreen('screen-signatures');
+
+  if (document.getElementById('paper-sig').checked) {
+    doFinalSubmit();
+  } else {
+    buildSignatureCards(members);
+    showScreen('screen-signatures');
+  }
 }
 
 // ---- SIGNATURE CARDS ----
@@ -815,26 +826,29 @@ function clearCanvas(id) {
 
 async function doFinalSubmit() {
   // Validate all signatures
-  const adults = pendingMembers.filter(m => !m.isMinor);
-  const minors = pendingMembers.filter(m => m.isMinor);
-  let valid = true;
+  const paperSig     = document.getElementById('paper-sig')?.checked;
+  const adults       = pendingMembers.filter(m => !m.isMinor);
+  const minors       = pendingMembers.filter(m => m.isMinor);
+  let valid          = true;
 
-  for (const m of adults) {
-    if (!signatures[m.evacueeId]) {
-      document.getElementById(`wrap-${m.evacueeId}`).classList.add('sig-required');
-      valid = false;
+  if (!paperSig) {
+    for (const m of adults) {
+      if (!signatures[m.evacueeId]) {
+        document.getElementById(`wrap-${m.evacueeId}`).classList.add('sig-required');
+        valid = false;
+      }
     }
-  }
-  if (minors.length > 0) {
-    const guardianName = document.getElementById('guardian-name')?.value.trim();
-    if (!guardianName) { document.getElementById('guardian-name').style.borderColor = '#e74c3c'; valid = false; }
-    if (!signatures['guardian']) {
-      document.getElementById('wrap-guardian').classList.add('sig-required');
-      valid = false;
+    if (minors.length > 0) {
+      const guardianName = document.getElementById('guardian-name')?.value.trim();
+      if (!guardianName) { document.getElementById('guardian-name').style.borderColor = '#e74c3c'; valid = false; }
+      if (!signatures['guardian']) {
+        document.getElementById('wrap-guardian').classList.add('sig-required');
+        valid = false;
+      }
     }
+    if (!valid) { alert('Please complete all signatures before submitting.'); return; }
   }
-  if (!valid) { alert('Please complete all signatures before submitting.'); return; }
-
+  
   const staffName      = document.getElementById('staff-name').value.trim();
   const guardianName   = document.getElementById('guardian-name')?.value.trim() || null;
   const submitBtn      = document.getElementById('submit-btn');
@@ -885,7 +899,8 @@ async function doFinalSubmit() {
         submissionDate, submissionTime, members,
         receiptUrl, receiptGraphPath: uploadData.graphPath,
         signatures, guardianName,
-        minors: members.filter(m => m.isMinor).map(m => m.name)
+        minors: members.filter(m => m.isMinor).map(m => m.name),
+        paerSig
       })
     }).then(r => r.json()).then(pdfData => {
       if (pdfData.pdfUrl && recordIds.length) {
