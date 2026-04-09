@@ -355,19 +355,19 @@
       <div class="card-title">Receipt</div>
       <div class="upload-zone" id="upload-zone" onclick="document.getElementById('receipt-file').click()">
         <div class="upload-icon">📎</div>
-        <div class="upload-text">Tap to attach receipt (photo or PDF)</div>
+        <div class="upload-text">Tap to attach receipt(s) (photo or PDF)</div>
         <div class="upload-filename" id="upload-filename"></div>
         <input type="file" id="receipt-file" accept="image/*,application/pdf" multiple onchange="handleFileSelect(this)">
       </div>
     </div>
 
    <div class="card" style="display:flex;align-items:center;gap:12px;padding:14px 16px;">
-      <input type="checkbox" id="paper-sig" checked style="width:22px;height:22px;cursor:pointer;accent-color:var(--navy);flex-shrink:0;">
+      <input type="checkbox" id="paper-sig" checked style="width:22px;height:22px;cursor:pointer;accent-color:var(--navy);flex-shrink:0;" onchange="document.getElementById('continue-btn').textContent = this.checked ? 'Submit Allotment' : 'Continue to Signatures'">
       <label for="paper-sig" style="font-size:13px;color:#444;cursor:pointer;margin:0;">
         Signatures collected on paper - skip digital signatures
       </label>
     </div>
-    <button class="submit-btn" id="continue-btn" onclick="goToSignatures()">Continue to Signatures</button>
+    <button class="submit-btn" id="continue-btn" onclick="goToSignatures()">Submit Allotment</button>
     <div style="height: 32px;"></div>
   </div>
 </div>
@@ -656,10 +656,12 @@ uploadZone.addEventListener('drop', e => {
 // ---- VALIDATE AND GO TO SIGNATURES ----
 
 function goToSignatures() {
+  const btn = document.getElementById('continue-btn');
+  btn.disabled = true;
   const staffName = document.getElementById('staff-name').value.trim();
-  if (!staffName)         { alert('Please enter your name.'); return; }
-  if (selectedIds.size === 0) { alert('Please select at least one community member.'); return; }
-  if (receiptFiles.length === 0) { alert('Please attach at least one receipt.'); return; }
+  if (!staffName)         { btn.disabled = false; alert('Please enter your name.'); return; }
+  if (selectedIds.size === 0) { btn.disabled = false; alert('Please select at least one community member.'); return; }
+  if (receiptFiles.length === 0) { btn.disabled = false; alert('Please attach at least one receipt.'); return; }
 
   const members = [];
   const lineItems = document.querySelectorAll('.line-item');
@@ -667,8 +669,8 @@ function goToSignatures() {
     const input = li.querySelector('input[type="number"]');
     const id    = li.dataset.id;
     const val   = parseFloat(input.value);
-    if (!val || val <= 0) { alert('Enter a valid amount for all selected members.'); return; }
-    if (val > getRemaining(id)) { alert('Amount exceeds remaining balance for one or more members.'); return; }
+   if (!val || val <= 0) { btn.disabled = false; alert('Enter a valid amount for all selected members.'); return; }
+    if (val > getRemaining(id)) { btn.disabled = false; alert('Amount exceeds remaining balance for one or more members.'); return; }
     const ev = evacuees.find(e => e.EvacueeID === id);
     members.push({
       evacueeId:  id,
@@ -936,8 +938,29 @@ function setProgress(msg, pct) {
   document.getElementById('progress-label').textContent = msg;
   document.getElementById('progress-fill').style.width  = pct + '%';
 }
+var _progressInterval = null;
+var _progressMessages = [
+  'Uploading receipts...',
+  'Creating allotment records...',
+  'Building PDF summary...',
+  'Stamping receipt...',
+  'Saving to SharePoint...',
+  'Almost done...'
+];
+
 function showProgress(show) {
-  document.getElementById('progress-wrap').classList.toggle('active', show);
+  var wrap = document.getElementById('progress-wrap');
+  wrap.classList.toggle('active', show);
+  if (show) {
+    var i = 0;
+    _progressInterval = setInterval(function() {
+      i = (i + 1) % _progressMessages.length;
+      var label = document.getElementById('progress-label');
+      if (label) label.textContent = _progressMessages[i];
+    }, 2200);
+  } else {
+    if (_progressInterval) { clearInterval(_progressInterval); _progressInterval = null; }
+  }
 }
 
 // ---- SUCCESS ----
