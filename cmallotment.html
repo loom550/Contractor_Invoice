@@ -893,7 +893,8 @@ async function doFinalSubmit() {
       const fd = new FormData();
       fd.append('file', file);
       fd.append('hub', currentHub);
-      fd.append('submissionRef', submissionRef + (receiptFiles.length > 1 ? `-${i + 1}` : ''));
+      fd.append('submissionRef', submissionRef);
+      fd.append('fileIndex', receiptFiles.length > 1 ? String(i + 1) : '');
       return fetch(`${WORKER}/upload-receipt`, { method: 'POST', body: fd })
         .then(r => r.json())
         .then(data => {
