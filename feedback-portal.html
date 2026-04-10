@@ -124,11 +124,11 @@
     .modal-body { padding: 24px; }
     .modal-field { margin-bottom: 16px; }
     .modal-field label { display: block; font-size: 12px; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
-    .modal-field select, .modal-field textarea, .modal-field input:not([type="checkbox"]) {
-  width: 100%; border: 1.5px solid var(--grey-border); border-radius: 8px;
-  padding: 10px 14px; font-size: 14px; font-family: 'DM Sans', sans-serif;
-  color: var(--text); background: var(--white); appearance: none;
-}
+    .modal-field select, .modal-field textarea, .modal-field input {
+      width: 100%; border: 1.5px solid var(--grey-border); border-radius: 8px;
+      padding: 10px 14px; font-size: 14px; font-family: 'DM Sans', sans-serif;
+      color: var(--text); background: var(--white); appearance: none;
+    }
     .modal-field select:focus, .modal-field textarea:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(0,166,81,0.12); }
     .modal-field textarea { min-height: 80px; resize: vertical; line-height: 1.6; }
     .modal-idea { background: var(--grey-bg); border-radius: 8px; padding: 14px; font-size: 14px; line-height: 1.6; color: var(--text); margin-bottom: 20px; border-left: 3px solid var(--green); }
@@ -200,6 +200,11 @@
       <option value="">All</option>
       <option value="false">Unreviewed</option>
       <option value="true">Reviewed</option>
+    </select>
+    <select class="filter-select" id="filterArchived" onchange="applyFilters()">
+      <option value="false">Active only</option>
+      <option value="">All (inc. archived)</option>
+      <option value="true">Archived only</option>
     </select>
     <div class="filters-right">
       <button class="btn-sm btn-outline" onclick="loadSubmissions()">&#8635; Refresh</button>
@@ -284,12 +289,10 @@
         <label>Admin Notes</label>
         <textarea id="modalNotes" placeholder="Internal notes, context, action taken..."></textarea>
       </div>
-      <div class="modal-field">
-  <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:400;">
-    <input type="checkbox" id="modalReviewed" style="width:16px;height:16px;accent-color:var(--navy);flex-shrink:0;">
-    Mark as reviewed
-  </label>
-</div>
+      <div class="modal-field" style="display:flex;align-items:center;gap:10px;">
+        <input type="checkbox" id="modalReviewed" style="width:16px;height:16px;accent-color:var(--navy);">
+        <label for="modalReviewed" style="margin:0;cursor:pointer;">Mark as reviewed</label>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-sm btn-outline" onclick="closeModal('classifyModal')">Cancel</button>
@@ -414,6 +417,7 @@
     const disposition = document.getElementById('filterDisposition').value;
     const survey      = document.getElementById('filterSurvey').value;
     const reviewed    = document.getElementById('filterReviewed').value;
+    const archived    = document.getElementById('filterArchived').value;
 
     filtered = allRecords.filter(r => {
       const f = r.fields;
@@ -422,6 +426,7 @@
       if (disposition && disposition !== 'Unclassified' && f['Disposition'] !== disposition) return false;
       if (survey      && f['Survey Type']  !== survey)                                        return false;
       if (reviewed    && String(!!f['Reviewed']) !== reviewed)                               return false;
+      if (archived !== '' && String(!!f['Archived']) !== archived)                           return false;
       return true;
     });
 
@@ -511,7 +516,8 @@
         <td>${dispBadge}</td>
         <td style="white-space:nowrap;">
           <button class="action-btn" onclick="openClassify('${id}')" style="margin-right:4px;">Classify</button>
-          <button class="action-btn escalate" onclick="openEscalate('${id}')">Escalate</button>
+          <button class="action-btn escalate" onclick="openEscalate('${id}')" style="margin-right:4px;">Escalate</button>
+          <button class="action-btn" onclick="archiveRecord('${id}', ${!!f['Archived']})" style="${f['Archived'] ? 'color:var(--green);border-color:var(--green-mid);' : 'color:var(--text-muted);'}">${f['Archived'] ? 'Unarchive' : 'Archive'}</button>
         </td>
       </tr>`;
     }).join('');
@@ -656,6 +662,22 @@
     a.download = `loomex-feedback-${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function archiveRecord(id, currentlyArchived) {
+    try {
+      const res = await fetch(`${WORKER_URL}/feedback-update`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Portal-Token': PORTAL_PASSWORD },
+        body: JSON.stringify({ recordId: id, fields: { 'Archived': !currentlyArchived } }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+      showToast(currentlyArchived ? 'Unarchived' : 'Archived');
+      await loadSubmissions();
+    } catch (err) {
+      showToast('Failed: ' + err.message);
+    }
   }
 
   // ---- HELPERS ----
