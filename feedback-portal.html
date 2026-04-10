@@ -284,10 +284,12 @@
         <label>Admin Notes</label>
         <textarea id="modalNotes" placeholder="Internal notes, context, action taken..."></textarea>
       </div>
-      <div class="modal-field" style="display:flex;align-items:center;gap:10px;">
-        <input type="checkbox" id="modalReviewed" style="width:16px;height:16px;accent-color:var(--navy);">
-        <label for="modalReviewed" style="margin:0;cursor:pointer;">Mark as reviewed</label>
-      </div>
+      <div class="modal-field">
+  <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:400;">
+    <input type="checkbox" id="modalReviewed" style="width:16px;height:16px;accent-color:var(--navy);flex-shrink:0;">
+    Mark as reviewed
+  </label>
+</div>
     </div>
     <div class="modal-footer">
       <button class="btn-sm btn-outline" onclick="closeModal('classifyModal')">Cancel</button>
