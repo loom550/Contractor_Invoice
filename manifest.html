@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>LOOMI — Manifest Portal</title>
+<style>
+/* ── BASE ────────────────────────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --navy:#1a4e7e;
+  --navy-dk:#0f2f50;
+  --navy-lt:rgba(26,78,126,.08);
+  --teal:#2f9879;
+  --teal-lt:rgba(47,152,121,.12);
+  --lime:#7dbe42;
+  --red:#d94040;
+  --red-lt:rgba(217,64,64,.1);
+  --yellow:#e8a000;
+  --yellow-lt:rgba(232,160,0,.1);
+  --purple:#9e60d4;
+  --bg:#eef1f6;
+  --card:#ffffff;
+  --border:#dde2ea;
+  --border-dk:#c8cfda;
+  --text:#1a1f2e;
+  --text-dim:#5c6478;
+  --text-muted:#9099ae;
+  --input-bg:#f7f8fb;
+  --input-border:#d0d5e0;
+  --radius:10px;
+  --shadow:0 2px 12px rgba(0,0,0,.07);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.12);
+}
+html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text);font-size:15px;-webkit-font-smoothing:antialiased;}
+
+/* ── HEADER ──────────────────────────────────────────────────────────────── */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:var(--navy);padding:12px 16px 10px;
+  border-bottom:3px solid var(--lime);
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.hdr-logo{font-size:11px;font-weight:700;color:var(--lime);letter-spacing:.14em;white-space:nowrap;}
+.hdr-div{width:1px;height:18px;background:rgba(255,255,255,.2);flex-shrink:0;}
+.hdr-title{font-size:13px;font-weight:600;color:#fff;}
+.hdr-hub{font-size:11px;color:rgba(255,255,255,.6);white-space:nowrap;margin-left:auto;}
+.hdr-act{font-size:10px;color:rgba(255,255,255,.4);white-space:nowrap;font-family:monospace;}
+.online-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.online-dot.on{background:var(--lime);}
+.online-dot.off{background:var(--yellow);animation:pulse 1.8s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* ── LAYOUT ──────────────────────────────────────────────────────────────── */
+.layout{
+  display:flex;flex-direction:column;
+  height:calc(100vh - 51px);
+  overflow:hidden;
+}
+@media(min-width:720px){
+  .layout{flex-direction:row;}
+  .flight-panel{width:320px;min-width:320px;border-right:1px solid var(--border);overflow-y:auto;}
+  .pax-panel{flex:1;overflow-y:auto;}
+}
+.flight-panel{overflow-y:auto;flex-shrink:0;}
+.pax-panel{flex:1;overflow-y:auto;}
+
+/* ── PANEL HEADERS ───────────────────────────────────────────────────────── */
+.panel-hdr{
+  position:sticky;top:0;z-index:10;
+  background:var(--card);border-bottom:1px solid var(--border);
+  padding:12px 16px;display:flex;align-items:center;gap:8px;
+}
+.panel-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--navy);}
+.panel-count{font-size:11px;color:var(--text-muted);font-weight:600;}
+.panel-action{
+  margin-left:auto;
+  background:var(--navy);color:#fff;border:none;
+  padding:6px 14px;border-radius:6px;
+  font-size:12px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:background .15s;white-space:nowrap;
+}
+.panel-action:hover{background:var(--navy-dk);}
+
+/* ── FLIGHT CARDS ────────────────────────────────────────────────────────── */
+.flight-list{padding:10px;}
+.flight-card{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);margin-bottom:8px;
+  cursor:pointer;overflow:hidden;
+  transition:border-color .15s,box-shadow .15s;
+}
+.flight-card:hover{box-shadow:var(--shadow);}
+.flight-card.active{border-color:var(--navy);box-shadow:0 0 0 2px rgba(26,78,126,.15);}
+.flight-card.departed{opacity:.6;}
+
+.fc-top{padding:12px 14px 10px;display:flex;align-items:flex-start;gap:10px;}
+.fc-num{
+  font-size:18px;font-weight:800;color:var(--navy);
+  font-family:-apple-system,BlinkMacSystemFont,monospace;
+  line-height:1;flex-shrink:0;
+}
+.fc-info{flex:1;min-width:0;}
+.fc-dest{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fc-meta{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.fc-status{flex-shrink:0;}
+.status-pill{
+  display:inline-block;padding:2px 9px;border-radius:20px;
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+}
+.pill-loading{background:var(--yellow-lt);color:#8a5c00;}
+.pill-ready{background:var(--teal-lt);color:var(--teal);}
+.pill-departed{background:#eee;color:#888;}
+
+.fc-stats{
+  display:flex;border-top:1px solid var(--border);
+  font-size:11px;color:var(--text-dim);
+}
+.fc-stat{
+  flex:1;padding:7px 10px;text-align:center;
+  border-right:1px solid var(--border);
+}
+.fc-stat:last-child{border-right:none;}
+.fc-stat-val{font-size:14px;font-weight:700;color:var(--text);display:block;}
+
+/* ── ADD FLIGHT FORM ─────────────────────────────────────────────────────── */
+.add-flight-form{
+  background:var(--card);border:1.5px dashed var(--border-dk);
+  border-radius:var(--radius);padding:14px;margin-bottom:8px;display:none;
+}
+.add-flight-form.open{display:block;}
+.aff-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--navy);margin-bottom:12px;}
+.aff-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.aff-grid.full{grid-template-columns:1fr;}
+.aff-field label{display:block;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.aff-field input,.aff-field select{
+  width:100%;height:40px;padding:0 10px;
+  background:var(--input-bg);border:1.5px solid var(--input-border);
+  border-radius:7px;font-size:14px;font-family:inherit;color:var(--text);
+  outline:none;appearance:none;-webkit-appearance:none;
+}
+.aff-field input:focus,.aff-field select:focus{border-color:var(--navy);}
+.aff-field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235c6478' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;
+}
+.aff-actions{display:flex;gap:8px;margin-top:10px;}
+.btn-save{background:var(--navy);color:#fff;border:none;height:38px;padding:0 18px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn-cancel{background:transparent;color:var(--text-muted);border:1.5px solid var(--border);height:38px;padding:0 14px;border-radius:7px;font-size:13px;cursor:pointer;font-family:inherit;}
+
+/* ── PAX PANEL ───────────────────────────────────────────────────────────── */
+.pax-empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:200px;color:var(--text-muted);font-size:14px;gap:8px;
+}
+.pax-empty-icon{font-size:36px;opacity:.3;}
+
+/* ── FLIGHT DETAIL HEADER ────────────────────────────────────────────────── */
+.flt-detail-hdr{
+  background:var(--navy);color:#fff;
+  padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.1);
+}
+.flt-detail-num{font-size:20px;font-weight:800;font-family:monospace;margin-bottom:4px;}
+.flt-detail-meta{font-size:12px;color:rgba(255,255,255,.65);display:flex;flex-wrap:wrap;gap:8px;}
+.flt-detail-meta span{display:flex;align-items:center;gap:4px;}
+
+.flt-summary-bar{
+  display:flex;background:#f0f4f9;border-bottom:1px solid var(--border);
+  font-size:12px;
+}
+.flt-stat{flex:1;padding:10px 12px;text-align:center;border-right:1px solid var(--border);}
+.flt-stat:last-child{border-right:none;}
+.flt-stat-val{font-size:18px;font-weight:800;color:var(--navy);display:block;}
+.flt-stat-lbl{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;}
+
+/* ── UNASSIGNED SECTION ──────────────────────────────────────────────────── */
+.section-label{
+  padding:10px 16px 6px;
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--text-muted);background:var(--bg);
+  display:flex;align-items:center;gap:6px;
+}
+.section-badge{
+  background:var(--yellow);color:#fff;
+  width:18px;height:18px;border-radius:50%;
+  font-size:10px;font-weight:800;display:inline-flex;
+  align-items:center;justify-content:center;
+}
+
+/* ── PAX ROWS ────────────────────────────────────────────────────────────── */
+.pax-row{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 16px;border-bottom:1px solid var(--border);
+  background:var(--card);
+  transition:background .12s;
+}
+.pax-row:hover{background:#f7f9fc;}
+.pax-row.unassigned-row{background:#fffdf5;cursor:pointer;}
+.pax-row.unassigned-row:hover{background:#fff8e0;}
+
+.ptype-badge{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;flex-shrink:0;
+  font-family:-apple-system,BlinkMacSystemFont,monospace;
+}
+.b-F{background:rgba(47,152,121,.15);color:#2f9879;}
+.b-M{background:rgba(26,78,126,.15);color:#1a4e7e;}
+.b-C{background:rgba(232,160,0,.15);color:#b87600;}
+.b-I{background:rgba(158,96,212,.15);color:#9e60d4;}
+
+.pax-name{font-size:14px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pax-sub{font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;}
+.pax-wt{font-size:12px;color:var(--text-dim);text-align:right;flex-shrink:0;line-height:1.4;}
+.pax-wt span{display:block;}
+
+.assign-btn{
+  background:var(--navy);color:#fff;border:none;
+  padding:5px 12px;border-radius:6px;
+  font-size:11px;font-weight:700;cursor:pointer;
+  font-family:inherit;white-space:nowrap;flex-shrink:0;
+}
+.assign-btn:hover{background:var(--navy-dk);}
+
+.pax-edit-btn{
+  background:transparent;border:1px solid var(--border);
+  color:var(--text-muted);padding:4px 10px;border-radius:5px;
+  font-size:11px;cursor:pointer;font-family:inherit;flex-shrink:0;
+  transition:all .12s;
+}
+.pax-edit-btn:hover{border-color:var(--navy);color:var(--navy);}
+
+/* ── DID NOT BOARD + GENERATE ────────────────────────────────────────────── */
+.generate-section{padding:16px;}
+.dnb-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-dim);margin-bottom:6px;display:block;}
+.dnb-input{
+  width:100%;padding:10px 12px;
+  background:var(--input-bg);border:1.5px solid var(--input-border);
+  border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);
+  outline:none;resize:none;
+  transition:border-color .15s;
+}
+.dnb-input:focus{border-color:var(--navy);}
+
+.email-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-dim);margin-bottom:6px;display:block;margin-top:12px;}
+.email-input{
+  width:100%;height:44px;padding:0 12px;
+  background:var(--input-bg);border:1.5px solid var(--input-border);
+  border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);
+  outline:none;
+}
+.email-input:focus{border-color:var(--navy);}
+.email-hint{font-size:11px;color:var(--text-muted);margin-top:4px;}
+
+.btn-generate{
+  width:100%;height:56px;margin-top:14px;
+  background:var(--teal);color:#fff;border:none;border-radius:10px;
+  font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all .15s;
+}
+.btn-generate:hover:not(:disabled){background:#267e65;}
+.btn-generate:disabled{opacity:.5;cursor:not-allowed;}
+.btn-generate.generating{background:#267e65;}
+
+.generate-result{
+  margin-top:12px;padding:14px;border-radius:8px;
+  font-size:13px;display:none;
+}
+.generate-result.success{background:#f0faf5;border:1px solid rgba(47,152,121,.3);color:#1a5c3a;}
+.generate-result.error{background:var(--red-lt);border:1px solid rgba(217,64,64,.3);color:#8a1515;}
+.generate-result a{color:var(--teal);font-weight:600;}
+
+/* ── DEPARTED LOCK ───────────────────────────────────────────────────────── */
+.departed-notice{
+  margin:16px;padding:14px;border-radius:8px;
+  background:#f5f5f5;border:1px solid #ddd;
+  font-size:13px;color:#888;text-align:center;
+}
+
+/* ── EDIT PAX MODAL ──────────────────────────────────────────────────────── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;
+  display:none;align-items:flex-end;justify-content:center;
+}
+.modal-overlay.open{display:flex;}
+@media(min-width:520px){
+  .modal-overlay{align-items:center;}
+  .modal{border-radius:12px!important;max-height:80vh;}
+}
+.modal{
+  background:var(--card);width:100%;max-width:480px;
+  border-radius:16px 16px 0 0;padding:0;
+  max-height:90vh;overflow-y:auto;
+}
+.modal-hdr{
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;background:var(--card);z-index:1;
+}
+.modal-title{font-size:15px;font-weight:700;color:var(--navy);}
+.modal-close{background:transparent;border:none;font-size:20px;color:var(--text-muted);cursor:pointer;padding:2px 6px;border-radius:4px;line-height:1;}
+.modal-body{padding:16px 20px 24px;}
+.modal-field{margin-bottom:12px;}
+.modal-field label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-dim);margin-bottom:5px;}
+.modal-field input,.modal-field select,.modal-field textarea{
+  width:100%;height:44px;padding:0 12px;
+  background:var(--input-bg);border:1.5px solid var(--input-border);
+  border-radius:8px;font-size:15px;font-family:inherit;color:var(--text);
+  outline:none;appearance:none;-webkit-appearance:none;
+}
+.modal-field input:focus,.modal-field select:focus,.modal-field textarea:focus{border-color:var(--navy);}
+.modal-field textarea{height:auto;padding:10px 12px;resize:none;}
+.modal-field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235c6478' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;
+}
+.modal-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.modal-actions{display:flex;gap:8px;margin-top:16px;}
+.btn-modal-save{flex:1;height:44px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn-modal-del{height:44px;background:var(--red-lt);color:var(--red);border:1px solid rgba(217,64,64,.3);padding:0 14px;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;}
+
+/* ── GATE ────────────────────────────────────────────────────────────────── */
+.gate{position:fixed;inset:0;z-index:400;background:var(--navy-dk);display:flex;align-items:center;justify-content:center;padding:20px;}
+.gate-card{background:#fff;border-radius:16px;padding:32px 24px;width:100%;max-width:340px;text-align:center;}
+.gate-logo{width:52px;height:52px;background:var(--navy);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--lime);margin-bottom:16px;}
+.gate-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.gate-sub{font-size:13px;color:var(--text-muted);}
+.gate-err{font-size:13px;color:var(--red);margin-top:14px;padding:10px;background:#fff5f5;border-radius:8px;border:1px solid #fcc;}
+
+/* ── TOAST ───────────────────────────────────────────────────────────────── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1f2e;color:#fff;padding:11px 20px;border-radius:10px;font-size:14px;font-weight:500;z-index:500;transition:transform .25s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;box-shadow:0 6px 20px rgba(0,0,0,.2);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.ok{background:var(--teal);}
+.toast.err{background:var(--red);}
+
+/* ── SPINNER ─────────────────────────────────────────────────────────────── */
+.spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── REFRESH BTN ─────────────────────────────────────────────────────────── */
+.btn-refresh{background:transparent;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.75);padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;font-family:inherit;flex-shrink:0;}
+.btn-refresh:hover{background:rgba(255,255,255,.1);}
+</style>
+</head>
+<body>
+
+<!-- Auth gate -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-logo">L</div>
+    <div class="gate-title">LOOMI Manifest</div>
+    <div class="gate-sub">Flight Dashboard</div>
+    <div class="gate-err" id="gate-err">This link is invalid or has expired. Contact EOC for a new link.</div>
+  </div>
+</div>
+
+<div id="app" style="display:none;height:100%;flex-direction:column;display:none;">
+
+  <div class="header">
+    <span class="hdr-logo">LOOMI</span>
+    <div class="hdr-div"></div>
+    <span class="hdr-title">Manifest Portal</span>
+    <span class="hdr-act" id="hdr-act"></span>
+    <span class="hdr-hub" id="hdr-hub"></span>
+    <button class="btn-refresh" id="btn-refresh">&#8635; Refresh</button>
+    <div class="online-dot off" id="online-dot"></div>
+  </div>
+
+  <div class="layout" id="layout">
+
+    <!-- Left: flight list -->
+    <div class="flight-panel" id="flight-panel">
+      <div class="panel-hdr">
+        <span class="panel-title">Flights</span>
+        <span class="panel-count" id="flight-count"></span>
+        <button class="panel-action" id="add-flight-btn">+ Add Flight</button>
+      </div>
+
+      <div class="flight-list" id="flight-list">
+        <!-- Add flight form (hidden by default) -->
+        <div class="add-flight-form" id="add-flight-form">
+          <div class="aff-title">New Flight</div>
+          <div class="aff-grid">
+            <div class="aff-field">
+              <label>Flight # *</label>
+              <input type="text" id="aff-num" placeholder="e.g. AC714" autocorrect="off">
+            </div>
+            <div class="aff-field">
+              <label>Mode</label>
+              <select id="aff-mode">
+                <option value="">Select...</option>
+                <option value="Fixed-wing">Fixed-wing</option>
+                <option value="Helicopter">Helicopter</option>
+                <option value="Bus">Bus</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="aff-grid">
+            <div class="aff-field">
+              <label>Airline</label>
+              <input type="text" id="aff-airline" placeholder="e.g. Air Canada" autocorrect="off">
+            </div>
+            <div class="aff-field">
+              <label>AC Type</label>
+              <input type="text" id="aff-actype" placeholder="e.g. DHC-8" autocorrect="off">
+            </div>
+          </div>
+          <div class="aff-grid">
+            <div class="aff-field">
+              <label>Departure</label>
+              <input type="text" id="aff-dep" placeholder="e.g. Kashechewan" autocorrect="off">
+            </div>
+            <div class="aff-field">
+              <label>Destination</label>
+              <input type="text" id="aff-dest" placeholder="e.g. Kingston" autocorrect="off">
+            </div>
+          </div>
+          <div class="aff-grid">
+            <div class="aff-field">
+              <label>ETD</label>
+              <input type="text" id="aff-etd" placeholder="14:30">
+            </div>
+            <div class="aff-field">
+              <label>ETA</label>
+              <input type="text" id="aff-eta" placeholder="16:45">
+            </div>
+          </div>
+          <div class="aff-grid">
+            <div class="aff-field">
+              <label>Date</label>
+              <input type="date" id="aff-date">
+            </div>
+            <div class="aff-field">
+              <label>Seats</label>
+              <input type="number" id="aff-seats" placeholder="e.g. 19" min="1" inputmode="numeric">
+            </div>
+          </div>
+          <div class="aff-actions">
+            <button class="btn-save" id="aff-save">Save Flight</button>
+            <button class="btn-cancel" id="aff-cancel">Cancel</button>
+          </div>
+        </div>
+
+        <div id="flight-cards">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: pax detail -->
+    <div class="pax-panel" id="pax-panel">
+      <div id="pax-panel-content">
+        <div class="pax-empty-state">
+          <div class="pax-empty-icon">&#9992;</div>
+          <div>Select a flight to view passengers</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Edit pax modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title">Edit Passenger</span>
+      <button class="modal-close" id="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-pax-id">
+      <div class="modal-field-row">
+        <div class="modal-field">
+          <label>First Name</label>
+          <input type="text" id="edit-first" autocorrect="off">
+        </div>
+        <div class="modal-field">
+          <label>Last Name</label>
+          <input type="text" id="edit-last" autocorrect="off">
+        </div>
+      </div>
+      <div class="modal-field-row">
+        <div class="modal-field">
+          <label>Date of Birth</label>
+          <input type="date" id="edit-dob">
+        </div>
+        <div class="modal-field">
+          <label>Passenger Type</label>
+          <select id="edit-ptype">
+            <option value="F">F — Female</option>
+            <option value="M">M — Male</option>
+            <option value="C">C — Child</option>
+            <option value="I">I — Infant</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-field-row">
+        <div class="modal-field">
+          <label>Luggage (lbs)</label>
+          <input type="number" id="edit-lug" min="0" inputmode="numeric">
+        </div>
+        <div class="modal-field">
+          <label>Carry-On (lbs)</label>
+          <input type="number" id="edit-carry" min="0" inputmode="numeric">
+        </div>
+      </div>
+      <div class="modal-field">
+        <label>Assign to Flight</label>
+        <select id="edit-flight"></select>
+      </div>
+      <div class="modal-field">
+        <label>Special Requirements</label>
+        <textarea id="edit-special" rows="2"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-modal-save" id="modal-save">Save Changes</button>
+        <button class="btn-modal-del" id="modal-del">Remove</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+var WORKER = 'https://loomi-manifest.loomex-it.workers.dev';
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var hubToken = '';
+var hubContext = null;
+var flights = [];
+var allPax = [];
+var selectedFlightId = null;
+var editingPaxId = null;
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+(function init() {
+  var params = new URLSearchParams(window.location.search);
+  hubToken = params.get('token') || '';
+  if (!hubToken) { showGate('Missing hub token.'); return; }
+  authAndLoad();
+  window.addEventListener('online', function() { updateDot(); loadData(); });
+  window.addEventListener('offline', updateDot);
+  updateDot();
+  document.getElementById('btn-refresh').addEventListener('click', loadData);
+  setupAddFlightForm();
+  setupModal();
+})();
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function authAndLoad() {
+  api('GET', '/api/auth')
+    .then(function(data) {
+      if (data.error) { showGate(data.error); return; }
+      hubContext = data;
+      document.getElementById('hdr-hub').textContent = data.hub;
+      document.getElementById('hdr-act').textContent = data.activationId;
+      document.getElementById('gate').style.display = 'none';
+      var app = document.getElementById('app');
+      app.style.display = 'flex';
+      app.style.flexDirection = 'column';
+      app.style.height = '100%';
+      loadData();
+    })
+    .catch(function(e) { showGate('Could not connect: ' + e.message); });
+}
+
+// ── LOAD DATA ─────────────────────────────────────────────────────────────────
+function loadData() {
+  Promise.all([
+    api('GET', '/api/flights'),
+    api('GET', '/api/pax'),
+  ]).then(function(results) {
+    flights = results[0].error ? [] : results[0];
+    allPax = results[1].error ? [] : results[1];
+    renderFlights();
+    if (selectedFlightId) renderPaxPanel(selectedFlightId);
+  }).catch(function(e) {
+    showToast('Load failed: ' + e.message, 'err');
+  });
+}
+
+// ── RENDER FLIGHTS ────────────────────────────────────────────────────────────
+function renderFlights() {
+  var container = document.getElementById('flight-cards');
+  document.getElementById('flight-count').textContent = flights.length ? flights.length + ' flight' + (flights.length === 1 ? '' : 's') : '';
+
+  if (!flights.length) {
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px;">No flights yet.<br>Tap + Add Flight to create one.</div>';
+    return;
+  }
+
+  // Sort: active first, then departed; within active by ETD
+  var sorted = flights.slice().sort(function(a, b) {
+    if (a.status === 'Departed' && b.status !== 'Departed') return 1;
+    if (a.status !== 'Departed' && b.status === 'Departed') return -1;
+    return (a.etd || '').localeCompare(b.etd || '');
+  });
+
+  container.innerHTML = sorted.map(function(f) {
+    var paxForFlight = allPax.filter(function(p) { return p.flightId === f.id; });
+    var totalLug = paxForFlight.reduce(function(s, p) { return s + (Number(p.luggageWeight) || 0); }, 0);
+    var totalCarry = paxForFlight.reduce(function(s, p) { return s + (Number(p.carryOnWeight) || 0); }, 0);
+    var statusClass = f.status === 'Departed' ? 'pill-departed' : f.status === 'Ready' ? 'pill-ready' : 'pill-loading';
+    var cardClass = 'flight-card' + (f.status === 'Departed' ? ' departed' : '') + (f.id === selectedFlightId ? ' active' : '');
+
+    return '<div class="' + cardClass + '" data-id="' + f.id + '">' +
+      '<div class="fc-top">' +
+        '<div class="fc-num">' + esc(f.flightNumber) + '</div>' +
+        '<div class="fc-info">' +
+          '<div class="fc-dest">' + (f.departureLocation ? esc(f.departureLocation) + ' \u2192 ' : '') + esc(f.destination || 'Destination TBD') + '</div>' +
+          '<div class="fc-meta">' +
+            (f.airline ? esc(f.airline) + ' &bull; ' : '') +
+            (f.acType ? esc(f.acType) + ' &bull; ' : '') +
+            (f.etd ? 'ETD ' + esc(f.etd) : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="fc-status"><span class="status-pill ' + statusClass + '">' + esc(f.status) + '</span></div>' +
+      '</div>' +
+      '<div class="fc-stats">' +
+        '<div class="fc-stat"><span class="fc-stat-val">' + paxForFlight.length + '</span>Pax</div>' +
+        '<div class="fc-stat"><span class="fc-stat-val">' + totalLug + '</span>Lug lbs</div>' +
+        '<div class="fc-stat"><span class="fc-stat-val">' + totalCarry + '</span>Carry lbs</div>' +
+        '<div class="fc-stat"><span class="fc-stat-val">' + (totalLug + totalCarry) + '</span>Total lbs</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  // Click handlers
+  container.querySelectorAll('.flight-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      var id = this.getAttribute('data-id');
+      selectedFlightId = id;
+      renderFlights(); // re-render to update active state
+      renderPaxPanel(id);
+    });
+  });
+}
+
+// ── RENDER PAX PANEL ──────────────────────────────────────────────────────────
+function renderPaxPanel(flightId) {
+  var flight = flights.find(function(f) { return f.id === flightId; });
+  if (!flight) return;
+
+  var flightPax = allPax.filter(function(p) { return p.flightId === flightId; });
+  var unassigned = allPax.filter(function(p) { return !p.flightId; });
+
+  var counts = { F:0, M:0, C:0, I:0 };
+  flightPax.forEach(function(p) { if (counts[p.passengerType] !== undefined) counts[p.passengerType]++; });
+  var totalLug = flightPax.reduce(function(s, p) { return s + (Number(p.luggageWeight)||0); }, 0);
+  var totalCarry = flightPax.reduce(function(s, p) { return s + (Number(p.carryOnWeight)||0); }, 0);
+
+  var departed = flight.status === 'Departed';
+
+  var html = '';
+
+  // Flight header
+  html += '<div class="flt-detail-hdr">' +
+    '<div class="flt-detail-num">' + esc(flight.flightNumber) + '</div>' +
+    '<div class="flt-detail-meta">' +
+      (flight.airline ? '<span>&#9992; ' + esc(flight.airline) + '</span>' : '') +
+      (flight.acType ? '<span>' + esc(flight.acType) + '</span>' : '') +
+      (flight.etd ? '<span>ETD ' + esc(flight.etd) + '</span>' : '') +
+      (flight.eta ? '<span>ETA ' + esc(flight.eta) + '</span>' : '') +
+      (flight.destination ? '<span>\u2192 ' + esc(flight.destination) + '</span>' : '') +
+      (flight.seats ? '<span>' + flight.seats + ' seats</span>' : '') +
+    '</div>' +
+  '</div>';
+
+  // Summary bar
+  html += '<div class="flt-summary-bar">' +
+    '<div class="flt-stat"><span class="flt-stat-val">' + flightPax.length + '</span><span class="flt-stat-lbl">Pax</span></div>' +
+    '<div class="flt-stat"><span class="flt-stat-val">F:' + counts.F + ' M:' + counts.M + ' C:' + counts.C + ' I:' + counts.I + '</span><span class="flt-stat-lbl">Breakdown</span></div>' +
+    '<div class="flt-stat"><span class="flt-stat-val">' + totalLug + '</span><span class="flt-stat-lbl">Lug lbs</span></div>' +
+    '<div class="flt-stat"><span class="flt-stat-val">' + totalCarry + '</span><span class="flt-stat-lbl">Carry lbs</span></div>' +
+  '</div>';
+
+  // Unassigned pax (only if flight is active)
+  if (!departed && unassigned.length) {
+    html += '<div class="section-label">Unassigned Passengers <span class="section-badge">' + unassigned.length + '</span> <span style="font-size:11px;font-weight:400;color:var(--text-muted);">— tap to assign</span></div>';
+    unassigned.forEach(function(p) {
+      html += renderPaxRow(p, true, flightId);
+    });
+  }
+
+  // Assigned pax
+  if (flightPax.length) {
+    html += '<div class="section-label">Assigned to ' + esc(flight.flightNumber) + '</div>';
+    flightPax.forEach(function(p) {
+      html += renderPaxRow(p, false, flightId);
+    });
+  } else if (!unassigned.length) {
+    html += '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px;">No passengers assigned yet.<br>Add them via the intake form.</div>';
+  }
+
+  // Generate section
+  if (!departed) {
+    html += '<div class="generate-section">' +
+      '<label class="dnb-label">Did Not Board Note (optional)</label>' +
+      '<textarea class="dnb-input" id="dnb-note" rows="2" placeholder="e.g. ** Alex Smith did not board as was on original manifest."></textarea>' +
+      '<label class="email-label">Email Manifest To</label>' +
+      '<input class="email-input" type="email" id="manifest-email" placeholder="recipient@example.com">' +
+      '<div class="email-hint">Separate multiple addresses with commas. Leave blank to use default.</div>' +
+      '<button class="btn-generate" id="btn-generate" ' + (flightPax.length === 0 ? 'disabled' : '') + '>' +
+        '<span id="gen-icon">&#128441;</span>' +
+        '<span id="gen-label">Generate Manifest</span>' +
+      '</button>' +
+      '<div class="generate-result" id="gen-result"></div>' +
+    '</div>';
+  } else {
+    html += '<div class="departed-notice">&#128274; This flight has departed. Manifest is locked.<br><small style="margin-top:4px;display:block">Contact EOC to make corrections.</small></div>';
+  }
+
+  var panel = document.getElementById('pax-panel-content');
+  panel.innerHTML = html;
+
+  // Wire up assign buttons
+  panel.querySelectorAll('.assign-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var paxId = this.getAttribute('data-pax-id');
+      assignPax(paxId, flightId);
+    });
+  });
+
+  // Wire up edit buttons
+  panel.querySelectorAll('.pax-edit-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var paxId = this.getAttribute('data-pax-id');
+      openEditModal(paxId);
+    });
+  });
+
+  // Wire up generate
+  var genBtn = document.getElementById('btn-generate');
+  if (genBtn) genBtn.addEventListener('click', function() { generateManifest(flightId); });
+}
+
+function renderPaxRow(p, isUnassigned, targetFlightId) {
+  var wt = (Number(p.luggageWeight)||0) + (Number(p.carryOnWeight)||0);
+  return '<div class="pax-row' + (isUnassigned ? ' unassigned-row' : '') + '">' +
+    '<div class="ptype-badge b-' + p.passengerType + '">' + p.passengerType + '</div>' +
+    '<div class="pax-info">' +
+      '<div class="pax-name">' + esc(p.firstName) + ' ' + esc(p.lastName) + '</div>' +
+      '<div class="pax-sub">' + (p.dob ? p.dob + ' &bull; ' : '') + (p.specialRequirements ? '&#9888; Special req.' : '') + '</div>' +
+    '</div>' +
+    '<div class="pax-wt">' +
+      '<span>' + (p.luggageWeight||0) + ' lug</span>' +
+      '<span>' + (p.carryOnWeight||0) + ' carry</span>' +
+    '</div>' +
+    (isUnassigned
+      ? '<button class="assign-btn" data-pax-id="' + p.id + '">Assign</button>'
+      : '<button class="pax-edit-btn" data-pax-id="' + p.id + '">Edit</button>') +
+  '</div>';
+}
+
+// ── ASSIGN PAX ────────────────────────────────────────────────────────────────
+function assignPax(paxId, flightId) {
+  api('PATCH', '/api/pax/' + paxId, { flightId: flightId })
+    .then(function(data) {
+      if (data.error) { showToast('Error: ' + data.error, 'err'); return; }
+      var pax = allPax.find(function(p) { return p.id === paxId; });
+      if (pax) pax.flightId = flightId;
+      renderFlights();
+      renderPaxPanel(flightId);
+      showToast('Passenger assigned', 'ok');
+    })
+    .catch(function(e) { showToast('Assign failed: ' + e.message, 'err'); });
+}
+
+// ── GENERATE MANIFEST ─────────────────────────────────────────────────────────
+function generateManifest(flightId) {
+  var btn = document.getElementById('btn-generate');
+  var result = document.getElementById('gen-result');
+  var dnb = (document.getElementById('dnb-note') || {}).value || '';
+  var emailRaw = (document.getElementById('manifest-email') || {}).value || '';
+  var emailTo = emailRaw.trim()
+    ? emailRaw.split(',').map(function(s) { return s.trim(); }).filter(Boolean)
+    : null;
+
+  btn.disabled = true;
+  btn.classList.add('generating');
+  document.getElementById('gen-icon').innerHTML = '<div class="spinner"></div>';
+  document.getElementById('gen-label').textContent = 'Generating...';
+  result.style.display = 'none';
+
+  api('POST', '/api/generate/' + flightId, {
+    didNotBoardNote: dnb,
+    emailTo: emailTo,
+  })
+  .then(function(data) {
+    btn.disabled = false;
+    btn.classList.remove('generating');
+    document.getElementById('gen-icon').textContent = '\u2713';
+    document.getElementById('gen-label').textContent = 'Manifest Generated!';
+
+    if (data.error) {
+      result.className = 'generate-result error';
+      result.textContent = 'Error: ' + data.error;
+      result.style.display = 'block';
+      document.getElementById('gen-icon').textContent = '&#128441;';
+      document.getElementById('gen-label').textContent = 'Generate Manifest';
+      return;
+    }
+
+    result.className = 'generate-result success';
+    result.innerHTML = '&#10003; Manifest generated for ' + data.paxCount + ' passenger(s).' +
+      (data.pdfUrl ? ' <a href="' + data.pdfUrl + '" target="_blank">Download PDF</a>' : '') +
+      (data.xlsUrl ? ' &bull; <a href="' + data.xlsUrl + '" target="_blank">Download Excel</a>' : '') +
+      '<br><small style="color:#555;margin-top:4px;display:block">Emailed and saved to SharePoint. Flight locked.</small>';
+    result.style.display = 'block';
+
+    // Update flight status locally
+    var flight = flights.find(function(f) { return f.id === flightId; });
+    if (flight) flight.status = 'Departed';
+    renderFlights();
+    renderPaxPanel(flightId);
+  })
+  .catch(function(e) {
+    btn.disabled = false;
+    btn.classList.remove('generating');
+    document.getElementById('gen-icon').textContent = '&#128441;';
+    document.getElementById('gen-label').textContent = 'Generate Manifest';
+    result.className = 'generate-result error';
+    result.textContent = 'Network error: ' + e.message;
+    result.style.display = 'block';
+  });
+}
+
+// ── ADD FLIGHT FORM ───────────────────────────────────────────────────────────
+function setupAddFlightForm() {
+  document.getElementById('add-flight-btn').addEventListener('click', function() {
+    var form = document.getElementById('add-flight-form');
+    form.classList.toggle('open');
+    if (form.classList.contains('open')) {
+      document.getElementById('aff-date').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('aff-num').focus();
+    }
+  });
+
+  document.getElementById('aff-cancel').addEventListener('click', function() {
+    document.getElementById('add-flight-form').classList.remove('open');
+    clearAddFlightForm();
+  });
+
+  document.getElementById('aff-save').addEventListener('click', saveNewFlight);
+}
+
+function saveNewFlight() {
+  var num = document.getElementById('aff-num').value.trim();
+  if (!num) { showToast('Flight number required', 'err'); return; }
+
+  var body = {
+    flightNumber: num,
+    mode: document.getElementById('aff-mode').value,
+    airline: document.getElementById('aff-airline').value.trim(),
+    acType: document.getElementById('aff-actype').value.trim(),
+    departureLocation: document.getElementById('aff-dep').value.trim(),
+    destination: document.getElementById('aff-dest').value.trim(),
+    etd: document.getElementById('aff-etd').value.trim(),
+    eta: document.getElementById('aff-eta').value.trim(),
+    flightDate: document.getElementById('aff-date').value,
+    seats: document.getElementById('aff-seats').value || null,
+  };
+
+  var btn = document.getElementById('aff-save');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  api('POST', '/api/flights', body)
+    .then(function(data) {
+      btn.disabled = false;
+      btn.textContent = 'Save Flight';
+      if (data.error) { showToast('Error: ' + data.error, 'err'); return; }
+      flights.push(data);
+      document.getElementById('add-flight-form').classList.remove('open');
+      clearAddFlightForm();
+      renderFlights();
+      showToast('Flight added', 'ok');
+    })
+    .catch(function(e) {
+      btn.disabled = false;
+      btn.textContent = 'Save Flight';
+      showToast('Save failed: ' + e.message, 'err');
+    });
+}
+
+function clearAddFlightForm() {
+  ['aff-num','aff-airline','aff-actype','aff-dep','aff-dest','aff-etd','aff-eta','aff-seats'].forEach(function(id) {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('aff-mode').value = '';
+}
+
+// ── EDIT PAX MODAL ────────────────────────────────────────────────────────────
+function setupModal() {
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('edit-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.getElementById('modal-save').addEventListener('click', saveEditedPax);
+  document.getElementById('modal-del').addEventListener('click', deletePax);
+}
+
+function openEditModal(paxId) {
+  var pax = allPax.find(function(p) { return p.id === paxId; });
+  if (!pax) return;
+
+  editingPaxId = paxId;
+  document.getElementById('edit-pax-id').value = paxId;
+  document.getElementById('edit-first').value = pax.firstName || '';
+  document.getElementById('edit-last').value = pax.lastName || '';
+  document.getElementById('edit-dob').value = pax.dob || '';
+  document.getElementById('edit-ptype').value = pax.passengerType || 'F';
+  document.getElementById('edit-lug').value = pax.luggageWeight || '';
+  document.getElementById('edit-carry').value = pax.carryOnWeight || '';
+  document.getElementById('edit-special').value = pax.specialRequirements || '';
+
+  // Populate flight dropdown
+  var flightSel = document.getElementById('edit-flight');
+  flightSel.innerHTML = '<option value="">Unassigned</option>';
+  flights.filter(function(f) { return f.status !== 'Departed'; }).forEach(function(f) {
+    var opt = document.createElement('option');
+    opt.value = f.id;
+    opt.textContent = f.flightNumber + (f.destination ? ' \u2192 ' + f.destination : '');
+    flightSel.appendChild(opt);
+  });
+  flightSel.value = pax.flightId || '';
+
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+  editingPaxId = null;
+}
+
+function saveEditedPax() {
+  if (!editingPaxId) return;
+  var body = {
+    firstName: document.getElementById('edit-first').value.trim(),
+    lastName: document.getElementById('edit-last').value.trim(),
+    dob: document.getElementById('edit-dob').value,
+    passengerType: document.getElementById('edit-ptype').value,
+    luggageWeight: Number(document.getElementById('edit-lug').value) || 0,
+    carryOnWeight: Number(document.getElementById('edit-carry').value) || 0,
+    specialRequirements: document.getElementById('edit-special').value.trim(),
+    flightId: document.getElementById('edit-flight').value,
+  };
+
+  var btn = document.getElementById('modal-save');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  api('PATCH', '/api/pax/' + editingPaxId, body)
+    .then(function(data) {
+      btn.disabled = false; btn.textContent = 'Save Changes';
+      if (data.error) { showToast('Error: ' + data.error, 'err'); return; }
+      var pax = allPax.find(function(p) { return p.id === editingPaxId; });
+      if (pax) Object.assign(pax, { firstName:body.firstName, lastName:body.lastName, dob:body.dob, passengerType:body.passengerType, luggageWeight:body.luggageWeight, carryOnWeight:body.carryOnWeight, specialRequirements:body.specialRequirements, flightId:body.flightId });
+      closeModal();
+      renderFlights();
+      if (selectedFlightId) renderPaxPanel(selectedFlightId);
+      showToast('Passenger updated', 'ok');
+    })
+    .catch(function(e) {
+      btn.disabled = false; btn.textContent = 'Save Changes';
+      showToast('Save failed: ' + e.message, 'err');
+    });
+}
+
+function deletePax() {
+  if (!editingPaxId) return;
+  if (!confirm('Remove this passenger? This cannot be undone.')) return;
+
+  api('DELETE', '/api/pax/' + editingPaxId)
+    .then(function(data) {
+      if (data.error) { showToast('Error: ' + data.error, 'err'); return; }
+      allPax = allPax.filter(function(p) { return p.id !== editingPaxId; });
+      closeModal();
+      renderFlights();
+      if (selectedFlightId) renderPaxPanel(selectedFlightId);
+      showToast('Passenger removed', 'ok');
+    })
+    .catch(function(e) { showToast('Delete failed: ' + e.message, 'err'); });
+}
+
+// ── API ───────────────────────────────────────────────────────────────────────
+function api(method, path, body) {
+  var opts = {
+    method: method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+  if (body && method !== 'GET' && method !== 'DELETE') opts.body = JSON.stringify(body);
+
+  var url = WORKER + path + (path.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(hubToken);
+
+  return fetch(url, opts).then(function(r) {
+    if (r.status === 204) return { success: true };
+    return r.json();
+  });
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function showGate(msg) {
+  document.getElementById('gate').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  if (msg) document.getElementById('gate-err').textContent = msg;
+}
+
+function updateDot() {
+  var dot = document.getElementById('online-dot');
+  if (navigator.onLine) { dot.className = 'online-dot on'; dot.title = 'Online'; }
+  else { dot.className = 'online-dot off'; dot.title = 'Offline'; }
+}
+
+var toastTimer = null;
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2600);
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
