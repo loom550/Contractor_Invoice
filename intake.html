@@ -8,305 +8,265 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>LOOMI — Passenger Intake</title>
 <style>
-/* ── RESET + BASE ─────────────────────────────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
-  --navy:#1a4e7e;
-  --navy-dk:#0f2f50;
-  --teal:#2f9879;
-  --lime:#7dbe42;
-  --red:#d94040;
-  --yellow:#e8a000;
-  --bg:#f2f4f7;
-  --card:#ffffff;
-  --border:#dde2ea;
-  --text:#1a1f2e;
-  --text-dim:#5c6478;
-  --text-muted:#9099ae;
-  --input-bg:#f7f8fb;
-  --input-border:#d0d5e0;
-  --input-focus:#1a4e7e;
-  --btn-h:56px;
-  --radius:10px;
-  --shadow:0 2px 12px rgba(0,0,0,.08);
+  --navy:#1a4e7e;--navy-dk:#0f2f50;--teal:#2f9879;--teal-lt:rgba(47,152,121,.1);
+  --lime:#7dbe42;--red:#d94040;--yellow:#e8a000;
+  --bg:#f2f4f7;--card:#ffffff;--border:#dde2ea;
+  --text:#1a1f2e;--text-dim:#5c6478;--text-muted:#9099ae;
+  --input-bg:#f7f8fb;--input-border:#d0d5e0;--input-focus:#1a4e7e;
+  --btn-h:56px;--radius:10px;--shadow:0 2px 12px rgba(0,0,0,.08);
 }
 html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text);font-size:16px;-webkit-font-smoothing:antialiased;}
 
-/* ── HEADER ───────────────────────────────────────────────────────────────── */
-.header{
-  position:sticky;top:0;z-index:100;
-  background:var(--navy);
-  padding:12px 16px 10px;
-  border-bottom:3px solid var(--lime);
-  display:flex;align-items:center;gap:10px;
-}
-.header-logo{font-size:11px;font-weight:700;color:var(--lime);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;}
+.header{position:sticky;top:0;z-index:100;background:var(--navy);padding:12px 16px 10px;border-bottom:3px solid var(--lime);display:flex;align-items:center;gap:10px;}
+.header.mode-out{background:var(--teal);border-bottom-color:#5de0b0;}
+.header-logo{font-size:11px;font-weight:700;color:var(--lime);letter-spacing:.14em;white-space:nowrap;}
+.header.mode-out .header-logo{color:#c8fde8;}
 .header-div{width:1px;height:18px;background:rgba(255,255,255,.2);flex-shrink:0;}
-.header-title{font-size:13px;font-weight:600;color:#fff;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.header-title{font-size:13px;font-weight:600;color:#fff;flex:1;}
 .header-hub{font-size:11px;color:rgba(255,255,255,.65);white-space:nowrap;}
-.online-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background .3s;}
+.online-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .online-dot.online{background:var(--lime);}
 .online-dot.offline{background:var(--yellow);animation:pulse 1.8s ease-in-out infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 
-/* ── SYNC BANNER ──────────────────────────────────────────────────────────── */
-.sync-banner{
-  display:none;
-  background:#fffbf0;
-  border-bottom:2px solid var(--yellow);
-  padding:10px 16px;
-  display:flex;align-items:center;gap:10px;
-  font-size:13px;color:#7a4e00;cursor:pointer;
-}
+/* ── MODE TOGGLE ── */
+.mode-toggle{display:grid;grid-template-columns:1fr 1fr;margin:14px 16px 0;background:var(--card);border-radius:10px;border:1.5px solid var(--border);overflow:hidden;box-shadow:var(--shadow);}
+.mode-btn{height:54px;border:none;background:transparent;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all .18s;padding:0;}
+.mode-btn:first-child{border-right:1.5px solid var(--border);}
+.mode-btn-icon{font-size:18px;line-height:1;}
+.mode-btn-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);}
+.mode-btn.active-in{background:var(--navy);}
+.mode-btn.active-in .mode-btn-label{color:#fff;}
+.mode-btn.active-out{background:var(--teal);}
+.mode-btn.active-out .mode-btn-label{color:#fff;}
+
+/* ── SYNC BANNER ── */
+.sync-banner{background:#fffbf0;border-bottom:2px solid var(--yellow);padding:10px 16px;display:flex;align-items:center;gap:10px;font-size:13px;color:#7a4e00;cursor:pointer;}
 .sync-banner.hidden{display:none!important;}
-.sync-icon{font-size:16px;flex-shrink:0;}
 .sync-text{flex:1;}
 .sync-retry{font-weight:700;text-decoration:underline;white-space:nowrap;}
 
-/* ── ERROR / AUTH GATE ────────────────────────────────────────────────────── */
-.gate{
-  position:fixed;inset:0;z-index:200;
-  background:var(--navy-dk);
-  display:flex;align-items:center;justify-content:center;padding:20px;
-}
+/* ── GATE ── */
+.gate{position:fixed;inset:0;z-index:200;background:var(--navy-dk);display:flex;align-items:center;justify-content:center;padding:20px;}
 .gate-card{background:#fff;border-radius:16px;padding:32px 24px;width:100%;max-width:360px;text-align:center;}
-.gate-logo{width:52px;height:52px;background:var(--navy);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--lime);letter-spacing:.08em;margin-bottom:16px;}
+.gate-logo{width:52px;height:52px;background:var(--navy);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--lime);margin-bottom:16px;}
 .gate-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;}
-.gate-sub{font-size:13px;color:var(--text-muted);margin-bottom:0;}
+.gate-sub{font-size:13px;color:var(--text-muted);}
 .gate-error-msg{font-size:13px;color:var(--red);margin-top:16px;padding:10px 14px;background:#fff5f5;border-radius:8px;border:1px solid #fcc;}
 
-/* ── MAIN CONTENT ─────────────────────────────────────────────────────────── */
-.main{padding:16px;max-width:560px;margin:0 auto;}
+/* ── MAIN ── */
+.main{padding:14px 16px;max-width:560px;margin:0 auto;}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:14px;overflow:hidden;}
+.card-header{padding:13px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.card-header-icon{font-size:17px;line-height:1;}
+.card-header-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--navy);}
+.card-header-badge{margin-left:auto;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;}
+.badge-in{background:rgba(26,78,126,.12);color:var(--navy);}
+.badge-out{background:var(--teal-lt);color:var(--teal);}
+.card-body{padding:14px 16px;}
 
-/* ── CARD ─────────────────────────────────────────────────────────────────── */
-.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:16px;overflow:hidden;}
-.card-header{padding:14px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
-.card-header-icon{font-size:18px;line-height:1;}
-.card-header-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--navy);}
-.card-body{padding:16px;}
-
-/* ── FORM FIELDS ──────────────────────────────────────────────────────────── */
-.field-group{margin-bottom:14px;}
+/* ── FIELDS ── */
+.field-group{margin-bottom:13px;}
 .field-group:last-child{margin-bottom:0;}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-label{display:block;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-dim);margin-bottom:6px;}
+label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-dim);margin-bottom:5px;}
 label .req{color:var(--red);margin-left:2px;}
-
-input[type=text],input[type=date],input[type=number],select,textarea{
-  display:block;width:100%;
-  height:var(--btn-h);
-  padding:0 14px;
-  background:var(--input-bg);
-  border:1.5px solid var(--input-border);
-  border-radius:8px;
-  font-size:17px;
-  font-family:inherit;
-  color:var(--text);
-  outline:none;
-  appearance:none;
-  -webkit-appearance:none;
-  transition:border-color .15s,box-shadow .15s;
-}
-input:focus,select:focus,textarea:focus{
-  border-color:var(--input-focus);
-  box-shadow:0 0 0 3px rgba(26,78,126,.12);
-  background:#fff;
-}
+input[type=text],input[type=date],input[type=number],select,textarea{display:block;width:100%;height:var(--btn-h);padding:0 14px;background:var(--input-bg);border:1.5px solid var(--input-border);border-radius:8px;font-size:17px;font-family:inherit;color:var(--text);outline:none;appearance:none;-webkit-appearance:none;transition:border-color .15s,box-shadow .15s;}
+input:focus,select:focus,textarea:focus{border-color:var(--input-focus);box-shadow:0 0 0 3px rgba(26,78,126,.12);background:#fff;}
 input::placeholder{color:var(--text-muted);}
 input[type=date]{color:var(--text);}
 input[type=date]::-webkit-calendar-picker-indicator{opacity:.5;cursor:pointer;}
-
-select{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235c6478' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 14px center;
-  padding-right:36px;
-}
-
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235c6478' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
 textarea{height:auto;padding:12px 14px;resize:none;font-size:15px;line-height:1.5;}
 
-/* ── PASSENGER TYPE BUTTONS ───────────────────────────────────────────────── */
+/* ── POOL SEARCH ── */
+.pool-search-wrap{position:relative;}
+.pool-search-input{width:100%;height:52px;padding:0 14px 0 42px;background:#fff;border:2px solid var(--teal);border-radius:8px;font-size:16px;font-family:inherit;color:var(--text);outline:none;appearance:none;}
+.pool-search-input:focus{box-shadow:0 0 0 3px rgba(47,152,121,.15);}
+.pool-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none;}
+.pool-search-clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--border);border:none;color:var(--text-muted);width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px;display:none;align-items:center;justify-content:center;padding:0;}
+.pool-search-clear.show{display:flex;}
+.pool-count{font-size:12px;color:var(--text-muted);margin-left:auto;}
+.pool-results{margin-top:8px;max-height:220px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;background:#fff;}
+.pool-results.hidden{display:none;}
+.pool-result-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;}
+.pool-result-item:last-child{border-bottom:none;}
+.pool-result-item:hover,.pool-result-item:active{background:#f0faf5;}
+.pool-result-badge{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;font-family:monospace;}
+.pool-result-info{flex:1;}
+.pool-result-name{font-size:14px;font-weight:600;}
+.pool-result-meta{font-size:11px;color:var(--text-muted);margin-top:1px;}
+.pool-result-arrow{color:var(--teal);font-size:18px;flex-shrink:0;}
+.pool-empty{padding:18px;text-align:center;color:var(--text-muted);font-size:13px;}
+
+.pool-selected-banner{background:#f0faf5;border:1.5px solid var(--teal);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.pool-selected-banner.hidden{display:none;}
+.pool-selected-info{flex:1;}
+.pool-selected-name{font-size:14px;font-weight:700;color:var(--teal);}
+.pool-selected-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.pool-selected-clear{background:transparent;border:1px solid rgba(47,152,121,.4);color:var(--teal);padding:4px 10px;border-radius:5px;font-size:12px;cursor:pointer;font-family:inherit;flex-shrink:0;}
+.weights-notice{font-size:12px;color:var(--teal);font-weight:600;padding:8px 0 4px;display:none;align-items:center;gap:6px;}
+.weights-notice.show{display:flex;}
+
+/* ── PTYPE ── */
 .ptype-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
-.ptype-btn{
-  height:60px;
-  border:2px solid var(--input-border);
-  border-radius:10px;
-  background:var(--input-bg);
-  cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-  transition:all .15s;
-  -webkit-tap-highlight-color:transparent;
-  padding:0;
-}
+.ptype-btn{height:60px;border:2px solid var(--input-border);border-radius:10px;background:var(--input-bg);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:all .15s;padding:0;}
 .ptype-btn:active{transform:scale(.96);}
-.ptype-code{font-size:22px;font-weight:800;color:var(--text-dim);line-height:1;font-family:-apple-system,BlinkMacSystemFont,monospace;}
+.ptype-code{font-size:22px;font-weight:800;color:var(--text-dim);line-height:1;font-family:monospace;}
 .ptype-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);}
-
 .ptype-btn.selected-F{border-color:#2f9879;background:rgba(47,152,121,.1);}
-.ptype-btn.selected-F .ptype-code{color:#2f9879;}
-.ptype-btn.selected-F .ptype-label{color:#2f9879;}
-
+.ptype-btn.selected-F .ptype-code,.ptype-btn.selected-F .ptype-label{color:#2f9879;}
 .ptype-btn.selected-M{border-color:#1a4e7e;background:rgba(26,78,126,.1);}
-.ptype-btn.selected-M .ptype-code{color:#1a4e7e;}
-.ptype-btn.selected-M .ptype-label{color:#1a4e7e;}
-
+.ptype-btn.selected-M .ptype-code,.ptype-btn.selected-M .ptype-label{color:#1a4e7e;}
 .ptype-btn.selected-C{border-color:#e8a000;background:rgba(232,160,0,.1);}
-.ptype-btn.selected-C .ptype-code{color:#e8a000;}
-.ptype-btn.selected-C .ptype-label{color:#e8a000;}
-
+.ptype-btn.selected-C .ptype-code,.ptype-btn.selected-C .ptype-label{color:#e8a000;}
 .ptype-btn.selected-I{border-color:#9e60d4;background:rgba(158,96,212,.1);}
-.ptype-btn.selected-I .ptype-code{color:#9e60d4;}
-.ptype-btn.selected-I .ptype-label{color:#9e60d4;}
+.ptype-btn.selected-I .ptype-code,.ptype-btn.selected-I .ptype-label{color:#9e60d4;}
 
-/* ── SPECIAL REQS TOGGLE ──────────────────────────────────────────────────── */
-.special-toggle{
-  display:flex;align-items:center;gap:8px;
-  padding:10px 0 0;
-  cursor:pointer;
-  font-size:13px;color:var(--text-dim);font-weight:500;
-  border:none;background:none;width:100%;text-align:left;
-}
+/* ── SPECIAL REQS ── */
+.special-toggle{display:flex;align-items:center;gap:8px;padding:10px 0 0;cursor:pointer;font-size:13px;color:var(--text-dim);font-weight:500;border:none;background:none;width:100%;text-align:left;}
 .special-toggle-icon{font-size:16px;transition:transform .2s;}
 .special-toggle.open .special-toggle-icon{transform:rotate(45deg);}
 .special-field{margin-top:10px;display:none;}
 .special-field.open{display:block;}
 
-/* ── SUBMIT BUTTON ────────────────────────────────────────────────────────── */
-.btn-submit{
-  width:100%;
-  height:60px;
-  background:var(--navy);
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  font-size:17px;
-  font-weight:700;
-  letter-spacing:.02em;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  transition:all .15s;
-  font-family:inherit;
-}
-.btn-submit:active{transform:scale(.98);background:var(--navy-dk);}
-.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none;}
-.btn-submit.success{background:var(--teal);}
+/* ── SUBMIT ── */
+.btn-submit{width:100%;height:60px;border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .15s;font-family:inherit;color:#fff;}
+.btn-submit.mode-in{background:var(--navy);}
+.btn-submit.mode-in:active{background:var(--navy-dk);}
+.btn-submit.mode-out{background:var(--teal);}
+.btn-submit.mode-out:active{background:#267e65;}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;}
+.btn-submit.success{background:#267e65!important;}
 
-/* ── VALIDATION HINT ──────────────────────────────────────────────────────── */
+/* ── VALIDATION ── */
 .field-err{font-size:12px;color:var(--red);margin-top:5px;display:none;}
 .field-err.show{display:block;}
 input.invalid,select.invalid{border-color:var(--red)!important;}
 
-/* ── RECENT LIST ──────────────────────────────────────────────────────────── */
+/* ── SESSION LIST ── */
 .recent-empty{text-align:center;padding:24px 0;color:var(--text-muted);font-size:14px;}
-.pax-item{
-  display:flex;align-items:center;gap:12px;
-  padding:12px 16px;
-  border-bottom:1px solid var(--border);
-}
+.pax-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);}
 .pax-item:last-child{border-bottom:none;}
-.pax-type-badge{
-  width:36px;height:36px;border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;font-weight:800;flex-shrink:0;
-  font-family:-apple-system,BlinkMacSystemFont,monospace;
-}
+.pax-type-badge{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0;font-family:monospace;}
 .badge-F{background:rgba(47,152,121,.15);color:#2f9879;}
 .badge-M{background:rgba(26,78,126,.15);color:#1a4e7e;}
 .badge-C{background:rgba(232,160,0,.15);color:#b87600;}
 .badge-I{background:rgba(158,96,212,.15);color:#9e60d4;}
-
 .pax-info{flex:1;min-width:0;}
-.pax-name{font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pax-meta{font-size:12px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pax-status{flex-shrink:0;}
+.pax-name{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pax-meta{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.dir-pill{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-right:4px;}
+.dir-in{background:rgba(26,78,126,.12);color:var(--navy);}
+.dir-out{background:var(--teal-lt);color:var(--teal);}
 .status-dot{width:8px;height:8px;border-radius:50%;}
 .status-dot.synced{background:var(--lime);}
 .status-dot.pending{background:var(--yellow);animation:pulse 1.8s ease-in-out infinite;}
-.status-dot.failed{background:var(--red);}
 
-/* ── TOAST ────────────────────────────────────────────────────────────────── */
-.toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
-  background:#1a1f2e;color:#fff;padding:12px 20px;
-  border-radius:10px;font-size:14px;font-weight:500;
-  z-index:999;transition:transform .25s cubic-bezier(.34,1.56,.64,1);
-  white-space:nowrap;pointer-events:none;
-  box-shadow:0 8px 24px rgba(0,0,0,.25);
-}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1f2e;color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;z-index:999;transition:transform .25s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.25);}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast.success{background:var(--teal);}
 .toast.error{background:var(--red);}
-
-/* ── FLIGHT SELECT LOADING STATE ──────────────────────────────────────────── */
-.flight-loading{font-size:13px;color:var(--text-muted);padding:8px 0;}
-
-@media(min-width:400px){
-  .ptype-grid{gap:10px;}
-  .ptype-btn{height:66px;}
-  .ptype-code{font-size:24px;}
-}
 </style>
 </head>
 <body>
 
-<!-- Auth gate (shown on bad/missing token) -->
 <div class="gate" id="gate">
   <div class="gate-card">
     <div class="gate-logo">L</div>
     <div class="gate-title">LOOMI Manifest</div>
-    <div class="gate-sub">Passenger Intake Portal</div>
-    <div class="gate-error-msg" id="gate-error">
-      This link is invalid or has expired.<br>Contact EOC for a new intake link.
-    </div>
+    <div class="gate-sub">Passenger Intake</div>
+    <div class="gate-error-msg" id="gate-error">This link is invalid or has expired. Contact EOC for a new intake link.</div>
   </div>
 </div>
 
-<!-- Main UI (shown after auth) -->
 <div id="app" style="display:none">
 
-  <div class="header">
+  <div class="header" id="main-header">
     <span class="header-logo">LOOMI</span>
     <div class="header-div"></div>
-    <span class="header-title">Passenger Intake</span>
-    <span class="header-hub" id="hub-name">Loading...</span>
-    <div class="online-dot offline" id="online-dot" title="Connection status"></div>
+    <span class="header-title" id="header-title">Incoming Passengers</span>
+    <span class="header-hub" id="hub-name"></span>
+    <div class="online-dot offline" id="online-dot"></div>
   </div>
 
-  <!-- Offline sync banner -->
-  <div class="sync-banner hidden" id="sync-banner" data-action="retry">
-    <span class="sync-icon">&#9888;</span>
-    <span class="sync-text"><strong id="pending-count">0</strong> passenger(s) pending upload</span>
+  <div class="mode-toggle">
+    <button class="mode-btn active-in" id="mode-in-btn" type="button">
+      <span class="mode-btn-icon">&#11015;</span>
+      <span class="mode-btn-label">Incoming</span>
+    </button>
+    <button class="mode-btn" id="mode-out-btn" type="button">
+      <span class="mode-btn-icon">&#11014;</span>
+      <span class="mode-btn-label">Outgoing</span>
+    </button>
+  </div>
+
+  <div class="sync-banner hidden" id="sync-banner">
+    <span>&#9888;</span>
+    <span class="sync-text"><strong id="pending-count">0</strong> pending upload</span>
     <span class="sync-retry">Retry now</span>
   </div>
 
   <div class="main">
 
-    <!-- Flight selection -->
+    <!-- Flight -->
     <div class="card">
       <div class="card-header">
         <span class="card-header-icon">&#9992;</span>
-        <span class="card-header-title">Flight</span>
+        <span class="card-header-title" id="flight-card-title">Inbound Flight</span>
+        <span class="card-header-badge badge-in" id="flight-dir-badge">INCOMING</span>
       </div>
       <div class="card-body">
         <div class="field-group">
-          <label for="flight-select">Assign to Flight <span class="req">*</span></label>
+          <label for="flight-select" id="flight-select-label">Inbound Flight</label>
           <select id="flight-select">
-            <option value="">Loading flights...</option>
+            <option value="">Unassigned / Unknown</option>
           </select>
-          <div class="field-err" id="err-flight">Select a flight or choose Unassigned</div>
+        </div>
+        <div class="field-group" id="destination-field">
+          <label for="destination">Going To</label>
+          <input type="text" id="destination" placeholder="e.g. Kingston, Timmins..." autocomplete="off">
         </div>
       </div>
     </div>
 
-    <!-- Passenger form -->
+    <!-- Pool search (outgoing only) -->
+    <div class="card" id="pool-search-card" style="display:none">
+      <div class="card-header">
+        <span class="card-header-icon">&#128269;</span>
+        <span class="card-header-title">Find in Pool</span>
+        <span class="pool-count" id="pool-count"></span>
+      </div>
+      <div class="card-body">
+        <div class="pool-selected-banner hidden" id="pool-selected-banner">
+          <div class="pool-selected-info">
+            <div class="pool-selected-name" id="pool-selected-name"></div>
+            <div class="pool-selected-sub" id="pool-selected-sub"></div>
+          </div>
+          <button class="pool-selected-clear" id="pool-selected-clear" type="button">Clear</button>
+        </div>
+        <div id="pool-search-section">
+          <div class="pool-search-wrap">
+            <span class="pool-search-icon">&#128100;</span>
+            <input class="pool-search-input" type="text" id="pool-search" placeholder="Type name to search pool..." autocomplete="off" autocorrect="off">
+            <button class="pool-search-clear" id="pool-search-clear-btn" type="button">&times;</button>
+          </div>
+          <div class="pool-results hidden" id="pool-results"></div>
+        </div>
+        <div class="weights-notice" id="weights-notice">&#9651; Re-weigh and enter fresh weights below</div>
+      </div>
+    </div>
+
+    <!-- Passenger details -->
     <div class="card">
       <div class="card-header">
         <span class="card-header-icon">&#128100;</span>
         <span class="card-header-title">Passenger Details</span>
       </div>
       <div class="card-body">
-
-        <!-- Name -->
         <div class="field-group field-row">
           <div>
             <label for="first-name">First Name <span class="req">*</span></label>
@@ -319,38 +279,20 @@ input.invalid,select.invalid{border-color:var(--red)!important;}
             <div class="field-err" id="err-last">Required</div>
           </div>
         </div>
-
-        <!-- DOB -->
         <div class="field-group">
           <label for="dob">Date of Birth</label>
           <input type="date" id="dob">
         </div>
-
-        <!-- Passenger type -->
         <div class="field-group">
           <label>Passenger Type <span class="req">*</span></label>
           <div class="ptype-grid">
-            <button class="ptype-btn" data-type="F" type="button">
-              <span class="ptype-code">F</span>
-              <span class="ptype-label">Female</span>
-            </button>
-            <button class="ptype-btn" data-type="M" type="button">
-              <span class="ptype-code">M</span>
-              <span class="ptype-label">Male</span>
-            </button>
-            <button class="ptype-btn" data-type="C" type="button">
-              <span class="ptype-code">C</span>
-              <span class="ptype-label">Child</span>
-            </button>
-            <button class="ptype-btn" data-type="I" type="button">
-              <span class="ptype-code">I</span>
-              <span class="ptype-label">Infant</span>
-            </button>
+            <button class="ptype-btn" data-type="F" type="button"><span class="ptype-code">F</span><span class="ptype-label">Female</span></button>
+            <button class="ptype-btn" data-type="M" type="button"><span class="ptype-code">M</span><span class="ptype-label">Male</span></button>
+            <button class="ptype-btn" data-type="C" type="button"><span class="ptype-code">C</span><span class="ptype-label">Child</span></button>
+            <button class="ptype-btn" data-type="I" type="button"><span class="ptype-code">I</span><span class="ptype-label">Infant</span></button>
           </div>
           <div class="field-err" id="err-ptype">Select a passenger type</div>
         </div>
-
-        <!-- Weights -->
         <div class="field-group field-row">
           <div>
             <label for="luggage-wt">Luggage (lbs)</label>
@@ -361,8 +303,6 @@ input.invalid,select.invalid{border-color:var(--red)!important;}
             <input type="number" id="carryon-wt" placeholder="0" min="0" max="9999" step="1" inputmode="numeric">
           </div>
         </div>
-
-        <!-- Special requirements (optional) -->
         <button class="special-toggle" id="special-toggle" type="button">
           <span class="special-toggle-icon">+</span>
           Special Requirements
@@ -370,18 +310,16 @@ input.invalid,select.invalid{border-color:var(--red)!important;}
         <div class="special-field" id="special-field">
           <textarea id="special-reqs" rows="3" placeholder="Wheelchair, oxygen, medical equipment, etc."></textarea>
         </div>
-
       </div>
     </div>
 
-    <!-- Submit -->
-    <button class="btn-submit" id="submit-btn" type="button">
+    <button class="btn-submit mode-in" id="submit-btn" type="button">
       <span id="submit-icon">&#43;</span>
-      <span id="submit-label">Add Passenger</span>
+      <span id="submit-label">Add to Pool</span>
     </button>
 
-    <!-- Recent this session -->
-    <div class="card" id="recent-card" style="margin-top:20px">
+    <!-- Session list -->
+    <div class="card" style="margin-top:18px">
       <div class="card-header">
         <span class="card-header-icon">&#128203;</span>
         <span class="card-header-title">Added This Session</span>
@@ -392,60 +330,52 @@ input.invalid,select.invalid{border-color:var(--red)!important;}
       </div>
     </div>
 
-  </div><!-- /main -->
-</div><!-- /app -->
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────────────
 var WORKER = 'https://manifests.loomex-it.workers.dev';
 var QUEUE_KEY = 'loomi_manifest_queue';
 var FLIGHTS_KEY = 'loomi_manifest_flights';
 var SESSION_KEY = 'loomi_manifest_session';
+var POOL_KEY = 'loomi_manifest_pool';
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
 var hubToken = '';
 var hubContext = null;
 var selectedPtype = '';
 var queue = [];
 var session = [];
 var flights = [];
+var pool = [];
+var mode = 'in';
+var poolSelectedPax = null;
 var syncTimer = null;
 var syncing = false;
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
 (function init() {
   var params = new URLSearchParams(window.location.search);
   hubToken = params.get('token') || '';
-
-  if (!hubToken) {
-    showGate('This link is missing a hub token.');
-    return;
-  }
-
+  if (!hubToken) { showGate('Missing hub token.'); return; }
   queue = loadJSON(QUEUE_KEY, []);
   session = loadJSON(SESSION_KEY, []);
-
-  // Try auth
   authHub();
-
-  // Online/offline
   window.addEventListener('online', onOnline);
   window.addEventListener('offline', onOffline);
   updateOnlineIndicator();
-
-  // Sync banner retry
   document.getElementById('sync-banner').addEventListener('click', flushQueue);
+  document.getElementById('mode-in-btn').addEventListener('click', function() { setMode('in'); });
+  document.getElementById('mode-out-btn').addEventListener('click', function() { setMode('out'); });
 })();
 
-// ── AUTH ──────────────────────────────────────────────────────────────────────
 function authHub() {
   fetch(WORKER + '/api/auth?token=' + encodeURIComponent(hubToken))
     .then(function(r) { return r.json(); })
     .then(function(data) {
       if (data.error) { showGate(data.error); return; }
       hubContext = data;
+      saveJSON('loomi_hub_context', hubContext);
       document.getElementById('hub-name').textContent = data.hub;
       document.title = 'LOOMI Intake — ' + data.hub;
       document.getElementById('gate').style.display = 'none';
@@ -457,7 +387,6 @@ function authHub() {
       setupForm();
     })
     .catch(function() {
-      // No connection — check if we have cached context
       var cached = loadJSON('loomi_hub_context', null);
       if (cached) {
         hubContext = cached;
@@ -470,21 +399,36 @@ function authHub() {
         startSyncTimer();
         setupForm();
       } else {
-        showGate('Could not connect and no cached session found. Connect to the internet to activate this device.');
+        showGate('Could not connect and no cached session found.');
       }
     });
 }
 
-// ── FLIGHTS ───────────────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  var isOut = m === 'out';
+  document.getElementById('main-header').className = 'header' + (isOut ? ' mode-out' : '');
+  document.getElementById('mode-in-btn').className = 'mode-btn' + (isOut ? '' : ' active-in');
+  document.getElementById('mode-out-btn').className = 'mode-btn' + (isOut ? ' active-out' : '');
+  document.getElementById('submit-btn').className = 'btn-submit ' + (isOut ? 'mode-out' : 'mode-in');
+  document.getElementById('submit-label').textContent = isOut ? 'Add to Flight' : 'Add to Pool';
+  document.getElementById('header-title').textContent = isOut ? 'Outgoing Passengers' : 'Incoming Passengers';
+  document.getElementById('flight-card-title').textContent = isOut ? 'Outbound Flight' : 'Inbound Flight';
+  document.getElementById('flight-select-label').textContent = isOut ? 'Outbound Flight' : 'Inbound Flight';
+  document.getElementById('flight-dir-badge').textContent = isOut ? 'OUTGOING' : 'INCOMING';
+  document.getElementById('flight-dir-badge').className = 'card-header-badge ' + (isOut ? 'badge-out' : 'badge-in');
+  document.getElementById('pool-search-card').style.display = isOut ? 'block' : 'none';
+  document.getElementById('destination-field').style.display = isOut ? 'none' : 'block';
+  renderFlightSelect();
+  if (isOut) loadPool();
+  clearPoolSelection();
+  resetForm();
+}
+
 function loadFlights() {
   var cached = loadJSON(FLIGHTS_KEY, null);
-  if (cached) {
-    flights = cached;
-    renderFlightSelect();
-  }
-
+  if (cached) { flights = cached; renderFlightSelect(); }
   if (!navigator.onLine) return;
-
   fetch(WORKER + '/api/flights?token=' + encodeURIComponent(hubToken))
     .then(function(r) { return r.json(); })
     .then(function(data) {
@@ -492,78 +436,161 @@ function loadFlights() {
       flights = data;
       saveJSON(FLIGHTS_KEY, flights);
       renderFlightSelect();
-      // Cache hub context now that we confirmed auth
-      saveJSON('loomi_hub_context', hubContext);
-    })
-    .catch(function() {});
+    }).catch(function() {});
 }
 
 function renderFlightSelect() {
   var sel = document.getElementById('flight-select');
   var prev = sel.value;
   sel.innerHTML = '';
+  var none = document.createElement('option');
+  none.value = '';
+  none.textContent = mode === 'in' ? 'Unassigned / Unknown' : 'Select outbound flight...';
+  sel.appendChild(none);
 
-  var unassigned = document.createElement('option');
-  unassigned.value = '';
-  unassigned.textContent = 'Unassigned';
-  sel.appendChild(unassigned);
-
-  var active = flights.filter(function(f) { return f.status !== 'Departed'; });
+  var dir = mode === 'in' ? 'Inbound' : 'Outbound';
+  var hasDir = flights.some(function(f) { return f.direction; });
+  var active = flights.filter(function(f) {
+    if (f.status === 'Departed') return false;
+    if (hasDir) return f.direction === dir;
+    return true;
+  });
   active.forEach(function(f) {
     var opt = document.createElement('option');
     opt.value = f.id;
-    opt.textContent = f.flightNumber
-      + (f.destination ? ' \u2192 ' + f.destination : '')
-      + (f.etd ? ' (' + f.etd + ')' : '')
-      + (f.mode ? ' [' + f.mode + ']' : '');
+    opt.textContent = f.flightNumber + (f.destination ? ' \u2192 ' + f.destination : '') + (f.etd ? ' (' + f.etd + ')' : '');
     sel.appendChild(opt);
   });
-
   if (prev) sel.value = prev;
 }
 
-// ── FORM SETUP ────────────────────────────────────────────────────────────────
-function setupForm() {
-  // Ptype buttons
-  document.querySelectorAll('.ptype-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var t = this.getAttribute('data-type');
-      selectPtype(t);
+function loadPool() {
+  var cached = loadJSON(POOL_KEY, null);
+  if (cached) { pool = cached; updatePoolCount(); }
+  if (!navigator.onLine) return;
+  fetch(WORKER + '/api/pax?status=AtHub&token=' + encodeURIComponent(hubToken))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) return;
+      pool = data;
+      saveJSON(POOL_KEY, pool);
+      updatePoolCount();
+    }).catch(function() {});
+}
+
+function updatePoolCount() {
+  document.getElementById('pool-count').textContent = pool.length ? pool.length + ' in pool' : 'Pool empty';
+}
+
+function setupPoolSearch() {
+  var input = document.getElementById('pool-search');
+  var clearBtn = document.getElementById('pool-search-clear-btn');
+  input.addEventListener('input', function() {
+    var q = this.value.trim();
+    clearBtn.classList.toggle('show', q.length > 0);
+    if (!q) { document.getElementById('pool-results').classList.add('hidden'); return; }
+    renderPoolResults(q);
+  });
+  clearBtn.addEventListener('click', function() {
+    document.getElementById('pool-search').value = '';
+    this.classList.remove('show');
+    document.getElementById('pool-results').classList.add('hidden');
+  });
+  document.getElementById('pool-selected-clear').addEventListener('click', clearPoolSelection);
+}
+
+function renderPoolResults(q) {
+  var results = document.getElementById('pool-results');
+  var lower = q.toLowerCase();
+  var matches = pool.filter(function(p) {
+    return (p.firstName + ' ' + p.lastName).toLowerCase().indexOf(lower) !== -1;
+  }).slice(0, 8);
+  results.classList.remove('hidden');
+  if (!matches.length) {
+    results.innerHTML = '<div class="pool-empty">No match &mdash; fill in below to add as new</div>';
+    return;
+  }
+  var colors = {F:'#2f9879',M:'#1a4e7e',C:'#b87600',I:'#9e60d4'};
+  var bgs = {F:'rgba(47,152,121,.15)',M:'rgba(26,78,126,.15)',C:'rgba(232,160,0,.15)',I:'rgba(158,96,212,.15)'};
+  results.innerHTML = matches.map(function(p) {
+    return '<div class="pool-result-item" data-id="' + p.id + '">' +
+      '<div class="pool-result-badge" style="background:' + (bgs[p.passengerType]||'#eee') + ';color:' + (colors[p.passengerType]||'#888') + '">' + p.passengerType + '</div>' +
+      '<div class="pool-result-info"><div class="pool-result-name">' + esc(p.firstName) + ' ' + esc(p.lastName) + '</div>' +
+      '<div class="pool-result-meta">' + (p.dob||'No DOB') + (p.destination ? ' \u2022 \u2192 ' + esc(p.destination) : '') + '</div></div>' +
+      '<span class="pool-result-arrow">\u2192</span></div>';
+  }).join('');
+  results.querySelectorAll('.pool-result-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      var id = this.getAttribute('data-id');
+      var pax = pool.find(function(p) { return p.id === id; });
+      if (pax) selectFromPool(pax);
     });
   });
+}
 
-  // Special requirements toggle
+function selectFromPool(pax) {
+  poolSelectedPax = pax;
+  document.getElementById('pool-search-section').style.display = 'none';
+  document.getElementById('pool-selected-banner').classList.remove('hidden');
+  document.getElementById('pool-selected-name').textContent = pax.firstName + ' ' + pax.lastName;
+  document.getElementById('pool-selected-sub').textContent =
+    (pax.dob || 'No DOB') + (pax.destination ? ' \u2022 \u2192 ' + pax.destination : '') + ' \u2022 Re-enter weights';
+  document.getElementById('weights-notice').classList.add('show');
+  document.getElementById('first-name').value = pax.firstName;
+  document.getElementById('last-name').value = pax.lastName;
+  document.getElementById('dob').value = pax.dob || '';
+  document.getElementById('luggage-wt').value = '';
+  document.getElementById('carryon-wt').value = '';
+  document.getElementById('special-reqs').value = pax.specialRequirements || '';
+  if (pax.specialRequirements) {
+    document.getElementById('special-toggle').classList.add('open');
+    document.getElementById('special-field').classList.add('open');
+  }
+  selectPtype(pax.passengerType);
+  setTimeout(function() { document.getElementById('luggage-wt').focus(); }, 100);
+}
+
+function clearPoolSelection() {
+  poolSelectedPax = null;
+  document.getElementById('pool-search-section').style.display = 'block';
+  document.getElementById('pool-selected-banner').classList.add('hidden');
+  document.getElementById('pool-results').classList.add('hidden');
+  document.getElementById('pool-search').value = '';
+  document.getElementById('pool-search-clear-btn').classList.remove('show');
+  document.getElementById('weights-notice').classList.remove('show');
+  resetForm();
+}
+
+function setupForm() {
+  document.querySelectorAll('.ptype-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() { selectPtype(this.getAttribute('data-type')); });
+  });
   document.getElementById('special-toggle').addEventListener('click', function() {
     this.classList.toggle('open');
     document.getElementById('special-field').classList.toggle('open');
   });
-
-  // Submit
   document.getElementById('submit-btn').addEventListener('click', submitPax);
-
-  // Clear validation on input
   ['first-name','last-name'].forEach(function(id) {
     document.getElementById(id).addEventListener('input', function() {
       this.classList.remove('invalid');
       document.getElementById('err-' + (id === 'first-name' ? 'first' : 'last')).classList.remove('show');
     });
   });
+  setupPoolSearch();
 }
 
 function selectPtype(type) {
   selectedPtype = type;
   document.querySelectorAll('.ptype-btn').forEach(function(btn) {
     btn.className = 'ptype-btn';
-    var t = btn.getAttribute('data-type');
-    if (t === type) btn.classList.add('selected-' + type);
+    if (btn.getAttribute('data-type') === type) btn.classList.add('selected-' + type);
   });
   document.getElementById('err-ptype').classList.remove('show');
 }
 
-// ── SUBMIT ────────────────────────────────────────────────────────────────────
 function submitPax() {
   if (!validate()) return;
-
+  var flightSel = document.getElementById('flight-select');
   var pax = {
     uuid: generateUUID(),
     firstName: document.getElementById('first-name').value.trim(),
@@ -573,55 +600,47 @@ function submitPax() {
     luggageWeight: Number(document.getElementById('luggage-wt').value) || 0,
     carryOnWeight: Number(document.getElementById('carryon-wt').value) || 0,
     specialRequirements: document.getElementById('special-reqs').value.trim(),
-    flightId: document.getElementById('flight-select').value,
-    flightLabel: document.getElementById('flight-select').selectedOptions[0].text,
-    hubId: hubContext.hubId,
-    syncUUID: '',
+    flightId: flightSel.value,
+    flightLabel: flightSel.value ? flightSel.selectedOptions[0].text : (mode === 'in' ? 'Unassigned' : ''),
+    destination: mode === 'in' ? (document.getElementById('destination').value.trim() || '') : '',
+    direction: mode,
+    inboundRecordId: (mode === 'out' && poolSelectedPax) ? poolSelectedPax.id : '',
     status: 'pending',
     addedAt: new Date().toISOString(),
   };
   pax.syncUUID = pax.uuid;
 
-  // Add to session display immediately
   session.unshift(pax);
   saveJSON(SESSION_KEY, session);
   renderSession();
-
-  // Add to sync queue
   queue.push(pax);
   saveJSON(QUEUE_KEY, queue);
   updateSyncBanner();
-
-  // Flash button
   flashSubmit();
-  resetForm();
 
-  // Try to sync now
+  if (mode === 'out' && poolSelectedPax) {
+    pool = pool.filter(function(p) { return p.id !== poolSelectedPax.id; });
+    saveJSON(POOL_KEY, pool);
+    updatePoolCount();
+  }
+
+  clearPoolSelection();
+  resetForm();
   flushQueue();
 }
 
 function validate() {
   var ok = true;
-
   var fn = document.getElementById('first-name');
-  if (!fn.value.trim()) {
-    fn.classList.add('invalid');
-    document.getElementById('err-first').classList.add('show');
-    ok = false;
-  }
-
+  if (!fn.value.trim()) { fn.classList.add('invalid'); document.getElementById('err-first').classList.add('show'); ok = false; }
   var ln = document.getElementById('last-name');
-  if (!ln.value.trim()) {
-    ln.classList.add('invalid');
-    document.getElementById('err-last').classList.add('show');
+  if (!ln.value.trim()) { ln.classList.add('invalid'); document.getElementById('err-last').classList.add('show'); ok = false; }
+  if (!selectedPtype) { document.getElementById('err-ptype').classList.add('show'); ok = false; }
+  if (mode === 'out' && !document.getElementById('flight-select').value) {
+    document.getElementById('flight-select').classList.add('invalid');
+    showToast('Select an outbound flight', 'error');
     ok = false;
   }
-
-  if (!selectedPtype) {
-    document.getElementById('err-ptype').classList.add('show');
-    ok = false;
-  }
-
   return ok;
 }
 
@@ -633,70 +652,48 @@ function flashSubmit() {
   setTimeout(function() {
     btn.classList.remove('success');
     document.getElementById('submit-icon').textContent = '+';
-    document.getElementById('submit-label').textContent = 'Add Passenger';
+    document.getElementById('submit-label').textContent = mode === 'in' ? 'Add to Pool' : 'Add to Flight';
   }, 1200);
 }
 
 function resetForm() {
-  document.getElementById('first-name').value = '';
-  document.getElementById('last-name').value = '';
-  document.getElementById('dob').value = '';
-  document.getElementById('luggage-wt').value = '';
-  document.getElementById('carryon-wt').value = '';
-  document.getElementById('special-reqs').value = '';
-
-  // Reset ptype
-  selectedPtype = '';
-  document.querySelectorAll('.ptype-btn').forEach(function(btn) {
-    btn.className = 'ptype-btn';
+  ['first-name','last-name','dob','luggage-wt','carryon-wt','special-reqs','destination'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
   });
-
-  // Close special reqs
+  document.getElementById('flight-select').classList.remove('invalid');
+  selectedPtype = '';
+  document.querySelectorAll('.ptype-btn').forEach(function(btn) { btn.className = 'ptype-btn'; });
   document.getElementById('special-toggle').classList.remove('open');
   document.getElementById('special-field').classList.remove('open');
-
-  // Focus first name for next entry
   setTimeout(function() {
-    document.getElementById('first-name').focus();
+    if (mode === 'out') { var s = document.getElementById('pool-search'); if (s) s.focus(); }
+    else document.getElementById('first-name').focus();
   }, 100);
 }
 
-// ── SYNC ──────────────────────────────────────────────────────────────────────
 function flushQueue() {
   if (syncing || !navigator.onLine || !queue.length) return;
   syncing = true;
-
   var pending = queue.filter(function(p) { return p.status !== 'synced'; });
   if (!pending.length) { syncing = false; return; }
-
   var promises = pending.map(function(pax) {
     return fetch(WORKER + '/api/pax?token=' + encodeURIComponent(hubToken), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        firstName: pax.firstName,
-        lastName: pax.lastName,
-        dob: pax.dob,
-        passengerType: pax.passengerType,
-        luggageWeight: pax.luggageWeight,
-        carryOnWeight: pax.carryOnWeight,
-        specialRequirements: pax.specialRequirements,
-        flightId: pax.flightId,
-        notes: '',
+        firstName: pax.firstName, lastName: pax.lastName, dob: pax.dob,
+        passengerType: pax.passengerType, luggageWeight: pax.luggageWeight,
+        carryOnWeight: pax.carryOnWeight, specialRequirements: pax.specialRequirements,
+        flightId: pax.flightId, destination: pax.destination || '',
+        direction: pax.direction || 'in', inboundRecordId: pax.inboundRecordId || '',
         syncUUID: pax.syncUUID,
       }),
     })
     .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (data.error && !data.duplicate) throw new Error(data.error);
-      // Mark synced in queue + session
-      markSynced(pax.uuid);
-    })
-    .catch(function(e) {
-      console.warn('Sync failed for', pax.uuid, e.message);
-    });
+    .then(function(data) { if (data.error && !data.duplicate) throw new Error(data.error); markSynced(pax.uuid); })
+    .catch(function(e) { console.warn('Sync failed:', pax.uuid, e.message); });
   });
-
   Promise.all(promises).then(function() {
     syncing = false;
     saveJSON(QUEUE_KEY, queue);
@@ -713,131 +710,73 @@ function markSynced(uuid) {
 
 function startSyncTimer() {
   if (syncTimer) clearInterval(syncTimer);
-  syncTimer = setInterval(function() {
-    if (navigator.onLine) flushQueue();
-  }, 8000);
+  syncTimer = setInterval(function() { if (navigator.onLine) flushQueue(); }, 8000);
 }
 
-// ── ONLINE/OFFLINE ────────────────────────────────────────────────────────────
-function onOnline() {
-  updateOnlineIndicator();
-  loadFlights();
-  flushQueue();
-}
+function onOnline() { updateOnlineIndicator(); loadFlights(); if (mode === 'out') loadPool(); flushQueue(); }
 function onOffline() { updateOnlineIndicator(); }
 function updateOnlineIndicator() {
   var dot = document.getElementById('online-dot');
-  if (navigator.onLine) {
-    dot.classList.remove('offline');
-    dot.classList.add('online');
-    dot.title = 'Online';
-  } else {
-    dot.classList.remove('online');
-    dot.classList.add('offline');
-    dot.title = 'Offline — entries will sync when connection restores';
-  }
+  if (navigator.onLine) { dot.classList.remove('offline'); dot.classList.add('online'); }
+  else { dot.classList.remove('online'); dot.classList.add('offline'); }
 }
 
-// ── RENDER SESSION LIST ───────────────────────────────────────────────────────
 function renderSession() {
   var list = document.getElementById('recent-list');
   var empty = document.getElementById('recent-empty');
-  var count = document.getElementById('session-count');
-
-  var activeSession = session.slice(0, 30); // cap display at 30
-
-  count.textContent = session.length ? session.length + ' added' : '';
-
-  if (!session.length) {
-    empty.style.display = 'block';
-    // Remove any existing items
-    var existing = list.querySelectorAll('.pax-item');
-    existing.forEach(function(el) { el.remove(); });
-    return;
-  }
-
+  document.getElementById('session-count').textContent = session.length ? session.length + ' added' : '';
+  list.querySelectorAll('.pax-item').forEach(function(el) { el.remove(); });
+  if (!session.length) { empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-
-  // Rebuild list
-  var existing = list.querySelectorAll('.pax-item');
-  existing.forEach(function(el) { el.remove(); });
-
-  activeSession.forEach(function(pax) {
+  session.slice(0, 30).forEach(function(pax) {
     var item = document.createElement('div');
     item.className = 'pax-item';
-
     var lugTotal = (pax.luggageWeight || 0) + (pax.carryOnWeight || 0);
-    var weightStr = lugTotal ? lugTotal + ' lbs total' : 'no weight recorded';
-    var flightStr = pax.flightId ? pax.flightLabel : 'Unassigned';
-
+    var dirPill = pax.direction === 'out'
+      ? '<span class="dir-pill dir-out">OUT</span>'
+      : '<span class="dir-pill dir-in">IN</span>';
     item.innerHTML =
       '<div class="pax-type-badge badge-' + pax.passengerType + '">' + pax.passengerType + '</div>' +
       '<div class="pax-info">' +
         '<div class="pax-name">' + esc(pax.firstName) + ' ' + esc(pax.lastName) + '</div>' +
-        '<div class="pax-meta">' + esc(flightStr) + ' &bull; ' + weightStr + (pax.specialRequirements ? ' &bull; Special req.' : '') + '</div>' +
+        '<div class="pax-meta">' + dirPill + ' ' + (lugTotal ? lugTotal + ' lbs' : 'no weight') +
+          (pax.destination ? ' \u2022 \u2192 ' + esc(pax.destination) : '') + '</div>' +
       '</div>' +
-      '<div class="pax-status"><div class="status-dot ' + (pax.status === 'synced' ? 'synced' : 'pending') + '" title="' + (pax.status === 'synced' ? 'Uploaded' : 'Pending upload') + '"></div></div>';
-
+      '<div><div class="status-dot ' + (pax.status === 'synced' ? 'synced' : 'pending') + '"></div></div>';
     list.appendChild(item);
   });
 }
 
-// ── SYNC BANNER ───────────────────────────────────────────────────────────────
 function updateSyncBanner() {
   var pending = queue.filter(function(p) { return p.status !== 'synced'; });
-  var banner = document.getElementById('sync-banner');
   document.getElementById('pending-count').textContent = pending.length;
-  if (pending.length > 0) {
-    banner.classList.remove('hidden');
-  } else {
-    banner.classList.add('hidden');
-  }
+  document.getElementById('sync-banner').classList.toggle('hidden', pending.length === 0);
 }
 
-// ── TOAST ─────────────────────────────────────────────────────────────────────
 var toastTimer = null;
 function showToast(msg, type) {
   var t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast show' + (type ? ' ' + type : '');
   if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(function() {
-    t.classList.remove('show');
-  }, 2500);
+  toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2500);
 }
 
-// ── GATE ──────────────────────────────────────────────────────────────────────
 function showGate(msg) {
   document.getElementById('gate').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
   if (msg) document.getElementById('gate-error').textContent = msg;
 }
 
-// ── UTILS ─────────────────────────────────────────────────────────────────────
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     var r = Math.random() * 16 | 0;
-    var v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
   });
 }
-
-function esc(s) {
-  return String(s || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function loadJSON(key, def) {
-  try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : def; }
-  catch(e) { return def; }
-}
-
-function saveJSON(key, val) {
-  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
-}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function loadJSON(key, def) { try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
+function saveJSON(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
 </script>
 </body>
 </html>
