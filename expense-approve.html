@@ -939,7 +939,7 @@
       .map((r, i) => ({ ...r, hst: rowDecisions[i]?.hst || 0, value: rowDecisions[i]?.approvedValue ?? parseFloat(r.value || 0) }))
       .filter((_, i) => rowDecisions[i]?.approved !== false);
 
-    let totalHotel=0, totalRental=0, totalMileage=0, totalMeals=0, totalEvacuee=0, totalHST=0, totalMisc=0;
+    let totalHotel=0, totalRental=0, totalMileage=0, totalMeals=0, totalHST=0, totalMisc=0;
 
     const dataRows = approvedRows.map(row => {
       let desc = row.description || '';
@@ -948,31 +948,30 @@
       if (row.type === 'evacuee') desc = row.evacueeCategory || '';
       const val  = parseFloat(row.value || 0);
       const hst  = ['hotel','rental','misc','evacuee'].includes(row.type) ? parseFloat(row.hst || 0) : 0;
-      let hotel=0, rental=0, mileage=0, meals=0, evacuee=0, misc=0;
+      let hotel=0, rental=0, mileage=0, meals=0, misc=0;
       if (row.type === 'hotel')                                { hotel   = val; }
       if (row.type === 'rental')                               { rental  = val; }
       if (row.type === 'mileage')                              { mileage = val; }
       if (row.type === 'meal')                                 { meals   = val; }
-      if (row.type === 'misc')    { misc    = val; }
-      if (row.type === 'evacuee') { evacuee = val; }
+      if (row.type === 'misc' || row.type === 'evacuee')       { misc    = val; }
       totalHotel+=hotel; totalRental+=rental; totalMileage+=mileage;
-      totalMeals+=meals; totalEvacuee+=evacuee; totalHST+=hst; totalMisc+=misc;
+      totalMeals+=meals; totalHST+=hst; totalMisc+=misc;
       return [row.date||'', desc,
-        hotel||'', rental||'', mileage||'', meals||'', evacuee||'', misc||'', hst||''];
+        hotel||'', rental||'', mileage||'', meals||'', hst||'', misc||''];
     });
 
-    const grandTotal = totalHotel + totalRental + totalMileage + totalMeals + totalEvacuee + totalHST + totalMisc;
+    const grandTotal = totalHotel + totalRental + totalMileage + totalMeals + totalHST + totalMisc;
 
     const aoa = [
       [submission.reportNumber || '', '', '', '', '', '', '', ''],
       ['Contractor:', fd.contractorName],
       ['Period:', fd.activation + ' | ' + fd.site + (fd.jobNumber ? ' | Job #' + fd.jobNumber : '') + ' | ' + fd.periodStart + ' to ' + fd.periodEnd],
       [],
-      ['Date', 'Description', 'Hotel/Accommodation', 'Rental Car', 'Mileage', 'Meals', 'Evacuee Costs', 'Misc/Other', 'HST'],
+      ['Date', 'Description', 'Hotel/Accommodation', 'Rental Car', 'Mileage', 'Meals', 'HST', 'Misc/Other'],
       ...dataRows,
       [],
-      ['APPROVED TOTAL', '', totalHotel, totalRental, totalMileage, totalMeals, totalEvacuee, totalMisc, totalHST],
-      ['GRAND TOTAL', '', '', '', '', '', '', '', grandTotal],
+      ['APPROVED TOTAL', '', totalHotel, totalRental, totalMileage, totalMeals, totalHST, totalMisc],
+      ['GRAND TOTAL', '', '', '', '', '', '', grandTotal],
       [],
       ['Approved By:', adminName],
       ['Approved On:', new Date().toLocaleDateString('en-CA')],
@@ -980,14 +979,14 @@
 
     const ws = XLSX.utils.aoa_to_sheet(aoa);
     ws['!cols'] = [
-      {wch:12},{wch:38},{wch:20},{wch:14},{wch:12},{wch:10},{wch:14},{wch:14},{wch:10}
+      {wch:12},{wch:38},{wch:20},{wch:14},{wch:12},{wch:10},{wch:10},{wch:14}
     ];
     XLSX.utils.book_append_sheet(wb, ws, 'Expense Report');
     return XLSX.write(wb, { type: 'base64', bookType: 'xlsx' });
   }
 
   // ── BUILD APPROVED PDF ────────────────────────────────────────────────────────
-  async function buildApprovedPDF(adminName, signatureDataUrl) {
+  async function buildApprovedPDF(adminName, signatureDataUrl, includeReceipts = true) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
     const fd = submission.formData;
@@ -1149,7 +1148,8 @@
       alternateRowStyles: { fillColor: [245,250,247] },
     });
 
-    // PAGES 3+: RECEIPT IMAGES
+    // PAGES 3+: RECEIPT IMAGES (skipped for email version to stay under Resend 40MB limit)
+    if (includeReceipts) {
     const receiptFilenames = submission.receiptFilenames || [];
     const approvedReceipts = receiptFilenames.filter(f => {
       const m = f.match(/^Item(\d+)-/);
@@ -1188,6 +1188,7 @@
         console.warn('Receipt embed failed:', filename, e.message);
       }
     }
+    } // end includeReceipts
 
     return doc.output('datauristring').split(',')[1];
   }
@@ -1228,7 +1229,8 @@
       const approvedExcelBase64 = buildApprovedExcel(submission.formData, adminName);
 
       btn.innerHTML = '<span class="spinner"></span>Building PDF (may take a moment)...';
-      const approvedPDFBase64 = await buildApprovedPDF(adminName, adminSignatureBase64);
+      const approvedPDFBase64       = await buildApprovedPDF(adminName, adminSignatureBase64, false); // email -- no receipts
+      const approvedPDFSPBase64     = await buildApprovedPDF(adminName, adminSignatureBase64, true);  // SharePoint -- with receipts
 
       btn.innerHTML = '<span class="spinner"></span>Processing...';
       const rejectedCount = rowDecisions.filter(d => !d.approved).length;
@@ -1237,7 +1239,7 @@
       const res = await fetch(`${WORKER_URL}/expense-approve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, adminName, adminNotes: document.getElementById('adminNotes').value.trim(), adminSignatureBase64, approvedExcelBase64, approvedPDFBase64, rowDecisions })
+        body: JSON.stringify({ token, adminName, adminNotes: document.getElementById('adminNotes').value.trim(), adminSignatureBase64, approvedExcelBase64, approvedPDFBase64, approvedPDFSPBase64, rowDecisions })
       });
 
       const result = await res.json();
