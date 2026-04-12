@@ -186,6 +186,12 @@
       .modal-body iframe { min-height: 460px; }
     }
   </style>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1a3a5c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Loomex">
+  <link rel="apple-touch-icon" href="/icon-192.png">
 </head>
 <body>
 <div class="container">
@@ -486,6 +492,71 @@ document.addEventListener('keydown', function(e) {
     closeModal('loginModal');
   }
 });
+// ── PWA: Service Worker ───────────────────────────────────────────────────
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').catch(function(err) {
+        console.warn('SW registration failed:', err);
+      });
+    });
+  }
+
+  // ── PWA: Install prompt (Android auto-banner + manual fallback) ───────────
+  var deferredInstallPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    showInstallBanner();
+  });
+
+  function showInstallBanner() {
+    if (document.getElementById('pwa-install-banner')) return;
+    var banner = document.createElement('div');
+    banner.id = 'pwa-install-banner';
+    banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#1a3a5c;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;z-index:999;font-family:DM Sans,sans-serif;font-size:14px;gap:12px;';
+    banner.innerHTML = '<span>&#128241; Add Loomex Tools to your home screen for quick access.</span>'
+      + '<div style="display:flex;gap:8px;flex-shrink:0">'
+      + '<button onclick="dismissInstallBanner()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;padding:7px 12px;border-radius:6px;font-family:DM Sans,sans-serif;font-size:13px;cursor:pointer;">Not now</button>'
+      + '<button onclick="triggerInstall()" style="background:#00A651;border:none;color:#fff;padding:7px 14px;border-radius:6px;font-family:DM Sans,sans-serif;font-size:13px;font-weight:600;cursor:pointer;">Install</button>'
+      + '</div>';
+    document.body.appendChild(banner);
+  }
+
+  function triggerInstall() {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(function() {
+      deferredInstallPrompt = null;
+      dismissInstallBanner();
+    });
+  }
+
+  function dismissInstallBanner() {
+    var b = document.getElementById('pwa-install-banner');
+    if (b) b.remove();
+    sessionStorage.setItem('pwa-dismissed', '1');
+  }
+
+  // On iOS, beforeinstallprompt never fires - show manual instructions instead
+  var isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var isInStandaloneMode = ('standalone' in navigator) && navigator.standalone;
+  var iosDismissed = sessionStorage.getItem('pwa-ios-dismissed');
+
+  if (isIos && !isInStandaloneMode && !iosDismissed) {
+    window.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        if (document.getElementById('pwa-install-banner')) return;
+        var banner = document.createElement('div');
+        banner.id = 'pwa-install-banner';
+        banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#1a3a5c;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;z-index:999;font-family:DM Sans,sans-serif;font-size:13px;gap:12px;';
+        banner.innerHTML = '<span>Tap <strong>Share &#8599;</strong> then <strong>Add to Home Screen</strong> to install Loomex Tools.</span>'
+          + '<button onclick="sessionStorage.setItem(\'pwa-ios-dismissed\',\'1\');this.parentElement.remove()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;padding:7px 12px;border-radius:6px;font-family:DM Sans,sans-serif;font-size:13px;cursor:pointer;flex-shrink:0;">Got it</button>';
+        document.body.appendChild(banner);
+      }, 2500);
+    });
+  }
+
 </script>
 
 </body>
