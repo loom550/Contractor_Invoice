@@ -581,7 +581,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
         <div class="upload-processing">
           <div class="upload-processing-spinner"></div>
           <div class="upload-processing-label">Extracting passengers...</div>
-          <div class="upload-processing-sub">This may take 10-20 seconds</div>
+          <div class="upload-processing-sub">This may take 1-2 minutes for large manifests (over 50 Pax)</div>
         </div>
       </div>
       <div id="upload-state-review" style="display:none">
@@ -1254,7 +1254,14 @@ function doUpload() {
   fetch(url, { method: 'POST', body: formData })
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      if (data.error) { setUploadState('picker'); showToast('Extraction error: ' + data.error, 'err'); return; }
+      if (data.error) {
+        setUploadState('picker');
+        var msg = data.error.includes('truncated') || data.error.includes('JSON') || data.error.includes('token')
+          ? 'Extraction incomplete — tap Extract again to retry'
+          : 'Extraction error — please try again';
+        showToast(msg, 'err');
+        return;
+      }
       uploadId = data.uploadId;
       uploadRows = data.rows || [];
       renderReviewTable();
@@ -1262,7 +1269,7 @@ function doUpload() {
     })
     .catch(function(e) {
       setUploadState('picker');
-      showToast('Upload failed: ' + e.message, 'err');
+      showToast('Upload failed — please try again', 'err');
     });
 }
 
