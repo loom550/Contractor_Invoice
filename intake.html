@@ -1,19 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="/pwa-nav.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>LOOMI — Passenger Intake</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
   --navy:#1a4e7e;--navy-dk:#0f2f50;--teal:#2f9879;--teal-lt:rgba(47,152,121,.1);
   --lime:#7dbe42;--red:#d94040;--yellow:#e8a000;
-  --bg:#f2f4f7;--card:#ffffff;--border:#dde2ea;
+  --bg:#f2f4f7;--card:#fff;--border:#dde2ea;
   --text:#1a1f2e;--text-dim:#5c6478;--text-muted:#9099ae;
   --input-bg:#f7f8fb;--input-border:#d0d5e0;--input-focus:#1a4e7e;
   --btn-h:56px;--radius:10px;--shadow:0 2px 12px rgba(0,0,0,.08);
@@ -32,7 +30,6 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 .online-dot.offline{background:var(--yellow);animation:pulse 1.8s ease-in-out infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 
-/* ── MODE TOGGLE ── */
 .mode-toggle{display:grid;grid-template-columns:1fr 1fr;margin:14px 16px 0;background:var(--card);border-radius:10px;border:1.5px solid var(--border);overflow:hidden;box-shadow:var(--shadow);}
 .mode-btn{height:54px;border:none;background:transparent;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all .18s;padding:0;}
 .mode-btn:first-child{border-right:1.5px solid var(--border);}
@@ -43,13 +40,11 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 .mode-btn.active-out{background:var(--teal);}
 .mode-btn.active-out .mode-btn-label{color:#fff;}
 
-/* ── SYNC BANNER ── */
 .sync-banner{background:#fffbf0;border-bottom:2px solid var(--yellow);padding:10px 16px;display:flex;align-items:center;gap:10px;font-size:13px;color:#7a4e00;cursor:pointer;}
 .sync-banner.hidden{display:none!important;}
 .sync-text{flex:1;}
 .sync-retry{font-weight:700;text-decoration:underline;white-space:nowrap;}
 
-/* ── GATE ── */
 .gate{position:fixed;inset:0;z-index:200;background:var(--navy-dk);display:flex;align-items:center;justify-content:center;padding:20px;}
 .gate-card{background:#fff;border-radius:16px;padding:32px 24px;width:100%;max-width:360px;text-align:center;}
 .gate-logo{width:52px;height:52px;background:var(--navy);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--lime);margin-bottom:16px;}
@@ -57,7 +52,6 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 .gate-sub{font-size:13px;color:var(--text-muted);}
 .gate-error-msg{font-size:13px;color:var(--red);margin-top:16px;padding:10px 14px;background:#fff5f5;border-radius:8px;border:1px solid #fcc;}
 
-/* ── MAIN ── */
 .main{padding:14px 16px;max-width:560px;margin:0 auto;}
 .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:14px;overflow:hidden;}
 .card-header{padding:13px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
@@ -68,21 +62,40 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 .badge-out{background:var(--teal-lt);color:var(--teal);}
 .card-body{padding:14px 16px;}
 
-/* ── FIELDS ── */
 .field-group{margin-bottom:13px;}
 .field-group:last-child{margin-bottom:0;}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-dim);margin-bottom:5px;}
 label .req{color:var(--red);margin-left:2px;}
-input[type=text],input[type=date],input[type=number],select,textarea{display:block;width:100%;height:var(--btn-h);padding:0 14px;background:var(--input-bg);border:1.5px solid var(--input-border);border-radius:8px;font-size:17px;font-family:inherit;color:var(--text);outline:none;appearance:none;-webkit-appearance:none;transition:border-color .15s,box-shadow .15s;}
+input[type=text],input[type=date],input[type=number],input[type=email],select,textarea{display:block;width:100%;height:var(--btn-h);padding:0 14px;background:var(--input-bg);border:1.5px solid var(--input-border);border-radius:8px;font-size:17px;font-family:inherit;color:var(--text);outline:none;appearance:none;-webkit-appearance:none;transition:border-color .15s,box-shadow .15s;}
 input:focus,select:focus,textarea:focus{border-color:var(--input-focus);box-shadow:0 0 0 3px rgba(26,78,126,.12);background:#fff;}
-input::placeholder{color:var(--text-muted);}
+input::placeholder,textarea::placeholder{color:var(--text-muted);}
 input[type=date]{color:var(--text);}
 input[type=date]::-webkit-calendar-picker-indicator{opacity:.5;cursor:pointer;}
 select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235c6478' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
 textarea{height:auto;padding:12px 14px;resize:none;font-size:15px;line-height:1.5;}
 
-/* ── POOL SEARCH ── */
+/* Medical devices */
+.device-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+.device-btn{height:48px;border:1.5px solid var(--input-border);border-radius:8px;background:var(--input-bg);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:600;color:var(--text-dim);transition:all .15s;padding:0 10px;font-family:inherit;}
+.device-btn:active{transform:scale(.97);}
+.device-btn.selected{border-color:var(--navy);background:rgba(26,78,126,.08);color:var(--navy);}
+.device-btn-icon{font-size:16px;flex-shrink:0;}
+
+/* Prescriptions toggle */
+.rx-toggle{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:8px;border:1.5px solid var(--input-border);background:var(--input-bg);cursor:pointer;transition:all .15s;margin-top:4px;}
+.rx-toggle.rx-yes{border-color:var(--red);background:rgba(217,64,64,.06);}
+.rx-toggle-label{font-size:15px;font-weight:600;color:var(--text-dim);flex:1;}
+.rx-toggle.rx-yes .rx-toggle-label{color:var(--red);}
+.rx-toggle-pill{min-width:52px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;transition:all .15s;background:var(--border);color:var(--text-muted);padding:0 10px;}
+.rx-toggle.rx-yes .rx-toggle-pill{background:var(--red);color:#fff;}
+
+/* Destination */
+.dest-other-field{margin-top:10px;display:none;}
+.dest-other-field.show{display:block;}
+.dest-email-field{margin-top:10px;}
+
+/* Pool search */
 .pool-search-wrap{position:relative;}
 .pool-search-input{width:100%;height:52px;padding:0 14px 0 42px;background:#fff;border:2px solid var(--teal);border-radius:8px;font-size:16px;font-family:inherit;color:var(--text);outline:none;appearance:none;}
 .pool-search-input:focus{box-shadow:0 0 0 3px rgba(47,152,121,.15);}
@@ -101,7 +114,6 @@ textarea{height:auto;padding:12px 14px;resize:none;font-size:15px;line-height:1.
 .pool-result-meta{font-size:11px;color:var(--text-muted);margin-top:1px;}
 .pool-result-arrow{color:var(--teal);font-size:18px;flex-shrink:0;}
 .pool-empty{padding:18px;text-align:center;color:var(--text-muted);font-size:13px;}
-
 .pool-selected-banner{background:#f0faf5;border:1.5px solid var(--teal);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .pool-selected-banner.hidden{display:none;}
 .pool-selected-info{flex:1;}
@@ -111,7 +123,7 @@ textarea{height:auto;padding:12px 14px;resize:none;font-size:15px;line-height:1.
 .weights-notice{font-size:12px;color:var(--teal);font-weight:600;padding:8px 0 4px;display:none;align-items:center;gap:6px;}
 .weights-notice.show{display:flex;}
 
-/* ── PTYPE ── */
+/* Passenger type */
 .ptype-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
 .ptype-btn{height:60px;border:2px solid var(--input-border);border-radius:10px;background:var(--input-bg);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:all .15s;padding:0;}
 .ptype-btn:active{transform:scale(.96);}
@@ -126,14 +138,12 @@ textarea{height:auto;padding:12px 14px;resize:none;font-size:15px;line-height:1.
 .ptype-btn.selected-I{border-color:#9e60d4;background:rgba(158,96,212,.1);}
 .ptype-btn.selected-I .ptype-code,.ptype-btn.selected-I .ptype-label{color:#9e60d4;}
 
-/* ── SPECIAL REQS ── */
 .special-toggle{display:flex;align-items:center;gap:8px;padding:10px 0 0;cursor:pointer;font-size:13px;color:var(--text-dim);font-weight:500;border:none;background:none;width:100%;text-align:left;}
 .special-toggle-icon{font-size:16px;transition:transform .2s;}
 .special-toggle.open .special-toggle-icon{transform:rotate(45deg);}
 .special-field{margin-top:10px;display:none;}
 .special-field.open{display:block;}
 
-/* ── SUBMIT ── */
 .btn-submit{width:100%;height:60px;border:none;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .15s;font-family:inherit;color:#fff;}
 .btn-submit.mode-in{background:var(--navy);}
 .btn-submit.mode-in:active{background:var(--navy-dk);}
@@ -142,12 +152,10 @@ textarea{height:auto;padding:12px 14px;resize:none;font-size:15px;line-height:1.
 .btn-submit:disabled{opacity:.5;cursor:not-allowed;}
 .btn-submit.success{background:#267e65!important;}
 
-/* ── VALIDATION ── */
 .field-err{font-size:12px;color:var(--red);margin-top:5px;display:none;}
 .field-err.show{display:block;}
 input.invalid,select.invalid{border-color:var(--red)!important;}
 
-/* ── SESSION LIST ── */
 .recent-empty{text-align:center;padding:24px 0;color:var(--text-muted);font-size:14px;}
 .pax-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);}
 .pax-item:last-child{border-bottom:none;}
@@ -158,15 +166,14 @@ input.invalid,select.invalid{border-color:var(--red)!important;}
 .badge-I{background:rgba(158,96,212,.15);color:#9e60d4;}
 .pax-info{flex:1;min-width:0;}
 .pax-name{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pax-meta{font-size:12px;color:var(--text-muted);margin-top:2px;}
+.pax-meta{font-size:12px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .dir-pill{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-right:4px;}
 .dir-in{background:rgba(26,78,126,.12);color:var(--navy);}
 .dir-out{background:var(--teal-lt);color:var(--teal);}
-.status-dot{width:8px;height:8px;border-radius:50%;}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .status-dot.synced{background:var(--lime);}
 .status-dot.pending{background:var(--yellow);animation:pulse 1.8s ease-in-out infinite;}
 
-/* ── TOAST ── */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1f2e;color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;z-index:999;transition:transform .25s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.25);}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast.success{background:var(--teal);}
@@ -185,7 +192,6 @@ input.invalid,select.invalid{border-color:var(--red)!important;}
 </div>
 
 <div id="app" style="display:none">
-
   <div class="header" id="main-header">
     <span class="header-logo">LOOMI</span>
     <div class="header-div"></div>
@@ -213,7 +219,7 @@ input.invalid,select.invalid{border-color:var(--red)!important;}
 
   <div class="main">
 
-    <!-- Flight -->
+    <!-- Flight card -->
     <div class="card">
       <div class="card-header">
         <span class="card-header-icon">&#9992;</span>
@@ -226,10 +232,6 @@ input.invalid,select.invalid{border-color:var(--red)!important;}
           <select id="flight-select">
             <option value="">Unassigned / Unknown</option>
           </select>
-        </div>
-        <div class="field-group" id="destination-field">
-          <label for="destination">Going To</label>
-          <input type="text" id="destination" placeholder="e.g. Kingston, Timmins..." autocomplete="off">
         </div>
       </div>
     </div>
@@ -258,6 +260,33 @@ input.invalid,select.invalid{border-color:var(--red)!important;}
           <div class="pool-results hidden" id="pool-results"></div>
         </div>
         <div class="weights-notice" id="weights-notice">&#9651; Re-weigh and enter fresh weights below</div>
+      </div>
+    </div>
+
+    <!-- Destination hub (outgoing only) -->
+    <div class="card" id="dest-hub-card" style="display:none">
+      <div class="card-header">
+        <span class="card-header-icon">&#127968;</span>
+        <span class="card-header-title">Destination</span>
+      </div>
+      <div class="card-body">
+        <div class="field-group">
+          <label for="dest-hub-select">Host Site <span class="req">*</span></label>
+          <select id="dest-hub-select">
+            <option value="">Loading sites...</option>
+          </select>
+          <div class="field-err" id="err-dest">Select a destination</div>
+        </div>
+        <div class="dest-other-field" id="dest-other-field">
+          <div class="field-group">
+            <label for="dest-other-name">Site Name</label>
+            <input type="text" id="dest-other-name" placeholder="e.g. Red Cross Shelter, Toronto" autocomplete="off">
+          </div>
+          <div class="dest-email-field">
+            <label for="dest-other-email">Site Email (optional)</label>
+            <input type="email" id="dest-other-email" placeholder="receiving@site.org">
+          </div>
+        </div>
       </div>
     </div>
 
@@ -304,12 +333,35 @@ input.invalid,select.invalid{border-color:var(--red)!important;}
             <input type="number" id="carryon-wt" placeholder="0" min="0" max="9999" step="1" inputmode="numeric">
           </div>
         </div>
+
+        <!-- Medical devices (incoming only) -->
+        <div class="field-group" id="med-devices-group">
+          <label>Medical / Assistive Devices</label>
+          <div class="device-grid">
+            <button class="device-btn" data-device="wheelchair" type="button"><span class="device-btn-icon">&#9855;</span>Wheelchair</button>
+            <button class="device-btn" data-device="walker" type="button"><span class="device-btn-icon">&#129466;</span>Walker</button>
+            <button class="device-btn" data-device="oxygen" type="button"><span class="device-btn-icon">&#129658;</span>Oxygen</button>
+            <button class="device-btn" data-device="cpap" type="button"><span class="device-btn-icon">&#128140;</span>CPAP</button>
+            <button class="device-btn" data-device="hearingAid" type="button"><span class="device-btn-icon">&#129974;</span>Hearing Aid</button>
+            <button class="device-btn" data-device="other" type="button"><span class="device-btn-icon">&#10133;</span>Other</button>
+          </div>
+        </div>
+
+        <!-- Prescriptions (incoming only) -->
+        <div class="field-group" id="rx-group">
+          <label>Prescriptions Required</label>
+          <button class="rx-toggle" id="rx-toggle" type="button">
+            <span class="rx-toggle-label" id="rx-label">No prescriptions</span>
+            <span class="rx-toggle-pill" id="rx-pill">NO</span>
+          </button>
+        </div>
+
         <button class="special-toggle" id="special-toggle" type="button">
           <span class="special-toggle-icon">+</span>
-          Special Requirements
+          Special Requirements / Notes
         </button>
         <div class="special-field" id="special-field">
-          <textarea id="special-reqs" rows="3" placeholder="Wheelchair, oxygen, medical equipment, etc."></textarea>
+          <textarea id="special-reqs" rows="3" placeholder="Additional notes, dietary needs, mobility concerns..."></textarea>
         </div>
       </div>
     </div>
@@ -342,14 +394,19 @@ var QUEUE_KEY = 'loomi_manifest_queue';
 var FLIGHTS_KEY = 'loomi_manifest_flights';
 var SESSION_KEY = 'loomi_manifest_session';
 var POOL_KEY = 'loomi_manifest_pool';
+var HOSTSITES_KEY = 'loomi_manifest_hostsites';
 
 var hubToken = '';
 var hubContext = null;
 var selectedPtype = '';
+// Boolean device state
+var medState = { wheelchair:false, walker:false, oxygen:false, cpap:false, hearingAid:false, other:false };
+var rxRequired = false;
 var queue = [];
 var session = [];
 var flights = [];
 var pool = [];
+var hostSites = [];
 var mode = 'in';
 var poolSelectedPax = null;
 var syncTimer = null;
@@ -378,10 +435,11 @@ function authHub() {
       hubContext = data;
       saveJSON('loomi_hub_context', hubContext);
       document.getElementById('hub-name').textContent = data.hub;
-      document.title = 'LOOMI Intake — ' + data.hub;
+      document.title = 'LOOMI Intake \u2014 ' + data.hub;
       document.getElementById('gate').style.display = 'none';
       document.getElementById('app').style.display = 'block';
       loadFlights();
+      loadHostSites();
       renderSession();
       updateSyncBanner();
       startSyncTimer();
@@ -395,6 +453,7 @@ function authHub() {
         document.getElementById('gate').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         loadFlights();
+        loadHostSites();
         renderSession();
         updateSyncBanner();
         startSyncTimer();
@@ -419,7 +478,9 @@ function setMode(m) {
   document.getElementById('flight-dir-badge').textContent = isOut ? 'OUTGOING' : 'INCOMING';
   document.getElementById('flight-dir-badge').className = 'card-header-badge ' + (isOut ? 'badge-out' : 'badge-in');
   document.getElementById('pool-search-card').style.display = isOut ? 'block' : 'none';
-  document.getElementById('destination-field').style.display = isOut ? 'none' : 'block';
+  document.getElementById('dest-hub-card').style.display = isOut ? 'block' : 'none';
+  document.getElementById('med-devices-group').style.display = isOut ? 'none' : 'block';
+  document.getElementById('rx-group').style.display = isOut ? 'none' : 'block';
   renderFlightSelect();
   if (isOut) loadPool();
   clearPoolSelection();
@@ -448,7 +509,6 @@ function renderFlightSelect() {
   none.value = '';
   none.textContent = mode === 'in' ? 'Unassigned / Unknown' : 'Select outbound flight...';
   sel.appendChild(none);
-
   var dir = mode === 'in' ? 'Inbound' : 'Outbound';
   var hasDir = flights.some(function(f) { return f.direction; });
   var active = flights.filter(function(f) {
@@ -462,6 +522,41 @@ function renderFlightSelect() {
     opt.textContent = f.flightNumber + (f.destination ? ' \u2192 ' + f.destination : '') + (f.etd ? ' (' + f.etd + ')' : '');
     sel.appendChild(opt);
   });
+  if (prev) sel.value = prev;
+}
+
+function loadHostSites() {
+  var cached = loadJSON(HOSTSITES_KEY, null);
+  if (cached) { hostSites = cached; renderHostSiteSelect(); }
+  if (!navigator.onLine) return;
+  fetch(WORKER + '/api/host-sites?token=' + encodeURIComponent(hubToken))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) return;
+      hostSites = data;
+      saveJSON(HOSTSITES_KEY, hostSites);
+      renderHostSiteSelect();
+    }).catch(function() {});
+}
+
+function renderHostSiteSelect() {
+  var sel = document.getElementById('dest-hub-select');
+  var prev = sel.value;
+  sel.innerHTML = '';
+  var none = document.createElement('option');
+  none.value = '';
+  none.textContent = hostSites.length ? 'Select host site...' : 'No active sites available';
+  sel.appendChild(none);
+  hostSites.forEach(function(s) {
+    var opt = document.createElement('option');
+    opt.value = s.title;
+    opt.textContent = s.hubName + ' (' + s.city + ')';
+    sel.appendChild(opt);
+  });
+  var other = document.createElement('option');
+  other.value = '__other__';
+  other.textContent = 'Non-Loomex Site...';
+  sel.appendChild(other);
   if (prev) sel.value = prev;
 }
 
@@ -508,16 +603,25 @@ function renderPoolResults(q) {
   }).slice(0, 8);
   results.classList.remove('hidden');
   if (!matches.length) {
-    results.innerHTML = '<div class="pool-empty">No match &mdash; fill in below to add as new</div>';
+    results.innerHTML = '<div class="pool-empty">No match \u2014 fill in below to add as new</div>';
     return;
   }
   var colors = {F:'#2f9879',M:'#1a4e7e',C:'#b87600',I:'#9e60d4'};
   var bgs = {F:'rgba(47,152,121,.15)',M:'rgba(26,78,126,.15)',C:'rgba(232,160,0,.15)',I:'rgba(158,96,212,.15)'};
   results.innerHTML = matches.map(function(p) {
+    var flags = [];
+    if (p.medWheelchair) flags.push('Wheelchair');
+    if (p.medWalker) flags.push('Walker');
+    if (p.medOxygen) flags.push('Oxygen');
+    if (p.medCPAP) flags.push('CPAP');
+    if (p.medHearingAid) flags.push('Hearing Aid');
+    if (p.medOther) flags.push('Other device');
+    if (p.prescriptionsRequired) flags.push('Rx');
+    var medNote = flags.length ? ' \u2022 \u26A0 ' + flags.join(', ') : '';
     return '<div class="pool-result-item" data-id="' + p.id + '">' +
       '<div class="pool-result-badge" style="background:' + (bgs[p.passengerType]||'#eee') + ';color:' + (colors[p.passengerType]||'#888') + '">' + p.passengerType + '</div>' +
       '<div class="pool-result-info"><div class="pool-result-name">' + esc(p.firstName) + ' ' + esc(p.lastName) + '</div>' +
-      '<div class="pool-result-meta">' + (p.dob||'No DOB') + (p.destination ? ' \u2022 \u2192 ' + esc(p.destination) : '') + '</div></div>' +
+      '<div class="pool-result-meta">' + (p.dob||'No DOB') + medNote + '</div></div>' +
       '<span class="pool-result-arrow">\u2192</span></div>';
   }).join('');
   results.querySelectorAll('.pool-result-item').forEach(function(item) {
@@ -533,9 +637,17 @@ function selectFromPool(pax) {
   poolSelectedPax = pax;
   document.getElementById('pool-search-section').style.display = 'none';
   document.getElementById('pool-selected-banner').classList.remove('hidden');
+  var flags = [];
+  if (pax.medWheelchair) flags.push('Wheelchair');
+  if (pax.medWalker) flags.push('Walker');
+  if (pax.medOxygen) flags.push('Oxygen');
+  if (pax.medCPAP) flags.push('CPAP');
+  if (pax.medHearingAid) flags.push('Hearing Aid');
+  if (pax.medOther) flags.push('Other');
+  if (pax.prescriptionsRequired) flags.push('Rx required');
   document.getElementById('pool-selected-name').textContent = pax.firstName + ' ' + pax.lastName;
   document.getElementById('pool-selected-sub').textContent =
-    (pax.dob || 'No DOB') + (pax.destination ? ' \u2022 \u2192 ' + pax.destination : '') + ' \u2022 Re-enter weights';
+    (pax.dob || 'No DOB') + (flags.length ? ' \u2022 ' + flags.join(', ') : '') + ' \u2022 Re-enter weights';
   document.getElementById('weights-notice').classList.add('show');
   document.getElementById('first-name').value = pax.firstName;
   document.getElementById('last-name').value = pax.lastName;
@@ -566,6 +678,10 @@ function setupForm() {
   document.querySelectorAll('.ptype-btn').forEach(function(btn) {
     btn.addEventListener('click', function() { selectPtype(this.getAttribute('data-type')); });
   });
+  document.querySelectorAll('.device-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() { toggleDevice(this.getAttribute('data-device')); });
+  });
+  document.getElementById('rx-toggle').addEventListener('click', toggleRx);
   document.getElementById('special-toggle').addEventListener('click', function() {
     this.classList.toggle('open');
     document.getElementById('special-field').classList.toggle('open');
@@ -576,6 +692,12 @@ function setupForm() {
       this.classList.remove('invalid');
       document.getElementById('err-' + (id === 'first-name' ? 'first' : 'last')).classList.remove('show');
     });
+  });
+  document.getElementById('dest-hub-select').addEventListener('change', function() {
+    var isOther = this.value === '__other__';
+    document.getElementById('dest-other-field').classList.toggle('show', isOther);
+    this.classList.remove('invalid');
+    document.getElementById('err-dest').classList.remove('show');
   });
   setupPoolSearch();
 }
@@ -589,9 +711,30 @@ function selectPtype(type) {
   document.getElementById('err-ptype').classList.remove('show');
 }
 
+function toggleDevice(device) {
+  medState[device] = !medState[device];
+  document.querySelectorAll('.device-btn').forEach(function(btn) {
+    btn.classList.toggle('selected', !!medState[btn.getAttribute('data-device')]);
+  });
+}
+
+function toggleRx() {
+  rxRequired = !rxRequired;
+  document.getElementById('rx-toggle').className = 'rx-toggle' + (rxRequired ? ' rx-yes' : '');
+  document.getElementById('rx-label').textContent = rxRequired ? 'Prescriptions required' : 'No prescriptions';
+  document.getElementById('rx-pill').textContent = rxRequired ? 'YES' : 'NO';
+}
+
 function submitPax() {
   if (!validate()) return;
   var flightSel = document.getElementById('flight-select');
+  var destSel = document.getElementById('dest-hub-select');
+  var isOther = destSel && destSel.value === '__other__';
+  var destinationHub = isOther
+    ? (document.getElementById('dest-other-name').value.trim() || 'Non-Loomex Site')
+    : (destSel && destSel.value ? destSel.selectedOptions[0].text : '');
+  var destinationHubEmail = isOther ? (document.getElementById('dest-other-email').value.trim() || '') : '';
+
   var pax = {
     uuid: generateUUID(),
     firstName: document.getElementById('first-name').value.trim(),
@@ -601,9 +744,17 @@ function submitPax() {
     luggageWeight: Number(document.getElementById('luggage-wt').value) || 0,
     carryOnWeight: Number(document.getElementById('carryon-wt').value) || 0,
     specialRequirements: document.getElementById('special-reqs').value.trim(),
+    medWheelchair: mode === 'in' ? medState.wheelchair : false,
+    medWalker: mode === 'in' ? medState.walker : false,
+    medOxygen: mode === 'in' ? medState.oxygen : false,
+    medCPAP: mode === 'in' ? medState.cpap : false,
+    medHearingAid: mode === 'in' ? medState.hearingAid : false,
+    medOther: mode === 'in' ? medState.other : false,
+    prescriptionsRequired: mode === 'in' ? rxRequired : false,
     flightId: flightSel.value,
     flightLabel: flightSel.value ? flightSel.selectedOptions[0].text : (mode === 'in' ? 'Unassigned' : ''),
-    destination: mode === 'in' ? (document.getElementById('destination').value.trim() || '') : '',
+    destinationHub: mode === 'out' ? destinationHub : '',
+    destinationHubEmail: mode === 'out' ? destinationHubEmail : '',
     direction: mode,
     inboundRecordId: (mode === 'out' && poolSelectedPax) ? poolSelectedPax.id : '',
     status: 'pending',
@@ -637,10 +788,18 @@ function validate() {
   var ln = document.getElementById('last-name');
   if (!ln.value.trim()) { ln.classList.add('invalid'); document.getElementById('err-last').classList.add('show'); ok = false; }
   if (!selectedPtype) { document.getElementById('err-ptype').classList.add('show'); ok = false; }
-  if (mode === 'out' && !document.getElementById('flight-select').value) {
-    document.getElementById('flight-select').classList.add('invalid');
-    showToast('Select an outbound flight', 'error');
-    ok = false;
+  if (mode === 'out') {
+    if (!document.getElementById('flight-select').value) {
+      document.getElementById('flight-select').classList.add('invalid');
+      showToast('Select an outbound flight', 'error');
+      ok = false;
+    }
+    var ds = document.getElementById('dest-hub-select');
+    if (ds && !ds.value) {
+      ds.classList.add('invalid');
+      document.getElementById('err-dest').classList.add('show');
+      ok = false;
+    }
   }
   return ok;
 }
@@ -658,13 +817,24 @@ function flashSubmit() {
 }
 
 function resetForm() {
-  ['first-name','last-name','dob','luggage-wt','carryon-wt','special-reqs','destination'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.value = '';
+  ['first-name','last-name','dob','luggage-wt','carryon-wt','special-reqs'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
   });
+  var ds = document.getElementById('dest-hub-select');
+  if (ds) { ds.value = ''; ds.classList.remove('invalid'); }
+  document.getElementById('dest-other-field').classList.remove('show');
+  var on = document.getElementById('dest-other-name'); if (on) on.value = '';
+  var oe = document.getElementById('dest-other-email'); if (oe) oe.value = '';
+  document.getElementById('err-dest').classList.remove('show');
   document.getElementById('flight-select').classList.remove('invalid');
   selectedPtype = '';
   document.querySelectorAll('.ptype-btn').forEach(function(btn) { btn.className = 'ptype-btn'; });
+  medState = { wheelchair:false, walker:false, oxygen:false, cpap:false, hearingAid:false, other:false };
+  document.querySelectorAll('.device-btn').forEach(function(btn) { btn.classList.remove('selected'); });
+  rxRequired = false;
+  document.getElementById('rx-toggle').className = 'rx-toggle';
+  document.getElementById('rx-label').textContent = 'No prescriptions';
+  document.getElementById('rx-pill').textContent = 'NO';
   document.getElementById('special-toggle').classList.remove('open');
   document.getElementById('special-field').classList.remove('open');
   setTimeout(function() {
@@ -686,8 +856,18 @@ function flushQueue() {
         firstName: pax.firstName, lastName: pax.lastName, dob: pax.dob,
         passengerType: pax.passengerType, luggageWeight: pax.luggageWeight,
         carryOnWeight: pax.carryOnWeight, specialRequirements: pax.specialRequirements,
-        flightId: pax.flightId, destination: pax.destination || '',
-        direction: pax.direction || 'in', inboundRecordId: pax.inboundRecordId || '',
+        medWheelchair: pax.medWheelchair || false,
+        medWalker: pax.medWalker || false,
+        medOxygen: pax.medOxygen || false,
+        medCPAP: pax.medCPAP || false,
+        medHearingAid: pax.medHearingAid || false,
+        medOther: pax.medOther || false,
+        prescriptionsRequired: pax.prescriptionsRequired || false,
+        flightId: pax.flightId,
+        destinationHub: pax.destinationHub || '',
+        destinationHubEmail: pax.destinationHubEmail || '',
+        direction: pax.direction || 'in',
+        inboundRecordId: pax.inboundRecordId || '',
         syncUUID: pax.syncUUID,
       }),
     })
@@ -714,7 +894,7 @@ function startSyncTimer() {
   syncTimer = setInterval(function() { if (navigator.onLine) flushQueue(); }, 8000);
 }
 
-function onOnline() { updateOnlineIndicator(); loadFlights(); if (mode === 'out') loadPool(); flushQueue(); }
+function onOnline() { updateOnlineIndicator(); loadFlights(); loadHostSites(); if (mode === 'out') loadPool(); flushQueue(); }
 function onOffline() { updateOnlineIndicator(); }
 function updateOnlineIndicator() {
   var dot = document.getElementById('online-dot');
@@ -732,16 +912,25 @@ function renderSession() {
   session.slice(0, 30).forEach(function(pax) {
     var item = document.createElement('div');
     item.className = 'pax-item';
-    var lugTotal = (pax.luggageWeight || 0) + (pax.carryOnWeight || 0);
+    var lugTotal = (pax.luggageWeight||0) + (pax.carryOnWeight||0);
     var dirPill = pax.direction === 'out'
       ? '<span class="dir-pill dir-out">OUT</span>'
       : '<span class="dir-pill dir-in">IN</span>';
+    var medFlags = [];
+    if (pax.medWheelchair) medFlags.push('Wheelchair');
+    if (pax.medWalker) medFlags.push('Walker');
+    if (pax.medOxygen) medFlags.push('Oxygen');
+    if (pax.medCPAP) medFlags.push('CPAP');
+    if (pax.medHearingAid) medFlags.push('Hearing Aid');
+    if (pax.medOther) medFlags.push('Other');
+    if (pax.prescriptionsRequired) medFlags.push('Rx');
+    var medNote = medFlags.length ? ' \u2022 \u26A0 ' + medFlags.join(', ') : '';
+    var destNote = pax.destinationHub ? ' \u2022 \u2192 ' + pax.destinationHub : '';
     item.innerHTML =
       '<div class="pax-type-badge badge-' + pax.passengerType + '">' + pax.passengerType + '</div>' +
       '<div class="pax-info">' +
         '<div class="pax-name">' + esc(pax.firstName) + ' ' + esc(pax.lastName) + '</div>' +
-        '<div class="pax-meta">' + dirPill + ' ' + (lugTotal ? lugTotal + ' lbs' : 'no weight') +
-          (pax.destination ? ' \u2022 \u2192 ' + esc(pax.destination) : '') + '</div>' +
+        '<div class="pax-meta">' + dirPill + ' ' + (lugTotal ? lugTotal + ' lbs' : 'no weight') + medNote + destNote + '</div>' +
       '</div>' +
       '<div><div class="status-dot ' + (pax.status === 'synced' ? 'synced' : 'pending') + '"></div></div>';
     list.appendChild(item);
