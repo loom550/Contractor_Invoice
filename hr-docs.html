@@ -254,12 +254,7 @@ input[type="file"].hidden-file { display: none; }
     <button class="tab-btn" id="tab-exec"   onclick="switchTab('exec')">📊 Onboarding Status</button>
   </div>
 
-  <!-- EXEC TABS (shown for exec role) -->
-  <div class="tab-bar" id="execTabs" style="display:none">
-    <button class="tab-btn active" id="etab-summary" onclick="switchExecTab('summary')">📊 Onboarding Status</button>
-  </div>
-
-  <!-- HR: Pending -->
+   <!-- HR: Pending -->
   <div class="tab-panel content" id="panel-pending" style="display:none">
     <div class="section-title">Contractors with unreviewed document submissions</div>
     <div id="pendingList"><div class="state-box"><div class="big-icon">⏳</div>Loading...</div></div>
@@ -338,22 +333,12 @@ async function login() {
 
 function initApp() {
   document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-
-  if (userRole === 'hr') {
-    document.getElementById('headerTitle').textContent = 'HR — Document Review Portal';
-    document.getElementById('headerBadge').textContent = 'HR Access';
-    document.getElementById('hrTabs').style.display    = 'flex';
-    showPanel('pending');
-    loadPending();
-  } else {
-    document.getElementById('headerTitle').textContent  = 'Onboarding Status';
-    document.getElementById('headerBadge').textContent  = 'Executive';
-    document.getElementById('headerBadge').classList.add('exec');
-    document.getElementById('execTabs').style.display   = 'flex';
-    showPanel('exec');
-    loadExecSummary();
-  }
+  document.getElementById('app').style.display         = 'block';
+  document.getElementById('headerTitle').textContent   = 'HR — Document Review Portal';
+  document.getElementById('headerBadge').textContent   = 'HR Access';
+  document.getElementById('hrTabs').style.display      = 'flex';
+  showPanel('pending');
+  loadPending();
 }
 
 // ── TAB SWITCHING ─────────────────────────────────────────────
@@ -744,12 +729,22 @@ function renderContractorTable(list, context) {
       ? `<span class="deployed-badge"><span class="warn-icon">⚠️</span> Deployed</span>`
       : c.isDeployed ? `<span class="deployed-badge" style="background:#e8f5ee;color:#1a6640">✓ Deployed</span>` : '';
 
+    const docTypeMap = { resume: 'resume', aoda: 'aoda', molhs: 'molhs', whmis: 'whmis', driversLicense: 'drivers' };
+    const docLabelMap = { resume: 'Resume', aoda: 'AODA Certificate', molhs: 'MOL H&S Certificate', whmis: 'WHMIS Certificate', driversLicense: "Driver's License" };
+
     const docPips = docKeys.map(d => {
       const done = c.docs[d.key];
-      return `<span class="doc-pip ${done ? 'done' : 'missing'}">${done ? '✓' : '✗'} ${d.label}</span>`;
+      if (done) return `<span class="doc-pip done">✓ ${d.label}</span>`;
+      return `<span class="doc-pip missing" style="cursor:pointer" title="Click to upload ${d.label}"
+        onclick="openUploadModal('${c.contractorId}','${escStr(c.name)}','${c.recordId}','${docTypeMap[d.key]}','${escStr(docLabelMap[d.key])}',false)">
+        ⬆ ${d.label}</span>`;
     }).join('');
 
-    const crjmPip = `<span class="doc-pip ${c.crjm ? 'done' : 'missing'}">${c.crjm ? '✓' : '✗'} CRJM</span>`;
+    const crjmPip = c.crjm
+      ? `<span class="doc-pip done">✓ CRJM</span>`
+      : `<span class="doc-pip missing" style="cursor:pointer" title="Click to upload CRJM"
+          onclick="openUploadModal('${c.contractorId}','${escStr(c.name)}','${c.recordId}','crjm','CRJM Check',true)">
+          ⬆ CRJM</span>`;
 
     return `<tr>
       <td class="mono">${c.contractorId}</td>
