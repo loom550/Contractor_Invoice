@@ -757,10 +757,20 @@ function renderContractorTable(list, context) {
           </span>
         </span>`;
 
-    return `<tr>
+    return `<tr id="execrow-${c.recordId}">
       <td class="mono">${c.contractorId}</td>
       <td><strong>${c.name}</strong>${deployedHtml ? '<br>' + deployedHtml : ''}</td>
-      <td><span class="status-chip ${statusChip}">${c.status || '—'}</span></td>
+      <td>
+        <span class="status-chip ${statusChip}">${c.status || '—'}</span>
+        <div style="margin-top:5px;display:flex;gap:4px">
+          <button onclick="setContractorStatus('${c.recordId}','Inactive',this)"
+            style="font-size:10px;padding:2px 7px;border-radius:3px;border:1px solid #ccc;background:white;color:var(--muted);cursor:pointer">
+            Inactive</button>
+          <button onclick="setContractorStatus('${c.recordId}','Removed from Pool',this)"
+            style="font-size:10px;padding:2px 7px;border-radius:3px;border:1px solid #f0b8b8;background:white;color:var(--red);cursor:pointer">
+            Remove</button>
+        </div>
+      </td>
       <td>${docPips}${context === 'missingcrjm' || context === 'complete' ? crjmPip : ''}</td>
     </tr>`;
   }).join('');
@@ -814,6 +824,25 @@ async function markReceivedCrjm(contractorRecordId, btn) {
     showToast('CRJM marked as received', 'success');
   } catch (e) {
     btn.disabled = false; btn.textContent = '✓';
+    showToast('Error: ' + e.message, 'error');
+  }
+}
+
+async function setContractorStatus(contractorRecordId, status, btn) {
+  if (!confirm(`Mark this contractor as "${status}"? They will be removed from all dashboard views.`)) return;
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const res  = await fetch(`${WORKER}/hr-set-status`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: sessionToken, contractorRecordId, status }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    // Remove the row from the table immediately
+    document.getElementById(`execrow-${contractorRecordId}`)?.remove();
+    showToast(`Contractor marked as ${status}`, 'success');
+  } catch (e) {
+    btn.disabled = false; btn.textContent = status === 'Inactive' ? 'Inactive' : 'Remove';
     showToast('Error: ' + e.message, 'error');
   }
 }
