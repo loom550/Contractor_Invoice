@@ -174,6 +174,89 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ---- TAB BAR ---- */
+    .dash-tab-bar {
+      background: white; display: flex; border-bottom: 2px solid #f0f0f0;
+      position: sticky; top: 62px; z-index: 99;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      max-width: 100%;
+    }
+    .dash-tab {
+      flex: 1; padding: 13px; border: none; background: none;
+      font-size: 13px; font-weight: bold; color: var(--grey);
+      cursor: pointer; border-bottom: 3px solid transparent;
+      transition: all 0.15s; margin-bottom: -2px;
+    }
+    .dash-tab.active { color: var(--navy); border-bottom-color: var(--navy); }
+
+    /* ---- FINANCE REIMBURSEMENT TABLE ---- */
+    .reimb-table-wrap { overflow-x: auto; margin-bottom: 20px; }
+    .reimb-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .reimb-table th {
+      background: var(--navy); color: white; padding: 10px 12px;
+      text-align: left; font-size: 12px; white-space: nowrap;
+    }
+    .reimb-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+    .reimb-table tr:nth-child(even) td { background: #f9f9f9; }
+    .reimb-table tr:hover td { background: #f0faf5; }
+    .status-pill {
+      display: inline-block; font-size: 11px; font-weight: bold;
+      padding: 3px 9px; border-radius: 10px; white-space: nowrap;
+    }
+    .pill-pending   { background: #fff8e1; color: #c8810a; }
+    .pill-issued    { background: #e3f2fd; color: #1565c0; }
+    .pill-handedout { background: #e8f5ee; color: #00A651; }
+    .pill-processed { background: #e8f5ee; color: #00A651; }
+    .action-btn {
+      padding: 6px 12px; border: none; border-radius: 6px;
+      font-size: 12px; font-weight: bold; cursor: pointer; white-space: nowrap;
+    }
+    .action-btn.issue   { background: #1565c0; color: white; }
+    .action-btn.process { background: var(--green); color: white; }
+    .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .hub-section-title {
+      font-size: 13px; font-weight: bold; color: var(--navy);
+      padding: 14px 0 8px; border-bottom: 2px solid var(--navy);
+      margin-bottom: 12px; margin-top: 20px;
+    }
+    .reimb-summary-bar {
+      display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
+    }
+    .reimb-sum-card {
+      background: white; border-radius: 8px; padding: 12px 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07); flex: 1; min-width: 120px;
+      border-left: 4px solid var(--navy);
+    }
+    .reimb-sum-card .n { font-size: 22px; font-weight: bold; color: var(--navy); }
+    .reimb-sum-card .l { font-size: 11px; color: var(--grey); margin-top: 2px; }
+
+    /* ---- MODAL ---- */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+      background: white; border-radius: 12px; padding: 28px;
+      width: 100%; max-width: 420px; margin: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .modal-box h3 { font-size: 16px; color: var(--navy); margin-bottom: 16px; }
+    .modal-box label { display: block; font-size: 12px; font-weight: bold; color: var(--grey); margin-bottom: 4px; margin-top: 12px; }
+    .modal-box input {
+      width: 100%; padding: 10px 12px; border: 1.5px solid #e0e0e0;
+      border-radius: 7px; font-size: 14px; outline: none;
+    }
+    .modal-box input:focus { border-color: var(--green); }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .modal-btn {
+      flex: 1; padding: 12px; border: none; border-radius: 8px;
+      font-size: 14px; font-weight: bold; cursor: pointer;
+    }
+    .modal-btn.confirm { background: var(--navy); color: white; }
+    .modal-btn.cancel  { background: #f0f0f0; color: #555; }
+
     @media (max-width: 600px) {
       .summary-grid { grid-template-columns: 1fr 1fr; }
       .hub-grid     { grid-template-columns: 1fr; }
@@ -212,6 +295,11 @@
     </div>
   </div>
 
+  <div class="dash-tab-bar">
+    <button class="dash-tab active" id="dt-overview" onclick="switchDashTab('overview')">Overview</button>
+    <button class="dash-tab" id="dt-reimbursements" onclick="switchDashTab('reimbursements')">Reimbursements</button>
+  </div>
+
   <div class="dash-body">
     <div id="dash-content">
       <div class="loading">
@@ -221,6 +309,28 @@
     </div>
     <div class="last-updated" id="last-updated"></div>
   </div>
+</div>
+
+<!-- MARK ISSUED MODAL -->
+<div class="modal-overlay" id="issue-modal">
+  <div class="modal-box">
+    <h3 id="modal-title">Mark Cheque Issued</h3>
+    <label>Your Name</label>
+    <input type="text" id="modal-staff-name" placeholder="Enter your full name">
+    <label id="modal-date-label">Date Issued</label>
+    <input type="date" id="modal-date">
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn confirm" id="modal-confirm-btn" onclick="confirmModal()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="dash-body" id="reimb-body" style="display:none;">
+  <div id="reimb-content">
+    <div class="loading"><div class="spinner"></div>Loading reimbursements...</div>
+  </div>
+  <div class="last-updated" id="reimb-last-updated"></div>
 </div>
 
 <script>
@@ -377,6 +487,199 @@ function renderDashboard(hubData) {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+}
+
+// ---- DASH TABS ----
+
+function switchDashTab(tab) {
+  document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('dt-' + tab).classList.add('active');
+  if (tab === 'overview') {
+    document.querySelector('.dash-body').style.display = 'block';
+    document.getElementById('reimb-body').style.display = 'none';
+  } else {
+    document.querySelector('.dash-body').style.display = 'none';
+    document.getElementById('reimb-body').style.display = 'block';
+    loadReimbursements();
+  }
+}
+
+// ---- REIMBURSEMENTS ----
+
+let allReimbData  = [];
+let activeModal   = null; // { submissionRef, action }
+
+async function loadReimbursements() {
+  document.getElementById('reimb-content').innerHTML =
+    '<div class="loading"><div class="spinner"></div>Loading reimbursements...</div>';
+  try {
+    const hubs = Object.keys(HUB_LABELS);
+    const results = await Promise.all(
+      hubs.map(h => fetch(`${WORKER}/reimbursements?hub=${h}`).then(r => r.json()))
+    );
+
+    // Flatten and group by submissionRef
+    const grouped = {};
+    hubs.forEach((hub, i) => {
+      for (const item of (results[i] || [])) {
+        if (!grouped[item.submissionRef]) {
+          grouped[item.submissionRef] = {
+            hub, hubLabel: HUB_LABELS[hub],
+            submissionRef:       item.submissionRef,
+            chequeName:          item.chequeName,
+            paymentRouting:      item.paymentRouting || 'Cheque',
+            isLoomexVendor:      item.isLoomexVendor,
+            reimbursementStatus: item.reimbursementStatus || 'Pending',
+            submissionDate:      item.submissionDate,
+            folderUrl:           item.folderUrl,
+            consentPdfUrl:       item.consentPdfUrl,
+            chequeIssuedDate:    item.chequeIssuedDate,
+            chequeIssuedBy:      item.chequeIssuedBy,
+            chequeHandedOutDate: item.chequeHandedOutDate,
+            chequeHandedOutBy:   item.chequeHandedOutBy,
+            ddFileUrl:           item.ddFileUrl,
+            members: [], total: 0
+          };
+        }
+        grouped[item.submissionRef].members.push({ name: item.evacueeName, amount: item.amount });
+        grouped[item.submissionRef].total += item.amount;
+      }
+    });
+
+    allReimbData = Object.values(grouped);
+
+    const pending   = allReimbData.filter(r => r.reimbursementStatus === 'Pending').length;
+    const issued    = allReimbData.filter(r => r.reimbursementStatus === 'Cheque Issued').length;
+    const handedOut = allReimbData.filter(r => r.reimbursementStatus === 'Cheque Handed Out').length;
+    const processed = allReimbData.filter(r => r.reimbursementStatus === 'Payment Processed').length;
+    const totalOwed = allReimbData.reduce((s, r) => s + r.total, 0);
+
+    let html = `
+      <div class="reimb-summary-bar">
+        <div class="reimb-sum-card"><div class="n">${allReimbData.length}</div><div class="l">Total Reimbursements</div></div>
+        <div class="reimb-sum-card"><div class="n">$${totalOwed.toFixed(2)}</div><div class="l">Total Owed</div></div>
+        <div class="reimb-sum-card" style="border-color:var(--warn)"><div class="n">${pending}</div><div class="l">Pending</div></div>
+        <div class="reimb-sum-card" style="border-color:#1565c0"><div class="n">${issued}</div><div class="l">Cheque Issued</div></div>
+        <div class="reimb-sum-card" style="border-color:var(--green)"><div class="n">${handedOut + processed}</div><div class="l">Complete</div></div>
+      </div>`;
+
+    // Group by hub
+    for (const hub of hubs) {
+      const hubItems = allReimbData.filter(r => r.hub === hub);
+      if (hubItems.length === 0) continue;
+      html += `<div class="hub-section-title">${HUB_LABELS[hub]} (${hubItems.length})</div>`;
+      html += `<div class="reimb-table-wrap"><table class="reimb-table">
+        <thead><tr>
+          <th>Cheque Name</th><th>Members</th><th>Amount</th>
+          <th>Routing</th><th>Status</th><th>Issued</th><th>Handed Out</th>
+          <th>Folder</th><th>Action</th>
+        </tr></thead><tbody>`;
+
+      for (const r of hubItems) {
+        const statusPill = {
+          'Pending':           '<span class="status-pill pill-pending">Pending</span>',
+          'Cheque Issued':     '<span class="status-pill pill-issued">Cheque Issued</span>',
+          'Cheque Handed Out': '<span class="status-pill pill-handedout">Handed Out</span>',
+          'Payment Processed': '<span class="status-pill pill-processed">Processed</span>'
+        }[r.reimbursementStatus] || '<span class="status-pill pill-pending">Pending</span>';
+
+        const issuedCell    = r.chequeIssuedDate
+          ? `${new Date(r.chequeIssuedDate).toLocaleDateString('en-CA')}<br><span style="font-size:11px;color:var(--grey)">${r.chequeIssuedBy}</span>`
+          : '-';
+        const handedOutCell = r.chequeHandedOutDate
+          ? `${new Date(r.chequeHandedOutDate).toLocaleDateString('en-CA')}<br><span style="font-size:11px;color:var(--grey)">${r.chequeHandedOutBy}</span>`
+          : '-';
+        const folderCell    = r.folderUrl
+          ? `<a href="${r.folderUrl}" target="_blank" style="font-size:12px;color:var(--navy);">View</a>`
+          : '-';
+        const memberNames   = r.members.map(m => m.name).join(', ');
+        const routing       = r.isLoomexVendor ? 'Loomex Vendor' : r.paymentRouting;
+        const ddLink        = r.ddFileUrl
+          ? `<br><a href="${r.ddFileUrl}" target="_blank" style="font-size:11px;color:var(--navy);">Banking Doc</a>` : '';
+
+        let actionBtn = '';
+        if (r.reimbursementStatus === 'Pending') {
+          const actionLabel = (r.paymentRouting === 'DirectDeposit' || r.isLoomexVendor)
+            ? 'Mark Payment Processed'
+            : 'Mark Cheque Issued';
+          const actionType  = (r.paymentRouting === 'DirectDeposit' || r.isLoomexVendor)
+            ? 'process' : 'issue';
+          actionBtn = `<button class="action-btn ${actionType}" onclick="openModal('${r.submissionRef}','${actionType}')">${actionLabel}</button>`;
+        } else if (r.reimbursementStatus === 'Cheque Issued') {
+          actionBtn = `<span style="font-size:12px;color:var(--grey);">Awaiting site handout</span>`;
+        }
+
+        html += `<tr>
+          <td><strong>${r.chequeName || '-'}</strong></td>
+          <td style="font-size:12px;">${memberNames}</td>
+          <td><strong>$${r.total.toFixed(2)}</strong></td>
+          <td>${routing}${ddLink}</td>
+          <td>${statusPill}</td>
+          <td style="font-size:12px;">${issuedCell}</td>
+          <td style="font-size:12px;">${handedOutCell}</td>
+          <td>${folderCell}</td>
+          <td>${actionBtn}</td>
+        </tr>`;
+      }
+      html += '</tbody></table></div>';
+    }
+
+    document.getElementById('reimb-content').innerHTML = html;
+    document.getElementById('reimb-last-updated').textContent =
+      'Last updated: ' + new Date().toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  } catch(e) {
+    document.getElementById('reimb-content').innerHTML =
+      `<div class="loading">Error: ${e.message}</div>`;
+  }
+}
+
+// ---- MODAL ----
+
+function openModal(submissionRef, action) {
+  activeModal = { submissionRef, action };
+  const isProcess = action === 'process';
+  document.getElementById('modal-title').textContent      = isProcess ? 'Mark Payment Processed' : 'Mark Cheque Issued';
+  document.getElementById('modal-date-label').textContent = isProcess ? 'Date Processed' : 'Date Issued';
+  document.getElementById('modal-date').value             = new Date().toISOString().split('T')[0];
+  document.getElementById('modal-staff-name').value       = '';
+  document.getElementById('modal-confirm-btn').textContent = isProcess ? 'Confirm' : 'Mark Issued';
+  document.getElementById('issue-modal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('issue-modal').classList.remove('active');
+  activeModal = null;
+}
+
+async function confirmModal() {
+  const staffName = document.getElementById('modal-staff-name').value.trim();
+  const date      = document.getElementById('modal-date').value;
+  if (!staffName) { alert('Please enter your name.'); return; }
+  if (!date)      { alert('Please enter a date.'); return; }
+
+  const btn = document.getElementById('modal-confirm-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  try {
+    const endpoint = activeModal.action === 'process'
+      ? '/reimbursements/mark-processed'
+      : '/reimbursements/mark-issued';
+
+    const res  = await fetch(`${WORKER}${endpoint}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ submissionRef: activeModal.submissionRef, staffName, date })
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'Failed');
+    closeModal();
+    loadReimbursements();
+  } catch(e) {
+    alert('Error: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = activeModal.action === 'process' ? 'Confirm' : 'Mark Issued';
+  }
+}
 }
 </script>
 </body>
