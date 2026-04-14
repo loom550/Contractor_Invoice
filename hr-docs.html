@@ -272,9 +272,15 @@ input[type="file"].hidden-file { display: none; }
 
   <!-- SHARED: Exec/Onboarding Summary -->
   <div class="tab-panel content" id="panel-exec" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Onboarding Status</div>
+      <button onclick="refreshExec()" id="refreshBtn"
+        style="font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--navy);cursor:pointer;display:flex;align-items:center;gap:6px">
+        ↻ Refresh
+      </button>
+    </div>
     <div id="execContent"><div class="state-box"><div class="big-icon">📊</div>Loading...</div></div>
   </div>
-</div>
 
 <!-- ── UPLOAD MODAL ────────────────────────────────────────── -->
 <div id="uploadModal">
@@ -353,7 +359,12 @@ function switchTab(tab) {
   document.querySelectorAll('#hrTabs .tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`tab-${tab}`).classList.add('active');
   showPanel(tab);
-  if (tab === 'exec' && !execData) loadExecSummary();
+  if (tab === 'exec') {
+    if (!execData) loadExecSummary();
+    startExecAutoRefresh();
+  } else {
+    stopExecAutoRefresh();
+  }
 }
 
 function switchExecTab(tab) {
@@ -623,9 +634,9 @@ function renderContractorDetail(c) {
 // ── EXEC SUMMARY ──────────────────────────────────────────────
 let execData = null;
 
-async function loadExecSummary() {
+async function loadExecSummary(silent = false) {
   const el = document.getElementById('execContent');
-  el.innerHTML = '<div class="state-box"><div class="big-icon">📊</div>Loading…</div>';
+  if (!silent) el.innerHTML = '<div class="state-box"><div class="big-icon">📊</div>Loading…</div>';
   try {
     const res  = await fetch(`${WORKER}/hr-exec-summary?token=${encodeURIComponent(sessionToken)}`);
     const data = await res.json();
@@ -847,6 +858,32 @@ async function setContractorStatus(contractorRecordId, status, btn) {
     btn.disabled = false; btn.textContent = status === 'Inactive' ? 'Inactive' : 'Remove';
     showToast('Error: ' + e.message, 'error');
   }
+}
+
+function refreshExec() {
+  const btn = document.getElementById('refreshBtn');
+  if (btn) { btn.textContent = '↻ Refreshing…'; btn.disabled = true; }
+  execData = null;
+  loadExecSummary(true).then(() => {
+    if (btn) { btn.innerHTML = '↻ Refresh'; btn.disabled = false; }
+  });
+}
+
+// Auto-refresh every 60s while exec tab is visible
+let execRefreshInterval = null;
+
+function startExecAutoRefresh() {
+  stopExecAutoRefresh();
+  execRefreshInterval = setInterval(() => {
+    if (document.getElementById('panel-exec').style.display !== 'none') {
+      execData = null;
+      loadExecSummary(true);
+    }
+  }, 60000);
+}
+
+function stopExecAutoRefresh() {
+  if (execRefreshInterval) { clearInterval(execRefreshInterval); execRefreshInterval = null; }
 }
 
 // ── MODAL ─────────────────────────────────────────────────────
