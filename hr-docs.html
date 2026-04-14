@@ -820,18 +820,6 @@ async function doModalUpload() {
       if (!data.success) throw new Error(data.error);
       setModalStatus('✅ CRJM file uploaded. Contractor marked complete.', 'success');
       showToast('CRJM uploaded', 'success');
-    try {
-    const b64 = await fileToBase64(modalFile);
-    const ext  = modalFile.name.split('.').pop().toLowerCase();
-    if (modalCtx.isCrjm) {
-      const res  = await fetch(`${WORKER}/hr-crjm-upload`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sessionToken, contractorId: modalCtx.contractorId, contractorName: modalCtx.contractorName, contractorRecordId: modalCtx.contractorRecordId, fileBase64: b64, fileExt: ext }),
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error);
-      setModalStatus('✅ CRJM file uploaded. Contractor marked complete.', 'success');
-      showToast('CRJM uploaded', 'success');
     } else {
       const labelMap = {
         resume:  `${modalCtx.contractorName} - Resume`,
