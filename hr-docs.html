@@ -353,6 +353,7 @@ function switchTab(tab) {
   document.querySelectorAll('#hrTabs .tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(`tab-${tab}`).classList.add('active');
   showPanel(tab);
+  if (tab === 'exec' && !execData) loadExecSummary();
 }
 
 function switchExecTab(tab) {
