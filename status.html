@@ -852,22 +852,7 @@ async function renderMasterView(){
   }
 }
 
-  // set map image
-  const mapImg=document.getElementById('master-map-img');
-  if (MAP_SRC) mapImg.src=MAP_SRC;
-
-  const overlay=document.getElementById('master-overlay');
-  overlay.innerHTML='';
-  document.getElementById('master-totals').style.display='none';
-
-  try {
-    const list=await api('/activations');
-    if (!list.length){
-      overlay.innerHTML='<div class="master-loading-msg">No active activations.</div>';
-      return;
-    }
-
-    // fetch data for all activations in parallel
+      // fetch data for all activations in parallel
     const results=await Promise.all(list.map(async a=>{
       try {
         const [cfg,data]=await Promise.all([
