@@ -255,8 +255,14 @@ input[type="file"].hidden-file { display: none; }
   </div>
 
    <!-- HR: Pending -->
-  <div class="tab-panel content" id="panel-pending" style="display:none">
-    <div class="section-title">Contractors with unreviewed document submissions</div>
+<div class="tab-panel content" id="panel-pending" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="section-title" style="margin-bottom:0">Contractors with unreviewed document submissions</div>
+      <button onclick="loadPending()" id="pendingRefreshBtn"
+        style="font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:1.5px solid var(--border);background:white;color:var(--navy);cursor:pointer">
+        ↻ Refresh
+      </button>
+    </div>
     <div id="pendingList"><div class="state-box"><div class="big-icon">⏳</div>Loading...</div></div>
   </div>
 
@@ -388,6 +394,7 @@ async function loadPending() {
       countEl.style.display = 'none'; return;
     }
     countEl.textContent = groups.length; countEl.style.display = 'inline';
+    groups.sort((a, b) => (a.contractor?.name || '').localeCompare(b.contractor?.name || ''));
     el.innerHTML = groups.map(g => renderContractorCard(g)).join('');
   } catch (e) {
     el.innerHTML = `<div class="state-box"><div class="big-icon">⚠️</div>${e.message}</div>`;
@@ -735,7 +742,8 @@ function renderContractorTable(list, context) {
     { key: 'driversLicense', label: 'DL' },
   ];
 
-  const rows = list.map(c => {
+  const sorted = [...list].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  const rows = sorted.map(c => {
     const statusChip = c.status === 'Active' ? 'chip-active' : c.status === 'VP Approved' ? 'chip-pending' : 'chip-other';
     const deployedHtml = c.deployedWarning
       ? `<span class="deployed-badge"><span class="warn-icon">⚠️</span> Deployed</span>`
