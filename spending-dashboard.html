@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">Tuck Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    /* ---- HEADER ---- */
+    .header {
+      background: #1a4e7e;
+      color: #fff;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .header h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .header-meta {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-top: 3px;
+    }
+    .accent-bar {
+      height: 4px;
+      background: linear-gradient(90deg, #2f9879 0%, #7dbe42 100%);
+    }
+    #refreshBtn {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: Arial, sans-serif;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    #refreshBtn:hover { background: rgba(255,255,255,0.22); }
+
+    /* ---- LAYOUT ---- */
+    .main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    /* ---- STATUS / ERROR ---- */
+    .loading-msg {
+      text-align: center;
+      padding: 72px 20px;
+      color: #888;
+      font-size: 15px;
+    }
+    .loading-msg .spinner {
+      display: inline-block;
+      width: 28px; height: 28px;
+      border: 3px solid #ddd;
+      border-top-color: #2f9879;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 14px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-banner {
+      background: #fff3f3;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+      padding: 16px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ---- BANNER CARDS ---- */
+    .banner {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px 22px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      border-left: 5px solid #cbd5e0;
+    }
+    .card.green  { border-left-color: #2f9879; }
+    .card.orange { border-left-color: #d97706; }
+    .card.red    { border-left-color: #dc2626; }
+
+    .card-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+    .card-value {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1;
+      color: #1a4e7e;
+    }
+    .card.green  .card-value { color: #2f9879; }
+    .card.orange .card-value { color: #d97706; }
+    .card.red    .card-value { color: #dc2626; }
+
+    .card-sub {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: 6px;
+    }
+
+    /* ---- CHARTS ---- */
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .chart-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .chart-card h3 {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #6b7280;
+      margin-bottom: 16px;
+    }
+    .chart-wrap {
+      position: relative;
+      height: 230px;
+    }
+
+    /* ---- TABLE CARD ---- */
+    .table-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .table-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .table-top h3 {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #6b7280;
+    }
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filters label {
+      font-size: 12px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .filters input[type="date"] {
+      font-size: 12px;
+      font-family: Arial, sans-serif;
+      padding: 4px 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      color: #374151;
+    }
+    .filters input[type="date"]:focus {
+      outline: none;
+      border-color: #2f9879;
+    }
+    .filter-btn {
+      font-size: 12px;
+      font-family: Arial, sans-serif;
+      padding: 5px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .filter-btn.apply  { background: #1a4e7e; color: #fff; }
+    .filter-btn.apply:hover  { background: #15406a; }
+    .filter-btn.clear  { background: #e5e7eb; color: #374151; }
+    .filter-btn.clear:hover  { background: #d1d5db; }
+
+    /* ---- DATA TABLE ---- */
+    .table-scroll { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead tr {
+      background: #1a4e7e;
+      color: #fff;
+    }
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    thead th.num { text-align: right; }
+    tbody tr { border-bottom: 1px solid #f3f4f6; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f9fafb; }
+    tbody td {
+      padding: 10px 14px;
+      vertical-align: middle;
+    }
+    tbody td.num {
+      text-align: right;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .date-cell .date-main { font-weight: 500; }
+    .date-cell .date-iso  { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+    .receipt-tag {
+      display: inline-block;
+      background: #e8f5ee;
+      color: #2f9879;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-family: monospace;
+      font-weight: 600;
+    }
+    .empty-row td {
+      text-align: center;
+      padding: 36px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 720px) {
+      .banner { grid-template-columns: 1fr; }
+      .charts { grid-template-columns: 1fr; }
+      .header { padding: 12px 16px; }
+      .main { padding: 16px 12px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1 id="headerTitle">Tuck Dashboard</h1>
+    <div class="header-meta" id="headerMeta">Loading...</div>
+  </div>
+  <button id="refreshBtn">&#8635; Refresh</button>
+</div>
+<div class="accent-bar"></div>
+
+<div class="main" id="main">
+  <div class="loading-msg">
+    <div class="spinner"></div><br>
+    Loading dashboard data...
+  </div>
+</div>
+
+<script>
+// ---- CONFIG ----
+// Update WORKER_BASE to the deployed worker URL or configured custom route
+const WORKER_BASE = 'https://loomex-procurement.workers.dev';
+
+// ---- SETUP ----
+const urlParams = new URLSearchParams(window.location.search);
+const site = (urlParams.get('site') || '').trim();
+
+document.getElementById('pageTitle').textContent = site ? `Tuck — ${site}` : 'Tuck Dashboard';
+document.getElementById('headerTitle').textContent = site ? `Tuck Dashboard \u2014 ${site}` : 'Tuck Dashboard';
+document.getElementById('refreshBtn').addEventListener('click', loadData);
+
+let allPurchases = [];
+let spendChart = null;
+let bvsChart = null;
+
+// ---- DATA LOAD ----
+async function loadData() {
+  if (!site) {
+    document.getElementById('main').innerHTML =
+      `<div class="error-banner">No site specified. Launch this dashboard with a <code>?site=Kingston</code> URL parameter.</div>`;
+    document.getElementById('headerMeta').textContent = 'No site';
+    return;
+  }
+
+  document.getElementById('main').innerHTML =
+    `<div class="loading-msg"><div class="spinner"></div><br>Loading...</div>`;
+  document.getElementById('headerMeta').textContent = 'Loading\u2026';
+
+  // Destroy existing charts before re-render
+  if (spendChart)  { spendChart.destroy();  spendChart = null; }
+  if (bvsChart)    { bvsChart.destroy();    bvsChart   = null; }
+
+  try {
+    const res = await fetch(`${WORKER_BASE}/tuck-data?site=${encodeURIComponent(site)}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+      throw new Error(err.error || `HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    render(data);
+  } catch (err) {
+    document.getElementById('main').innerHTML =
+      `<div class="error-banner">Failed to load: ${escHtml(err.message)}</div>`;
+    document.getElementById('headerMeta').textContent = 'Error';
+  }
+}
+
+// ---- RENDER ----
+function render(data) {
+  const today = new Date();
+  const todayLabel = today.toLocaleDateString('en-CA', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+
+  document.getElementById('headerMeta').textContent =
+    `${site} \u2014 ${todayLabel} \u2014 ${data.headcountToday} active evacuees`;
+
+  allPurchases = data.purchases || [];
+
+  const pctUsed = data.budgetToday > 0 ? (data.spentToday / data.budgetToday) * 100 : 0;
+  const budgetCls = pctUsed > 100 ? 'red' : pctUsed >= 80 ? 'orange' : 'green';
+  const remainCls = data.remainingToday < 0 ? 'red' : budgetCls;
+
+  document.getElementById('main').innerHTML = `
+    <div class="banner">
+      <div class="card ${budgetCls}">
+        <div class="card-label">Budget Today</div>
+        <div class="card-value">${fmtCAD(data.budgetToday)}</div>
+        <div class="card-sub">${data.headcountToday} pax &times; ${fmtCAD(data.allotmentPerPerson)}/person</div>
+      </div>
+      <div class="card ${budgetCls}">
+        <div class="card-label">Spent Today</div>
+        <div class="card-value">${fmtCAD(data.spentToday)}</div>
+        <div class="card-sub">${pctUsed.toFixed(1)}% of budget used</div>
+      </div>
+      <div class="card ${remainCls}">
+        <div class="card-label">Remaining Today</div>
+        <div class="card-value">${data.remainingToday < 0 ? '-' : ''}${fmtCAD(Math.abs(data.remainingToday))}</div>
+        <div class="card-sub">${data.remainingToday < 0 ? 'Over budget' : 'Available to spend'}</div>
+      </div>
+    </div>
+
+    <div class="charts">
+      <div class="chart-card">
+        <h3>Daily Tuck Spend &mdash; Last 14 Days</h3>
+        <div class="chart-wrap"><canvas id="chartSpend"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Budget vs. Spent &mdash; Last 14 Days</h3>
+        <div class="chart-wrap"><canvas id="chartBvS"></canvas></div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-top">
+        <h3>Purchase History</h3>
+        <div class="filters">
+          <label>From <input type="date" id="filterFrom"></label>
+          <label>To <input type="date" id="filterTo"></label>
+          <button class="filter-btn apply" id="applyFilterBtn">Apply</button>
+          <button class="filter-btn clear" id="clearFilterBtn">Clear</button>
+        </div>
+      </div>
+      <div class="table-scroll" id="tableWrap"></div>
+    </div>
+  `;
+
+  buildCharts(data.history);
+  renderTable(allPurchases);
+
+  document.getElementById('applyFilterBtn').addEventListener('click', applyFilter);
+  document.getElementById('clearFilterBtn').addEventListener('click', clearFilter);
+}
+
+// ---- CHARTS ----
+function buildCharts(history) {
+  const labels = history.map(h => fmtDateShort(h.date));
+  const spends  = history.map(h => h.spent);
+  const budgets = history.map(h => h.budget);
+
+  const spendCtx = document.getElementById('chartSpend').getContext('2d');
+  spendChart = new Chart(spendCtx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Spend',
+        data: spends,
+        backgroundColor: '#2f9879',
+        borderRadius: 3,
+        borderSkipped: false,
+      }],
+    },
+    options: chartOptions(),
+  });
+
+  const bvsCtx = document.getElementById('chartBvS').getContext('2d');
+  bvsChart = new Chart(bvsCtx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Budget',
+          data: budgets,
+          backgroundColor: 'rgba(26,78,126,0.18)',
+          borderColor: '#1a4e7e',
+          borderWidth: 1.5,
+          borderRadius: 3,
+          borderSkipped: false,
+        },
+        {
+          label: 'Spent',
+          data: spends,
+          backgroundColor: '#2f9879',
+          borderRadius: 3,
+          borderSkipped: false,
+        },
+      ],
+    },
+    options: {
+      ...chartOptions(),
+      plugins: {
+        legend: {
+          labels: { font: { size: 11, family: 'Arial' }, boxWidth: 12, padding: 16 },
+        },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtCAD(ctx.raw)}` } },
+      },
+    },
+  });
+}
+
+function chartOptions() {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${fmtCAD(ctx.raw)}` } },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: '#f3f4f6' },
+        ticks: {
+          font: { size: 11, family: 'Arial' },
+          callback: v => '$' + v.toLocaleString('en-CA'),
+        },
+      },
+      x: {
+        grid: { display: false },
+        ticks: { font: { size: 10, family: 'Arial' } },
+      },
+    },
+  };
+}
+
+// ---- TABLE ----
+function renderTable(purchases) {
+  const wrap = document.getElementById('tableWrap');
+  if (!wrap) return;
+
+  if (purchases.length === 0) {
+    wrap.innerHTML = `<table><tbody><tr class="empty-row"><td colspan="5">No purchases in this date range.</td></tr></tbody></table>`;
+    return;
+  }
+
+  const rows = purchases.map(p => `
+    <tr>
+      <td class="date-cell">
+        <div class="date-main">${fmtDateLong(p.date)}</div>
+        <div class="date-iso">${p.date}</div>
+      </td>
+      <td>${escHtml(p.supplier) || '<span style="color:#9ca3af">—</span>'}</td>
+      <td class="num">${fmtCAD(p.lineTotal)}</td>
+      <td>${escHtml(p.purchasedFor) || '<span style="color:#9ca3af">—</span>'}</td>
+      <td>${p.receiptRef ? `<span class="receipt-tag">${escHtml(p.receiptRef)}</span>` : '<span style="color:#9ca3af">—</span>'}</td>
+    </tr>
+  `).join('');
+
+  wrap.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Supplier</th>
+          <th class="num">Line Total</th>
+          <th>Purchased For</th>
+          <th>Receipt Ref</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function applyFilter() {
+  const from = document.getElementById('filterFrom')?.value || '';
+  const to   = document.getElementById('filterTo')?.value   || '';
+  const filtered = allPurchases.filter(p => {
+    if (from && p.date < from) return false;
+    if (to   && p.date > to)   return false;
+    return true;
+  });
+  renderTable(filtered);
+}
+
+function clearFilter() {
+  const f = document.getElementById('filterFrom');
+  const t = document.getElementById('filterTo');
+  if (f) f.value = '';
+  if (t) t.value = '';
+  renderTable(allPurchases);
+}
+
+// ---- UTILS ----
+function fmtCAD(val) {
+  return '$' + parseFloat(val || 0).toLocaleString('en-CA', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function fmtDateShort(iso) {
+  if (!iso) return '';
+  const [, m, d] = iso.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${months[parseInt(m) - 1]} ${parseInt(d)}`;
+}
+
+function fmtDateLong(iso) {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  const months = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+  return `${months[parseInt(m) - 1]} ${parseInt(d)}, ${y}`;
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ---- START ----
+loadData();
+</script>
+
+</body>
+</html>
