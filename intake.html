@@ -389,6 +389,8 @@ input.invalid,select.invalid{border-color:var(--red)!important;}
 <div class="toast" id="toast"></div>
 
 <script>
+var showAllPool = false; 
+  var poolUpdateId = '';
 var WORKER = 'https://manifests.loomex-it.workers.dev';
 var QUEUE_KEY = 'loomi_manifest_queue';
 var FLIGHTS_KEY = 'loomi_manifest_flights';
@@ -477,7 +479,8 @@ function setMode(m) {
   document.getElementById('flight-select-label').textContent = isOut ? 'Outbound Flight' : 'Inbound Flight';
   document.getElementById('flight-dir-badge').textContent = isOut ? 'OUTGOING' : 'INCOMING';
   document.getElementById('flight-dir-badge').className = 'card-header-badge ' + (isOut ? 'badge-out' : 'badge-in');
-  document.getElementById('pool-search-card').style.display = isOut ? 'block' : 'none';
+  document.getElementById('pool-search-card').style.display = 'block';
+  document.getElementById('pool-search-card').querySelector('.card-header-title').textContent = isOut ? 'Find in Pool' : 'Pre-Registered — Verify Arrival';
   document.getElementById('dest-hub-card').style.display = isOut ? 'block' : 'none';
   document.getElementById('med-devices-group').style.display = isOut ? 'none' : 'block';
   document.getElementById('rx-group').style.display = isOut ? 'none' : 'block';
@@ -574,8 +577,37 @@ function loadPool() {
     }).catch(function() {});
 }
 
+function loadFlightPax(flightId) {
+  pool = [];
+  updatePoolCount();
+  if (!navigator.onLine) return;
+  fetch(WORKER + '/api/pax?flightId=' + encodeURIComponent(flightId) + '&token=' + encodeURIComponent(hubToken))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) return;
+      pool = data;
+      updatePoolCount();
+    }).catch(function() {});
+}
+
 function updatePoolCount() {
-  document.getElementById('pool-count').textContent = pool.length ? pool.length + ' in pool' : 'Pool empty';
+  var label = mode === 'in' ? (showAllPool ? ' in pool (all)' : ' on manifest') : ' in pool';
+  var countText = pool.length ? pool.length + label : (mode === 'in' ? 'Select a flight' : 'Pool empty');
+  var toggleHtml = mode === 'in' && document.getElementById('flight-select').value
+    ? ' <button onclick="togglePoolView()" style="font-size:10px;font-weight:700;color:var(--teal);background:none;border:none;cursor:pointer;text-decoration:underline;padding:0;">' + (showAllPool ? 'Flight only' : 'Show all') + '</button>'
+    : '';
+  var el = document.getElementById('pool-count');
+  el.innerHTML = countText + toggleHtml;
+}
+function togglePoolView() {
+  showAllPool = !showAllPool;
+  if (showAllPool) {
+    loadPool();
+  } else {
+    var flightId = document.getElementById('flight-select').value;
+    if (flightId) loadFlightPax(flightId);
+    else { pool = []; updatePoolCount(); }
+  }
 }
 
 function setupPoolSearch() {
@@ -635,6 +667,7 @@ function renderPoolResults(q) {
 
 function selectFromPool(pax) {
   poolSelectedPax = pax;
+  poolUpdateId = mode === 'in' ? pax.id : '';
   document.getElementById('pool-search-section').style.display = 'none';
   document.getElementById('pool-selected-banner').classList.remove('hidden');
   var flags = [];
@@ -665,6 +698,7 @@ function selectFromPool(pax) {
 
 function clearPoolSelection() {
   poolSelectedPax = null;
+  poolUpdateId = '';
   document.getElementById('pool-search-section').style.display = 'block';
   document.getElementById('pool-selected-banner').classList.add('hidden');
   document.getElementById('pool-results').classList.add('hidden');
@@ -692,6 +726,16 @@ function setupForm() {
       this.classList.remove('invalid');
       document.getElementById('err-' + (id === 'first-name' ? 'first' : 'last')).classList.remove('show');
     });
+  });
+  document.getElementById('flight-select').addEventListener('change', function() {
+    showAllPool = false;
+    if (mode === 'in' && this.value) {
+      loadFlightPax(this.value);
+    } else if (mode === 'in') {
+      pool = [];
+      updatePoolCount();
+      document.getElementById('pool-results').classList.add('hidden');
+    }
   });
   document.getElementById('dest-hub-select').addEventListener('change', function() {
     var isOther = this.value === '__other__';
@@ -757,6 +801,7 @@ function submitPax() {
     destinationHubEmail: mode === 'out' ? destinationHubEmail : '',
     direction: mode,
     inboundRecordId: (mode === 'out' && poolSelectedPax) ? poolSelectedPax.id : '',
+    poolUpdateId: poolUpdateId,
     status: 'pending',
     addedAt: new Date().toISOString(),
   };
@@ -849,8 +894,12 @@ function flushQueue() {
   var pending = queue.filter(function(p) { return p.status !== 'synced'; });
   if (!pending.length) { syncing = false; return; }
   var promises = pending.map(function(pax) {
-    return fetch(WORKER + '/api/pax?token=' + encodeURIComponent(hubToken), {
-      method: 'POST',
+    var isUpdate = pax.poolUpdateId && pax.direction === 'in';
+    var paxUrl = isUpdate
+      ? WORKER + '/api/pax/' + pax.poolUpdateId + '?token=' + encodeURIComponent(hubToken)
+      : WORKER + '/api/pax?token=' + encodeURIComponent(hubToken);
+    return fetch(paxUrl, {
+      method: isUpdate ? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         firstName: pax.firstName, lastName: pax.lastName, dob: pax.dob,
