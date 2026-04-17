@@ -447,7 +447,9 @@ function applyData() {
   hotels = {};
   Object.keys(cfg.hotels||{}).forEach(sid => {
     hotels[sid] = (cfg.hotels[sid]||[]).map(h => {
-      const d = ((liveData?.hotels||{})[sid]||[]).find(x=>x.id===h.id);
+      const liveHotels = (liveData?.hotels||{})[sid]||[];
+      const d = liveHotels.find(x=>x.id===h.id)
+             || liveHotels.find(x=>x.name?.toLowerCase()===h.name?.toLowerCase());
       return { ...h, count:d?.count||0, capacity:d?.capacity||0 };
     });
   });
