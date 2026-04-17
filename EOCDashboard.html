@@ -536,16 +536,18 @@ async function fetchData() {
 
   const hubs = configSites.map(s => {
     const live = liveSites.find(x => x.id === s.id) || {};
+    const totalRooms = live.totalRooms || 0;
+    const maxCapacity = Math.round(totalRooms * 2.5);
     return {
       name: s.name,
       status: 'Active',
-      rooms: 0,
-      occupied: 0,
-      vacant: 0,
+      rooms: totalRooms,
+      occupied: live.occupiedRooms || 0,
+      vacant: live.vacantRooms || 0,
       evacuees: live.count || 0,
       capacity: live.capacity || 0,
+      utilization: maxCapacity > 0 ? Math.round((live.count || 0) / maxCapacity * 100) : 0,
     };
-  });
 
   const totalEvacuees = hubs.reduce((sum, h) => sum + h.evacuees, 0);
   const summary = liveData.summary || {};
@@ -619,7 +621,7 @@ function renderHubs(hubs) {
   hubs = hubs.filter(hub => hub.name !== "Main EOC");
   
   const hubsHTML = hubs.map(hub => {
-    const occupancyRate = hub.rooms > 0 
+    const occupancyRate = hub.utilization || 0;
   ? Math.round((hub.occupied / hub.rooms) * 100) 
   : 0;
 
