@@ -1003,7 +1003,7 @@ async function init(){
       backBtn.className='login-btn';
       backBtn.innerHTML='&#8592; All Activations';
       backBtn.onclick=()=>location.href=location.pathname;
-      const hr=document.getElementById('header-right');
+      const hr=document.querySelector('.header-right');
       if(hr) hr.prepend(backBtn);
     }
     renderAll();
