@@ -995,15 +995,17 @@ async function init(){
     document.title=`${cfg.name||activationId} | Loomex Emergency Operations`;
     document.getElementById('active-badge').style.display='';
     document.getElementById('export-btn').style.display='';
-    // Back button
-    const backBtn=document.createElement('button');
-    backBtn.className='login-btn';
-    backBtn.innerHTML='← All Activations';
-    backBtn.style.cssText='font-size:.65rem;padding:.55rem 1rem;cursor:pointer';
-    backBtn.onclick=()=>location.href=location.pathname;
-    document.getElementById('header-right').prepend(backBtn);
     document.getElementById('activation-view').style.display = window.innerWidth <= 960 ? 'flex' : '';
     if (window.innerWidth <= 960) document.getElementById('activation-view').style.flexDirection = 'column';
+    if (!document.getElementById('back-btn')){
+      const backBtn=document.createElement('button');
+      backBtn.id='back-btn';
+      backBtn.className='login-btn';
+      backBtn.innerHTML='&#8592; All Activations';
+      backBtn.onclick=()=>location.href=location.pathname;
+      const hr=document.getElementById('header-right');
+      if(hr) hr.prepend(backBtn);
+    }
     renderAll();
 
     // Poll data every 30 s — worker handles override expiry server-side
