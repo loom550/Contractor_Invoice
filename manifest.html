@@ -471,20 +471,10 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
         <!-- Add flight form (hidden by default) -->
         <div class="add-flight-form" id="add-flight-form">
           <div class="aff-title">New Flight</div>
-          <div class="aff-grid">
+          <div class="aff-grid full">
             <div class="aff-field">
               <label>Flight # *</label>
               <input type="text" id="aff-num" placeholder="e.g. AC714" autocorrect="off">
-            </div>
-            <div class="aff-field">
-              <label>Mode</label>
-              <select id="aff-mode">
-                <option value="">Select...</option>
-                <option value="Fixed-wing">Fixed-wing</option>
-                <option value="Helicopter">Helicopter</option>
-                <option value="Bus">Bus</option>
-                <option value="Other">Other</option>
-              </select>
             </div>
           </div>
           <div class="aff-grid">
@@ -505,6 +495,26 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
             <div class="aff-field">
               <label>Destination</label>
               <input type="text" id="aff-dest" placeholder="e.g. Kingston" autocorrect="off">
+            </div>
+          </div>
+          <div class="aff-grid">
+            <div class="aff-field">
+              <label>Direction</label>
+              <select id="aff-direction">
+                <option value="">Select...</option>
+                <option value="Inbound">Inbound</option>
+                <option value="Outbound">Outbound</option>
+              </select>
+            </div>
+            <div class="aff-field">
+              <label>Mode</label>
+              <select id="aff-mode">
+                <option value="">Select...</option>
+                <option value="Fixed-wing">Fixed-wing</option>
+                <option value="Helicopter">Helicopter</option>
+                <option value="Bus">Bus</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
           </div>
           <div class="aff-grid">
@@ -1090,6 +1100,7 @@ function saveNewFlight() {
     eta: document.getElementById('aff-eta').value.trim(),
     flightDate: document.getElementById('aff-date').value,
     seats: document.getElementById('aff-seats').value || null,
+    direction: document.getElementById('aff-direction').value,
   };
 
   var btn = document.getElementById('aff-save');
@@ -1119,6 +1130,7 @@ function clearAddFlightForm() {
     document.getElementById(id).value = '';
   });
   document.getElementById('aff-mode').value = '';
+  document.getElementById('aff-direction').value = '';
 }
 
 // ── EDIT PAX MODAL ────────────────────────────────────────────────────────────
