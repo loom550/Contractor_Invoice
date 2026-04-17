@@ -523,34 +523,47 @@
     // Fetch data from Power Automate
 // Fetch data from Power Automate
 async function fetchData() {
-  const FLOW_URL = 'https://defaultf37e3a4c5aaa4bf993d2cc21b157eb.4c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/49779f52c7ce4b1cac7d0d3bdd2a71e7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ym6PDiJax2F_Kcf87lUZmFPLQt-n4p0atqwPq2YSbys';
-  
-  try {
-    console.log('Calling Power Automate flow...');
-    const response = await fetch(FLOW_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    console.log('Response status:', response.status);
-    
-    const text = await response.text();
-    console.log('Raw response:', text);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
-    }
-    
-    const data = JSON.parse(text);
-    console.log('Parsed data:', data);
-    return data;
-  } catch (error) {
-    console.error('FULL ERROR:', error);
-    console.error('Error details:', error.message);
-    throw error; // Re-throw the error instead of returning mock data
-  }
+  const WORKER_BASE = 'https://loomi-status.loomex-it.workers.dev';
+  const ACTIVATION_ID = '2026-KASH-HUBHOST';
+
+  const [cfg, liveData] = await Promise.all([
+    fetch(`${WORKER_BASE}/activation/${ACTIVATION_ID}/config`).then(r => r.json()),
+    fetch(`${WORKER_BASE}/activation/${ACTIVATION_ID}/data`).then(r => r.json()),
+  ]);
+
+  const configSites = (cfg.sites || []).filter(s => s.type === 'host' || s.type === 'host-kingston');
+  const liveSites = liveData.sites || [];
+
+  const hubs = configSites.map(s => {
+    const live = liveSites.find(x => x.id === s.id) || {};
+    return {
+      name: s.name,
+      status: 'Active',
+      rooms: 0,
+      occupied: 0,
+      vacant: 0,
+      evacuees: live.count || 0,
+      capacity: live.capacity || 0,
+    };
+  });
+
+  const totalEvacuees = hubs.reduce((sum, h) => sum + h.evacuees, 0);
+  const summary = liveData.summary || {};
+
+  return {
+    summary: {
+      totalHubs: hubs.length,
+      totalRooms: 0,
+      occupied: 0,
+      vacant: 0,
+      totalEvacuees: summary.totalEvacuees || totalEvacuees,
+      open213s: summary.open213s || 0,
+      pendingTransfers: summary.pendingTransfers || 0,
+      activeTransfers: summary.activeTransfers || 0,
+      completedToday: summary.completedToday || 0,
+    },
+    hubs,
+  };
 }
 // Render summary cards
 function renderSummary(data, hubs) {
