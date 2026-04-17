@@ -471,10 +471,14 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
         <!-- Add flight form (hidden by default) -->
         <div class="add-flight-form" id="add-flight-form">
           <div class="aff-title">New Flight</div>
-          <div class="aff-grid full">
+          <div class="aff-grid">
             <div class="aff-field">
               <label>Flight # *</label>
               <input type="text" id="aff-num" placeholder="e.g. AC714" autocorrect="off">
+            </div>
+            <div class="aff-field">
+              <label>Tail Number</label>
+              <input type="text" id="aff-tail" placeholder="e.g. C-FABC" autocorrect="off" style="text-transform:uppercase">
             </div>
           </div>
           <div class="aff-grid">
@@ -788,9 +792,11 @@ function renderFlights() {
   }
 
   // Sort: active first, then departed; within active by ETD
+  var statusOrder = { 'Loading': 0, 'Ready': 1, 'Received': 2, 'Departed': 3 };
   var sorted = flights.slice().sort(function(a, b) {
-    if (a.status === 'Departed' && b.status !== 'Departed') return 1;
-    if (a.status !== 'Departed' && b.status === 'Departed') return -1;
+    var sa = statusOrder[a.status] !== undefined ? statusOrder[a.status] : 2;
+    var sb = statusOrder[b.status] !== undefined ? statusOrder[b.status] : 2;
+    if (sa !== sb) return sa - sb;
     return (a.etd || '').localeCompare(b.etd || '');
   });
 
@@ -809,8 +815,9 @@ function renderFlights() {
           '<div class="fc-meta">' +
             (f.airline ? esc(f.airline) + ' &bull; ' : '') +
             (f.acType ? esc(f.acType) + ' &bull; ' : '') +
+            (f.tailNumber ? esc(f.tailNumber) + ' &bull; ' : '') +
             (f.etd ? 'ETD ' + esc(f.etd) : '') +
-          '</div>' +
+          '</div>' ++
         '</div>' +
         '<div class="fc-status"><span class="status-pill ' + statusClass + '">' + esc(f.status) + '</span></div>' +
       '</div>' +
@@ -1101,6 +1108,7 @@ function saveNewFlight() {
     flightDate: document.getElementById('aff-date').value,
     seats: document.getElementById('aff-seats').value || null,
     direction: document.getElementById('aff-direction').value,
+    tailNumber: document.getElementById('aff-tail').value.trim().toUpperCase(),
   };
 
   var btn = document.getElementById('aff-save');
@@ -1131,6 +1139,7 @@ function clearAddFlightForm() {
   });
   document.getElementById('aff-mode').value = '';
   document.getElementById('aff-direction').value = '';
+  document.getElementById('aff-tail').value = '';
 }
 
 // ── EDIT PAX MODAL ────────────────────────────────────────────────────────────
