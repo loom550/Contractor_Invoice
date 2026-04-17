@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a4e7e">
+<title>Room Inspector — LOOMI</title>
+<style>
+  :root {
+    --navy: #1a4e7e;
+    --navy-dark: #123656;
+    --teal: #2f9879;
+    --lime: #7dbe42;
+    --red: #e24f3e;
+    --amber: #f5a623;
+    --bg: #f2f4f7;
+    --panel: #ffffff;
+    --border: #dbe1ea;
+    --text: #1a2533;
+    --muted: #6b7884;
+    --shadow: 0 2px 8px rgba(20, 40, 70, 0.08);
+    --shadow-md: 0 4px 16px rgba(20, 40, 70, 0.12);
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    min-height: 100vh;
+  }
+  .header {
+    background: var(--navy);
+    color: #fff;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-title { font-size: 17px; font-weight: 600; line-height: 1.2; }
+  .header-sub { font-size: 12px; opacity: 0.85; line-height: 1.3; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .icon-btn {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #fff;
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .icon-btn:active { background: rgba(255,255,255,0.2); }
+  .container { max-width: 760px; margin: 0 auto; padding: 16px; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600; color: var(--navy);
+    margin: 0 0 12px 0; letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+  .card-title.lg { font-size: 16px; text-transform: none; letter-spacing: 0; }
+
+  /* Forms */
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .form-row { margin-bottom: 12px; }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 480px) {
+    .form-grid { grid-template-columns: 1fr; }
+  }
+  input[type="text"], input[type="password"], input[type="number"],
+  textarea, select {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 16px;
+    background: #fff;
+    color: var(--text);
+    font-family: inherit;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M6 8L0 0h12z' fill='%236b7884'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(26,78,126,0.15);
+  }
+  .checkbox-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 0;
+  }
+  .checkbox-row input[type="checkbox"] {
+    width: 22px; height: 22px; cursor: pointer;
+  }
+  .checkbox-row label { margin: 0; font-weight: 500; cursor: pointer; font-size: 15px; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.05s, box-shadow 0.1s;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--navy); color: #fff; }
+  .btn-primary:hover { background: var(--navy-dark); }
+  .btn-success { background: var(--teal); color: #fff; }
+  .btn-accent { background: var(--lime); color: #1a2533; }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-ghost {
+    background: transparent; color: var(--navy);
+    border: 1px solid var(--border);
+  }
+  .btn-block { width: 100%; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .sticky-bottom {
+    position: sticky;
+    bottom: 0;
+    background: var(--bg);
+    padding: 12px 0;
+    margin: 0 -16px -16px;
+    padding-left: 16px; padding-right: 16px;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+    z-index: 5;
+  }
+
+  /* Room list & classes */
+  .room-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .room-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 10px;
+    background: #eef3f9;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    font-size: 14px; font-weight: 500;
+  }
+  .room-chip .x {
+    color: var(--red); cursor: pointer;
+    width: 18px; height: 18px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 18px; line-height: 1;
+  }
+  .class-card {
+    background: #f8fafc;
+    border-left: 4px solid var(--navy);
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  .class-card-committed { border-left-color: var(--teal); }
+  .class-meta {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    font-size: 13px; color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .class-meta strong { color: var(--text); font-weight: 600; }
+
+  /* Stats bar */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .stat {
+    background: var(--panel);
+    padding: 10px 8px;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .stat-num { font-size: 22px; font-weight: 700; color: var(--navy); line-height: 1; }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+  /* Inspect list */
+  .inspect-room {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .inspect-room:active { background: #f8fafc; }
+  .inspect-room-num { font-size: 17px; font-weight: 600; }
+  .inspect-room-meta { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .status-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: #d0d5dd;
+    flex-shrink: 0;
+  }
+  .status-dot.partial { background: var(--amber); }
+  .status-dot.done { background: var(--teal); }
+
+  /* Modals */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(10, 20, 40, 0.5);
+    z-index: 100;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .overlay.active { display: flex; }
+  @media (min-width: 600px) {
+    .overlay { align-items: center; }
+  }
+  .modal {
+    background: var(--bg);
+    width: 100%;
+    max-width: 720px;
+    max-height: 92vh;
+    border-radius: 16px 16px 0 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  @media (min-width: 600px) {
+    .modal { border-radius: 16px; max-height: 86vh; }
+  }
+  .modal-header {
+    background: var(--navy);
+    color: #fff;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .modal-title { font-size: 18px; font-weight: 600; }
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .modal-footer {
+    padding: 12px 16px;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .modal-footer .btn { flex: 1; }
+
+  /* Media capture */
+  .media-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .capture-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 18px 10px;
+    background: #fff;
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    color: var(--navy);
+    font-weight: 600;
+    font-size: 14px;
+    gap: 6px;
+    min-height: 88px;
+  }
+  .capture-btn:hover { border-color: var(--navy); }
+  .capture-btn .emoji { font-size: 28px; }
+  .hidden-file { display: none; }
+
+  .media-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .media-tile {
+    position: relative;
+    aspect-ratio: 1;
+    background: #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .media-tile img, .media-tile video {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .media-tile-remove {
+    position: absolute; top: 4px; right: 4px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(226, 79, 62, 0.95);
+    color: #fff; font-size: 14px; font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: none;
+  }
+  .media-tile-status {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.7); color: #fff;
+    font-size: 11px; padding: 3px 6px;
+    text-align: center;
+  }
+  .progress-bar {
+    height: 3px; background: #fff; width: 0%;
+    transition: width 0.2s;
+  }
+
+  /* Toasts */
+  .toast-stack {
+    position: fixed;
+    bottom: max(20px, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .toast {
+    background: rgba(20, 30, 45, 0.95);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: var(--shadow-md);
+    animation: slideUp 0.2s;
+    max-width: 90vw;
+  }
+  .toast.error { background: rgba(180, 40, 30, 0.95); }
+  .toast.success { background: rgba(47, 152, 121, 0.95); }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } }
+
+  /* Spinner */
+  .spinner {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .divider { height: 1px; background: var(--border); margin: 14px 0; }
+  .tabs {
+    display: flex; gap: 2px;
+    background: #e6ebf3;
+    padding: 3px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  .tab {
+    flex: 1;
+    padding: 9px;
+    text-align: center;
+    font-size: 14px; font-weight: 600;
+    color: var(--muted);
+    border-radius: 7px;
+    cursor: pointer;
+  }
+  .tab.active { background: var(--panel); color: var(--navy); box-shadow: var(--shadow); }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div>
+    <div class="header-title">Room Inspector</div>
+    <div class="header-sub" id="headerContext">Initial site intake</div>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" id="btnBack" title="Back" style="display:none">←</button>
+    <button class="icon-btn" id="btnMenu" title="Menu">⋮</button>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- ======================= SCREEN: LOGIN ======================= -->
+  <section class="screen active" id="screenLogin">
+    <div class="card">
+      <h2 class="card-title lg" style="margin-bottom:6px">Sign in</h2>
+      <p class="hint" style="margin-bottom:14px">Enter the inspector password to begin.</p>
+      <div class="form-row">
+        <label for="inpPassword">Password</label>
+        <input type="password" id="inpPassword" autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button class="btn btn-primary btn-block" id="btnLogin">Sign in</button>
+    </div>
+  </section>
+
+  <!-- ======================= SCREEN: SETUP ======================= -->
+  <section class="screen" id="screenSetup">
+    <div class="card">
+      <h2 class="card-title lg">Start inspection</h2>
+      <p class="hint" style="margin-bottom:14px">Pick the activation and site, then enter the hotel you're inspecting.</p>
+
+      <div class="form-row">
+        <label for="selActivation">Activation</label>
+        <select id="selActivation"><option value="">Loading…</option></select>
+      </div>
+      <div class="form-row">
+        <label for="selSite">Site</label>
+        <select id="selSite" disabled><option value="">Choose activation first</option></select>
+      </div>
+      <div class="form-row">
+        <label for="inpHotel">Hotel / Building name</label>
+        <input type="text" id="inpHotel" placeholder="e.g., Bon Air" autocomplete="off">
+        <div class="hint">This is the SharePoint folder name that media will be stored under.</div>
+      </div>
+
+      <button class="btn btn-primary btn-block" id="btnStart">Start</button>
+    </div>
+
+    <div class="card" id="resumeCard" style="display:none">
+      <h2 class="card-title">Resume previous session</h2>
+      <div id="resumeMeta" style="font-size:14px; margin-bottom:10px; color:var(--muted)"></div>
+      <button class="btn btn-ghost btn-block" id="btnResume">Resume</button>
+    </div>
+  </section>
+
+  <!-- ======================= SCREEN: BUILD ======================= -->
+  <section class="screen" id="screenBuild">
+    <div class="tabs">
+      <div class="tab active" data-tab="build">1. Build list</div>
+      <div class="tab" data-tab="inspect">2. Inspect</div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Add a class of rooms</h2>
+      <p class="hint" style="margin-bottom:14px">
+        Enter specs once for a batch of similar rooms, then list the room numbers. Each room gets these values as defaults.
+      </p>
+
+      <div class="form-grid">
+        <div class="form-row">
+          <label for="classRoomType">Room Type</label>
+          <select id="classRoomType"></select>
+        </div>
+        <div class="form-row">
+          <label for="classBeds">Number of Beds</label>
+          <input type="number" id="classBeds" min="0" step="1" value="2">
+        </div>
+        <div class="form-row">
+          <label for="classBedConfig">Bed Configuration</label>
+          <select id="classBedConfig"></select>
+        </div>
+        <div class="form-row">
+          <label for="classBathroom">Bathroom</label>
+          <select id="classBathroom"></select>
+        </div>
+        <div class="form-row">
+          <label for="classMaxOcc">Max Occupancy</label>
+          <input type="number" id="classMaxOcc" min="1" step="1" value="4">
+        </div>
+        <div class="form-row">
+          <div class="checkbox-row" style="padding-top:22px">
+            <input type="checkbox" id="classKitchenette">
+            <label for="classKitchenette">Has Kitchenette</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label for="classRoomNumbers">Room Numbers</label>
+        <textarea id="classRoomNumbers" placeholder="101, 102, 105-110, 115"></textarea>
+        <div class="hint">Comma-separated. Use dashes for ranges (e.g., <code>201-215</code>).</div>
+      </div>
+
+      <div style="display:flex; gap:8px">
+        <button class="btn btn-primary" id="btnAddClass" style="flex:2">Add class</button>
+        <button class="btn btn-ghost" id="btnClearClass" style="flex:1">Clear</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Single room (one-off)</h2>
+      <p class="hint" style="margin-bottom:10px">For a room that doesn't fit a class, add it directly with all its own attributes during inspection.</p>
+      <button class="btn btn-ghost btn-block" id="btnAddSingle">+ Add single room</button>
+    </div>
+
+    <div id="classesContainer"></div>
+
+    <div class="sticky-bottom">
+      <button class="btn btn-success btn-block" id="btnCommitAll">
+        <span id="commitLabel">Commit to SharePoint</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ======================= SCREEN: INSPECT ======================= -->
+  <section class="screen" id="screenInspect">
+    <div class="tabs">
+      <div class="tab" data-tab="build">1. Build list</div>
+      <div class="tab active" data-tab="inspect">2. Inspect</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-num" id="stTotal">0</div><div class="stat-label">Rooms</div></div>
+      <div class="stat"><div class="stat-num" id="stDone">0</div><div class="stat-label">Done</div></div>
+      <div class="stat"><div class="stat-num" id="stPartial">0</div><div class="stat-label">Partial</div></div>
+      <div class="stat"><div class="stat-num" id="stTodo">0</div><div class="stat-label">To do</div></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; gap:8px; margin-bottom:12px">
+        <input type="text" id="inpFilter" placeholder="Filter room number…">
+        <button class="btn btn-ghost" id="btnFilterToggle" style="padding-left:12px; padding-right:12px" title="Show only incomplete">⚪</button>
+      </div>
+      <div id="inspectList"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ======================= INSPECTION MODAL ======================= -->
+<div class="overlay" id="inspectModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="imTitle">Room</div>
+      <button class="icon-btn" id="imClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="card" style="margin-bottom:10px">
+        <h3 class="card-title">Photos</h3>
+        <div class="media-row">
+          <label class="capture-btn">
+            <span class="emoji">📷</span>
+            <span>Take photo</span>
+            <input type="file" class="hidden-file" id="imPhotoCapture" accept="image/*" capture="environment">
+          </label>
+          <label class="capture-btn">
+            <span class="emoji">🖼️</span>
+            <span>From gallery</span>
+            <input type="file" class="hidden-file" id="imPhotoGallery" accept="image/*" multiple>
+          </label>
+        </div>
+        <div class="media-grid" id="photoGrid"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <h3 class="card-title">Video (optional, one max)</h3>
+        <label class="capture-btn" id="videoCaptureBtn">
+          <span class="emoji">🎥</span>
+          <span id="videoCaptureLabel">Record video</span>
+          <input type="file" class="hidden-file" id="imVideoCapture" accept="video/*" capture="environment">
+        </label>
+        <div id="videoPreview" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:10px">
+        <h3 class="card-title">Room details</h3>
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="imRoomNumber">Room Number</label>
+            <input type="text" id="imRoomNumber">
+          </div>
+          <div class="form-row">
+            <label for="imFloor">Floor</label>
+            <input type="text" id="imFloor">
+          </div>
+          <div class="form-row">
+            <label for="imRoomType">Room Type</label>
+            <select id="imRoomType"></select>
+          </div>
+          <div class="form-row">
+            <label for="imBeds"># Beds</label>
+            <input type="number" id="imBeds" min="0" step="1">
+          </div>
+          <div class="form-row">
+            <label for="imBedConfig">Bed Config</label>
+            <select id="imBedConfig"></select>
+          </div>
+          <div class="form-row">
+            <label for="imBathroom">Bathroom</label>
+            <select id="imBathroom"></select>
+          </div>
+          <div class="form-row">
+            <label for="imMaxOcc">Max Occupancy</label>
+            <input type="number" id="imMaxOcc" min="1" step="1">
+          </div>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="imAccessible"><label for="imAccessible">♿ Wheelchair Accessible</label>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="imKitchenette"><label for="imKitchenette">🍳 Has Kitchenette</label>
+        </div>
+        <div class="form-row" style="margin-top:10px">
+          <label for="imNotes">Notes</label>
+          <textarea id="imNotes" placeholder="Damage, missing items, anything worth flagging"></textarea>
+        </div>
+      </div>
+
+      <button class="btn btn-danger btn-block" id="imDelete" style="margin-top:10px">Remove this room</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="imCancel">Cancel</button>
+      <button class="btn btn-primary" id="imSave">
+        <span id="imSaveLabel">Save & close</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= DUPES MODAL ======================= -->
+<div class="overlay" id="dupesModal">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <div class="modal-title">Duplicate rooms</div>
+      <button class="icon-btn" id="dmClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-top:0">These rooms already exist in the Rooms list and will be <strong>skipped</strong>:</p>
+      <div id="dupesList" style="font-family: monospace; background:#f8fafc; padding:10px; border-radius:6px; margin:10px 0"></div>
+      <p class="hint">The remaining rooms will still be added.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="dmCancel">Cancel</button>
+      <button class="btn btn-primary" id="dmContinue">Continue & skip dupes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= SINGLE ROOM MODAL ======================= -->
+<div class="overlay" id="singleModal">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <div class="modal-title">Add single room</div>
+      <button class="icon-btn" id="smClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Room Number</label>
+          <input type="text" id="smRoomNumber">
+        </div>
+        <div class="form-row">
+          <label>Floor</label>
+          <input type="text" id="smFloor">
+        </div>
+        <div class="form-row">
+          <label>Room Type</label>
+          <select id="smRoomType"></select>
+        </div>
+        <div class="form-row">
+          <label># Beds</label>
+          <input type="number" id="smBeds" min="0" step="1" value="2">
+        </div>
+        <div class="form-row">
+          <label>Bed Config</label>
+          <select id="smBedConfig"></select>
+        </div>
+        <div class="form-row">
+          <label>Bathroom</label>
+          <select id="smBathroom"></select>
+        </div>
+        <div class="form-row">
+          <label>Max Occupancy</label>
+          <input type="number" id="smMaxOcc" min="1" step="1" value="4">
+        </div>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="smAccessible"><label for="smAccessible">Accessible</label>
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="smKitchenette"><label for="smKitchenette">Has Kitchenette</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="smCancel">Cancel</button>
+      <button class="btn btn-primary" id="smSave">Add to list</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toasts"></div>
+
+<script>
+// =============================================================================
+// CONFIG
+// =============================================================================
+const API_BASE = 'https://loomex-room-inspector.loomex-it.workers.dev'; // << CHANGE to your worker URL after deploy
+
+const LS = {
+  auth: 'roomInspector:auth',
+  session: 'roomInspector:session',
+  classes: 'roomInspector:classes',
+  rooms: 'roomInspector:rooms'
+};
+
+// =============================================================================
+// STATE
+// =============================================================================
+let state = {
+  auth: null,              // { token, ts }
+  session: null,           // { activationId, activationName, siteId, siteName, hotelName, startedAt }
+  activations: [],         // [{ id, name, sites: [] }]
+  choices: {},             // { RoomType: [...], BedConfiguration: [...], BathroomType: [...] }
+  classes: [],             // [{ id, roomType, ..., roomNumbers: [], committed: bool, spIds: {roomNumber: spId} }]
+  rooms: [],               // [{ id, classId, spId, roomNumber, ..., photoUrls, videoUrl, folderWebUrl, inspectionStatus }]
+  currentInspectingRoomId: null,
+  imPhotos: [],            // Photos in the modal right now: { id, file, previewUrl, uploadedUrl, progress }
+  imVideo: null,           // { file, previewUrl, uploadedUrl, progress } or null
+  filterQuery: '',
+  filterOnlyIncomplete: false
+};
+
+// =============================================================================
+// UTILITIES
+// =============================================================================
+const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
+
+function toast(msg, type = '') {
+  const t = document.createElement('div');
+  t.className = 'toast' + (type ? ' ' + type : '');
+  t.textContent = msg;
+  $('#toasts').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function saveLS(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+function loadLS(key) {
+  try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; }
+}
+function saveAuth(auth) { sessionStorage.setItem(LS.auth, JSON.stringify(auth)); }
+function loadAuth() { try { return JSON.parse(sessionStorage.getItem(LS.auth) || 'null'); } catch { return null; } }
+
+function uid() { return Math.random().toString(36).slice(2, 10); }
+
+// Parse room number input like "101, 102, 105-110, 115" into array
+function parseRoomNumbers(input) {
+  const out = new Set();
+  const parts = input.split(/[,\n]+/).map(s => s.trim()).filter(Boolean);
+  for (const p of parts) {
+    const m = p.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (m) {
+      const from = parseInt(m[1], 10);
+      const to = parseInt(m[2], 10);
+      if (from <= to && to - from <= 500) {
+        for (let i = from; i <= to; i++) out.add(String(i));
+      }
+    } else {
+      out.add(p);
+    }
+  }
+  return [...out];
+}
+
+// Default floor = first digit of numeric room number
+function deriveFloor(roomNumber) {
+  const m = String(roomNumber || '').match(/^(\d)/);
+  return m ? m[1] : '';
+}
+
+// =============================================================================
+// API
+// =============================================================================
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  if (state.auth) {
+    headers.Authorization = `Bearer ${state.auth.token}:${state.auth.ts}`;
+  }
+  const res = await fetch(API_BASE + path, { ...opts, headers });
+  if (res.status === 401) {
+    state.auth = null;
+    sessionStorage.removeItem(LS.auth);
+    showScreen('screenLogin');
+    throw new Error('Session expired, please sign in again');
+  }
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
+
+// =============================================================================
+// SCREEN NAVIGATION
+// =============================================================================
+function showScreen(id) {
+  $$('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+  if (id === 'screenLogin') {
+    $('#headerContext').textContent = 'Initial site intake';
+    $('#btnBack').style.display = 'none';
+  } else if (id === 'screenSetup') {
+    $('#headerContext').textContent = 'Signed in';
+    $('#btnBack').style.display = 'none';
+  } else {
+    const s = state.session;
+    $('#headerContext').textContent = s ? `${s.siteName} · ${s.hotelName}` : 'Inspection';
+    $('#btnBack').style.display = '';
+  }
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+// =============================================================================
+// LOGIN
+// =============================================================================
+async function doLogin() {
+  const pw = $('#inpPassword').value;
+  if (!pw) return toast('Enter password', 'error');
+  const btn = $('#btnLogin');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Signing in…';
+  try {
+    const res = await fetch(API_BASE + '/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    state.auth = { token: data.token, ts: data.ts };
+    saveAuth(state.auth);
+    $('#inpPassword').value = '';
+    await onSignedIn();
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign in';
+  }
+}
+
+async function onSignedIn() {
+  showScreen('screenSetup');
+  // Show resume option if we had a prior session
+  const prior = loadLS(LS.session);
+  if (prior && prior.activationId) {
+    $('#resumeCard').style.display = '';
+    const rooms = loadLS(LS.rooms) || [];
+    const done = rooms.filter(r => r.inspectionStatus === 'done').length;
+    $('#resumeMeta').innerHTML =
+      `<strong>${prior.hotelName}</strong> at ${prior.siteName}<br>` +
+      `${rooms.length} rooms (${done} inspected)`;
+  }
+  try {
+    const boot = await api('/api/session/bootstrap', { method: 'POST', body: '{}' });
+    state.activations = boot.activations || [];
+    populateActivationSelect();
+    // Pre-fetch choices
+    try {
+      const ch = await api('/api/rooms/choices');
+      state.choices = ch.choices || {};
+      populateAllChoiceSelects();
+    } catch (e) {
+      console.warn('Choices fetch failed:', e);
+      // Non-fatal - use empty selects, users type values
+    }
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+function populateActivationSelect() {
+  const sel = $('#selActivation');
+  sel.innerHTML = '<option value="">— Select —</option>' +
+    state.activations.map(a => `<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('');
+}
+
+$('#selActivation').addEventListener('change', e => {
+  const actId = e.target.value;
+  const act = state.activations.find(a => a.id === actId);
+  const siteSel = $('#selSite');
+  if (!act) {
+    siteSel.innerHTML = '<option>Choose activation first</option>';
+    siteSel.disabled = true;
+    return;
+  }
+  siteSel.disabled = false;
+  siteSel.innerHTML = '<option value="">— Select —</option>' +
+    act.sites.map(s => `<option value="${s.id}" data-name="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
+});
+
+function populateAllChoiceSelects() {
+  populateChoiceSelect('classRoomType', 'RoomType');
+  populateChoiceSelect('classBedConfig', 'BedConfiguration');
+  populateChoiceSelect('classBathroom', 'BathroomType');
+  populateChoiceSelect('imRoomType', 'RoomType');
+  populateChoiceSelect('imBedConfig', 'BedConfiguration');
+  populateChoiceSelect('imBathroom', 'BathroomType');
+  populateChoiceSelect('smRoomType', 'RoomType');
+  populateChoiceSelect('smBedConfig', 'BedConfiguration');
+  populateChoiceSelect('smBathroom', 'BathroomType');
+}
+function populateChoiceSelect(elId, choiceKey) {
+  const el = $('#' + elId);
+  if (!el) return;
+  const list = state.choices[choiceKey] || [];
+  const blank = '<option value="">—</option>';
+  el.innerHTML = blank + list.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+}
+
+// =============================================================================
+// SETUP -> BUILD
+// =============================================================================
+$('#btnStart').addEventListener('click', () => {
+  const actId = $('#selActivation').value;
+  const siteSelEl = $('#selSite');
+  const siteId = siteSelEl.value;
+  const siteName = siteSelEl.options[siteSelEl.selectedIndex]?.dataset.name || '';
+  const hotel = $('#inpHotel').value.trim();
+  if (!actId || !siteId || !hotel) return toast('All fields required', 'error');
+  const act = state.activations.find(a => a.id === actId);
+  state.session = {
+    activationId: act.id,
+    activationName: act.name,
+    siteId,
+    siteName,
+    hotelName: hotel,
+    startedAt: new Date().toISOString()
+  };
+  saveLS(LS.session, state.session);
+  // Fresh classes/rooms for new session
+  state.classes = [];
+  state.rooms = [];
+  saveLS(LS.classes, state.classes);
+  saveLS(LS.rooms, state.rooms);
+  renderClasses();
+  renderInspectList();
+  showScreen('screenBuild');
+});
+
+$('#btnResume').addEventListener('click', () => {
+  state.session = loadLS(LS.session);
+  state.classes = loadLS(LS.classes) || [];
+  state.rooms = loadLS(LS.rooms) || [];
+  renderClasses();
+  renderInspectList();
+  const anyCommitted = state.classes.some(c => c.committed) || state.rooms.length > 0;
+  showScreen(anyCommitted && state.rooms.length > 0 ? 'screenInspect' : 'screenBuild');
+});
+
+// =============================================================================
+// BUILD SCREEN
+// =============================================================================
+$('#btnAddClass').addEventListener('click', () => {
+  const roomType = $('#classRoomType').value;
+  const beds = $('#classBeds').value;
+  const bedConfig = $('#classBedConfig').value;
+  const bathroom = $('#classBathroom').value;
+  const maxOcc = $('#classMaxOcc').value;
+  const kitchenette = $('#classKitchenette').checked;
+  const numsRaw = $('#classRoomNumbers').value.trim();
+
+  if (!numsRaw) return toast('Enter at least one room number', 'error');
+  const nums = parseRoomNumbers(numsRaw);
+  if (!nums.length) return toast('No valid room numbers parsed', 'error');
+
+  const cls = {
+    id: uid(),
+    roomType, beds, bedConfig, bathroom, maxOcc, kitchenette,
+    roomNumbers: nums,
+    committed: false,
+    createdAt: new Date().toISOString()
+  };
+  state.classes.push(cls);
+  saveLS(LS.classes, state.classes);
+  clearClassForm();
+  renderClasses();
+  toast(`Added ${nums.length} rooms to a new class`, 'success');
+});
+
+$('#btnClearClass').addEventListener('click', clearClassForm);
+function clearClassForm() {
+  $('#classRoomType').value = '';
+  $('#classBeds').value = '2';
+  $('#classBedConfig').value = '';
+  $('#classBathroom').value = '';
+  $('#classMaxOcc').value = '4';
+  $('#classKitchenette').checked = false;
+  $('#classRoomNumbers').value = '';
+}
+
+function renderClasses() {
+  const container = $('#classesContainer');
+  if (!state.classes.length) {
+    container.innerHTML = `<div class="empty-state">No classes yet. Add your first batch above.</div>`;
+    updateCommitLabel();
+    return;
+  }
+  container.innerHTML = state.classes.map(c => {
+    const commCls = c.committed ? 'class-card-committed' : '';
+    const statusTxt = c.committed ? '✓ Committed' : 'Pending';
+    return `
+      <div class="card">
+        <div class="class-card ${commCls}">
+          <div class="class-meta">
+            <span><strong>${escapeHtml(c.roomType || 'Unspecified')}</strong></span>
+            <span>${c.roomNumbers.length} rooms</span>
+            <span>${escapeHtml(c.bedConfig || '')}</span>
+            <span>${escapeHtml(c.bathroom || '')}</span>
+            <span>Max: ${c.maxOcc}</span>
+            ${c.kitchenette ? '<span>🍳</span>' : ''}
+            <span style="color:${c.committed ? 'var(--teal)' : 'var(--amber)'}; font-weight:600">${statusTxt}</span>
+          </div>
+          <div class="room-list">
+            ${c.roomNumbers.map(n => `
+              <span class="room-chip">
+                ${escapeHtml(n)}
+                ${c.committed ? '' : `<span class="x" data-action="remove-num" data-class="${c.id}" data-num="${escapeHtml(n)}">×</span>`}
+              </span>
+            `).join('')}
+          </div>
+          ${c.committed ? '' : `
+            <div style="margin-top:10px; display:flex; gap:8px">
+              <button class="btn btn-ghost" data-action="delete-class" data-class="${c.id}" style="padding:6px 12px; font-size:13px">Delete class</button>
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+  }).join('');
+  updateCommitLabel();
+}
+
+function updateCommitLabel() {
+  const uncommittedCount = state.classes
+    .filter(c => !c.committed)
+    .reduce((s, c) => s + c.roomNumbers.length, 0);
+  const btn = $('#btnCommitAll');
+  $('#commitLabel').textContent = uncommittedCount
+    ? `Commit ${uncommittedCount} room${uncommittedCount === 1 ? '' : 's'} to SharePoint`
+    : 'Nothing to commit';
+  btn.disabled = uncommittedCount === 0;
+}
+
+document.body.addEventListener('click', e => {
+  const action = e.target.dataset.action;
+  if (action === 'remove-num') {
+    const clsId = e.target.dataset.class;
+    const num = e.target.dataset.num;
+    const c = state.classes.find(x => x.id === clsId);
+    if (!c) return;
+    c.roomNumbers = c.roomNumbers.filter(n => n !== num);
+    if (!c.roomNumbers.length) {
+      state.classes = state.classes.filter(x => x.id !== clsId);
+    }
+    saveLS(LS.classes, state.classes);
+    renderClasses();
+  } else if (action === 'delete-class') {
+    const clsId = e.target.dataset.class;
+    if (!confirm('Delete this class and all its rooms?')) return;
+    state.classes = state.classes.filter(x => x.id !== clsId);
+    saveLS(LS.classes, state.classes);
+    renderClasses();
+  }
+});
+
+// =============================================================================
+// SINGLE ROOM
+// =============================================================================
+$('#btnAddSingle').addEventListener('click', () => openSingleModal());
+function openSingleModal() {
+  $('#smRoomNumber').value = '';
+  $('#smFloor').value = '';
+  $('#smRoomType').value = '';
+  $('#smBeds').value = '2';
+  $('#smBedConfig').value = '';
+  $('#smBathroom').value = '';
+  $('#smMaxOcc').value = '4';
+  $('#smAccessible').checked = false;
+  $('#smKitchenette').checked = false;
+  $('#singleModal').classList.add('active');
+}
+$('#smClose').addEventListener('click', () => $('#singleModal').classList.remove('active'));
+$('#smCancel').addEventListener('click', () => $('#singleModal').classList.remove('active'));
+
+$('#smSave').addEventListener('click', () => {
+  const rn = $('#smRoomNumber').value.trim();
+  if (!rn) return toast('Room number required', 'error');
+  // Treat a single room as its own class of 1
+  const cls = {
+    id: uid(),
+    roomType: $('#smRoomType').value,
+    beds: $('#smBeds').value,
+    bedConfig: $('#smBedConfig').value,
+    bathroom: $('#smBathroom').value,
+    maxOcc: $('#smMaxOcc').value,
+    kitchenette: $('#smKitchenette').checked,
+    accessible: $('#smAccessible').checked,
+    floor: $('#smFloor').value.trim() || deriveFloor(rn),
+    roomNumbers: [rn],
+    committed: false,
+    isSingle: true,
+    createdAt: new Date().toISOString()
+  };
+  state.classes.push(cls);
+  saveLS(LS.classes, state.classes);
+  $('#singleModal').classList.remove('active');
+  renderClasses();
+  toast('Added single room', 'success');
+});
+
+// =============================================================================
+// COMMIT TO SHAREPOINT
+// =============================================================================
+let pendingCommit = null; // { classes, proceedWithSkips }
+
+$('#btnCommitAll').addEventListener('click', async () => {
+  const uncommitted = state.classes.filter(c => !c.committed);
+  if (!uncommitted.length) return;
+
+  const btn = $('#btnCommitAll');
+  btn.disabled = true;
+  $('#commitLabel').innerHTML = '<span class="spinner"></span> Checking for duplicates…';
+
+  try {
+    // Flatten all room numbers across uncommitted classes
+    const allNums = [];
+    for (const c of uncommitted) for (const n of c.roomNumbers) allNums.push(n);
+
+    const dup = await api('/api/rooms/check-dupes', {
+      method: 'POST',
+      body: JSON.stringify({
+        siteName: state.session.siteName,
+        building: state.session.hotelName,
+        roomNumbers: allNums
+      })
+    });
+
+    if (dup.existing && dup.existing.length) {
+      // Show dupes modal
+      pendingCommit = { uncommitted, existing: dup.existing };
+      $('#dupesList').textContent = dup.existing.join(', ');
+      $('#dupesModal').classList.add('active');
+      $('#commitLabel').textContent = 'Commit to SharePoint';
+      btn.disabled = false;
+      return;
+    }
+
+    // No dupes — proceed
+    await doCommit(uncommitted, []);
+  } catch (e) {
+    toast(e.message, 'error');
+    updateCommitLabel();
+    btn.disabled = false;
+  }
+});
+
+$('#dmCancel').addEventListener('click', () => {
+  $('#dupesModal').classList.remove('active');
+  pendingCommit = null;
+  updateCommitLabel();
+});
+$('#dmClose').addEventListener('click', () => {
+  $('#dupesModal').classList.remove('active');
+  pendingCommit = null;
+  updateCommitLabel();
+});
+$('#dmContinue').addEventListener('click', async () => {
+  if (!pendingCommit) return;
+  $('#dupesModal').classList.remove('active');
+  await doCommit(pendingCommit.uncommitted, pendingCommit.existing);
+  pendingCommit = null;
+});
+
+async function doCommit(uncommitted, skipRoomNumbers) {
+  const btn = $('#btnCommitAll');
+  btn.disabled = true;
+  const skipSet = new Set(skipRoomNumbers.map(String));
+  let totalCreated = 0;
+  let totalErrors = 0;
+
+  for (const c of uncommitted) {
+    const numsToCommit = c.roomNumbers.filter(n => !skipSet.has(String(n)));
+    if (!numsToCommit.length) continue;
+
+    $('#commitLabel').innerHTML = `<span class="spinner"></span> Committing ${escapeHtml(c.roomType || 'rooms')}…`;
+    try {
+      const res = await api('/api/rooms/commit-class', {
+        method: 'POST',
+        body: JSON.stringify({
+          siteName: state.session.siteName,
+          building: state.session.hotelName,
+          roomNumbers: numsToCommit,
+          classDefaults: {
+            roomType: c.roomType,
+            numberOfBeds: c.beds ? Number(c.beds) : null,
+            bedConfiguration: c.bedConfig,
+            bathroomType: c.bathroom,
+            isAccessible: !!c.accessible,
+            hasKitchenette: !!c.kitchenette,
+            maxOccupancy: c.maxOcc ? Number(c.maxOcc) : null
+          }
+        })
+      });
+
+      // Add each created room to state.rooms
+      const spIdMap = {};
+      for (const cr of res.created || []) {
+        spIdMap[cr.roomNumber] = cr.spId;
+        state.rooms.push({
+          id: uid(),
+          classId: c.id,
+          spId: cr.spId,
+          roomNumber: cr.roomNumber,
+          building: state.session.hotelName,
+          floor: c.floor || deriveFloor(cr.roomNumber),
+          roomType: c.roomType,
+          beds: c.beds,
+          bedConfig: c.bedConfig,
+          bathroom: c.bathroom,
+          maxOcc: c.maxOcc,
+          kitchenette: !!c.kitchenette,
+          accessible: !!c.accessible,
+          notes: '',
+          photoUrls: [],
+          videoUrl: '',
+          folderWebUrl: '',
+          inspectionStatus: 'not-started',
+          committedAt: new Date().toISOString()
+        });
+        totalCreated++;
+      }
+
+      c.committed = true;
+      c.spIds = spIdMap;
+
+      if (res.errors && res.errors.length) {
+        totalErrors += res.errors.length;
+        for (const er of res.errors) console.error('Commit error', er);
+      }
+    } catch (e) {
+      totalErrors += numsToCommit.length;
+      toast(`Commit failed: ${e.message}`, 'error');
+      console.error(e);
+    }
+  }
+
+  saveLS(LS.classes, state.classes);
+  saveLS(LS.rooms, state.rooms);
+  renderClasses();
+  renderInspectList();
+
+  btn.disabled = false;
+  updateCommitLabel();
+
+  if (totalErrors) toast(`Committed ${totalCreated}, ${totalErrors} errors — check console`, 'error');
+  else toast(`Committed ${totalCreated} rooms. Switch to Inspect.`, 'success');
+
+  if (totalCreated > 0) showScreen('screenInspect');
+}
+
+// =============================================================================
+// INSPECT SCREEN
+// =============================================================================
+function renderInspectList() {
+  const rooms = state.rooms;
+  $('#stTotal').textContent = rooms.length;
+  $('#stDone').textContent = rooms.filter(r => r.inspectionStatus === 'done').length;
+  $('#stPartial').textContent = rooms.filter(r => r.inspectionStatus === 'partial').length;
+  $('#stTodo').textContent = rooms.filter(r => r.inspectionStatus === 'not-started').length;
+
+  const list = $('#inspectList');
+  let filtered = rooms;
+  if (state.filterQuery) {
+    const q = state.filterQuery.toLowerCase();
+    filtered = filtered.filter(r => String(r.roomNumber).toLowerCase().includes(q));
+  }
+  if (state.filterOnlyIncomplete) {
+    filtered = filtered.filter(r => r.inspectionStatus !== 'done');
+  }
+  // Sort by room number
+  filtered = [...filtered].sort((a, b) => {
+    const an = parseInt(a.roomNumber, 10);
+    const bn = parseInt(b.roomNumber, 10);
+    if (!isNaN(an) && !isNaN(bn)) return an - bn;
+    return String(a.roomNumber).localeCompare(String(b.roomNumber));
+  });
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty-state">No rooms match. Commit some classes first.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(r => {
+    const dotCls = r.inspectionStatus === 'done' ? 'done'
+                : r.inspectionStatus === 'partial' ? 'partial' : '';
+    const meta = [r.roomType, r.bedConfig].filter(Boolean).join(' · ');
+    return `
+      <div class="inspect-room" data-roomid="${r.id}">
+        <div>
+          <div class="inspect-room-num">${escapeHtml(state.session.hotelName)} — ${escapeHtml(r.roomNumber)}</div>
+          <div class="inspect-room-meta">${escapeHtml(meta || 'No class info')}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px">
+          ${r.photoUrls.length ? `<span style="font-size:12px; color:var(--muted)">📷${r.photoUrls.length}</span>` : ''}
+          ${r.videoUrl ? `<span style="font-size:12px; color:var(--muted)">🎥</span>` : ''}
+          <div class="status-dot ${dotCls}"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+$('#inspectList').addEventListener('click', e => {
+  const roomEl = e.target.closest('.inspect-room');
+  if (!roomEl) return;
+  openInspectModal(roomEl.dataset.roomid);
+});
+
+$('#inpFilter').addEventListener('input', e => {
+  state.filterQuery = e.target.value;
+  renderInspectList();
+});
+$('#btnFilterToggle').addEventListener('click', () => {
+  state.filterOnlyIncomplete = !state.filterOnlyIncomplete;
+  $('#btnFilterToggle').textContent = state.filterOnlyIncomplete ? '🔘' : '⚪';
+  renderInspectList();
+});
+
+// =============================================================================
+// TABS
+// =============================================================================
+document.body.addEventListener('click', e => {
+  if (e.target.classList.contains('tab')) {
+    const which = e.target.dataset.tab;
+    if (which === 'build') showScreen('screenBuild');
+    else if (which === 'inspect') showScreen('screenInspect');
+    $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === which));
+  }
+});
+
+// =============================================================================
+// INSPECTION MODAL
+// =============================================================================
+function openInspectModal(roomId) {
+  const r = state.rooms.find(x => x.id === roomId);
+  if (!r) return;
+  state.currentInspectingRoomId = roomId;
+  // Populate form
+  $('#imTitle').textContent = `${state.session.hotelName} — ${r.roomNumber}`;
+  $('#imRoomNumber').value = r.roomNumber;
+  $('#imFloor').value = r.floor || deriveFloor(r.roomNumber);
+  $('#imRoomType').value = r.roomType || '';
+  $('#imBeds').value = r.beds || '';
+  $('#imBedConfig').value = r.bedConfig || '';
+  $('#imBathroom').value = r.bathroom || '';
+  $('#imMaxOcc').value = r.maxOcc || '';
+  $('#imAccessible').checked = !!r.accessible;
+  $('#imKitchenette').checked = !!r.kitchenette;
+  $('#imNotes').value = r.notes || '';
+
+  // Media: load already-uploaded items (cannot re-upload, they're on SP)
+  state.imPhotos = (r.photoUrls || []).map(url => ({
+    id: uid(), file: null, previewUrl: url, uploadedUrl: url, progress: 1
+  }));
+  state.imVideo = r.videoUrl
+    ? { file: null, previewUrl: r.videoUrl, uploadedUrl: r.videoUrl, progress: 1 }
+    : null;
+  renderMediaPhotos();
+  renderMediaVideo();
+
+  $('#inspectModal').classList.add('active');
+}
+
+function closeInspectModal() {
+  $('#inspectModal').classList.remove('active');
+  state.currentInspectingRoomId = null;
+  state.imPhotos = [];
+  state.imVideo = null;
+}
+$('#imClose').addEventListener('click', closeInspectModal);
+$('#imCancel').addEventListener('click', closeInspectModal);
+
+// Photo capture
+$('#imPhotoCapture').addEventListener('change', e => handlePhotoFiles(e.target.files));
+$('#imPhotoGallery').addEventListener('change', e => handlePhotoFiles(e.target.files));
+$('#imVideoCapture').addEventListener('change', e => handleVideoFile(e.target.files[0]));
+
+function handlePhotoFiles(files) {
+  if (!files || !files.length) return;
+  for (const f of files) {
+    state.imPhotos.push({
+      id: uid(),
+      file: f,
+      previewUrl: URL.createObjectURL(f),
+      uploadedUrl: null,
+      progress: 0
+    });
+  }
+  renderMediaPhotos();
+  // Reset inputs so same file can be re-picked
+  $('#imPhotoCapture').value = '';
+  $('#imPhotoGallery').value = '';
+}
+function handleVideoFile(f) {
+  if (!f) return;
+  state.imVideo = {
+    file: f,
+    previewUrl: URL.createObjectURL(f),
+    uploadedUrl: null,
+    progress: 0
+  };
+  renderMediaVideo();
+  $('#imVideoCapture').value = '';
+}
+
+function renderMediaPhotos() {
+  const grid = $('#photoGrid');
+  if (!state.imPhotos.length) {
+    grid.innerHTML = '';
+    return;
+  }
+  grid.innerHTML = state.imPhotos.map(p => `
+    <div class="media-tile" data-photo="${p.id}">
+      <img src="${p.previewUrl}" alt="">
+      <button class="media-tile-remove" data-action="rm-photo" data-photo="${p.id}">×</button>
+      ${p.uploadedUrl ? '' : `
+        <div class="media-tile-status">
+          <div class="progress-bar" style="width:${Math.round(p.progress * 100)}%"></div>
+          Pending
+        </div>
+      `}
+    </div>
+  `).join('');
+}
+function renderMediaVideo() {
+  const div = $('#videoPreview');
+  if (!state.imVideo) {
+    div.innerHTML = '';
+    $('#videoCaptureLabel').textContent = 'Record video';
+    return;
+  }
+  $('#videoCaptureLabel').textContent = 'Replace video';
+  div.innerHTML = `
+    <div class="media-tile" style="aspect-ratio:16/9; max-width:300px">
+      <video src="${state.imVideo.previewUrl}" controls playsinline></video>
+      <button class="media-tile-remove" data-action="rm-video">×</button>
+      ${state.imVideo.uploadedUrl ? '' : `
+        <div class="media-tile-status">
+          <div class="progress-bar" style="width:${Math.round(state.imVideo.progress * 100)}%"></div>
+          Pending
+        </div>
+      `}
+    </div>
+  `;
+}
+
+document.body.addEventListener('click', e => {
+  if (e.target.dataset.action === 'rm-photo') {
+    const pid = e.target.dataset.photo;
+    state.imPhotos = state.imPhotos.filter(p => p.id !== pid);
+    renderMediaPhotos();
+  } else if (e.target.dataset.action === 'rm-video') {
+    state.imVideo = null;
+    renderMediaVideo();
+  }
+});
+
+// =============================================================================
+// CHUNKED UPLOAD TO GRAPH
+// =============================================================================
+async function uploadToGraph(uploadUrl, file, onProgress) {
+  const CHUNK = 10 * 1024 * 1024; // 10 MiB (multiple of 320 KiB)
+  const total = file.size;
+  let start = 0;
+  let finalItem = null;
+
+  while (start < total) {
+    const end = Math.min(start + CHUNK, total);
+    const chunk = file.slice(start, end);
+    const resp = await fetch(uploadUrl, {
+      method: 'PUT',
+      headers: { 'Content-Range': `bytes ${start}-${end - 1}/${total}` },
+      body: chunk
+    });
+    if (resp.status === 202) {
+      // more chunks needed
+    } else if (resp.status === 200 || resp.status === 201) {
+      finalItem = await resp.json();
+    } else {
+      const t = await resp.text();
+      throw new Error(`Upload failed (${resp.status}): ${t}`);
+    }
+    start = end;
+    if (onProgress) onProgress(start / total);
+  }
+  if (!finalItem) throw new Error('Upload did not finalize');
+  return finalItem;
+}
+
+async function uploadOneFile(file, kind, index) {
+  // kind = 'photo' | 'video'; index = 1-based for naming
+  const ts = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
+  const safeExt = (file.name.split('.').pop() || (kind === 'video' ? 'mp4' : 'jpg')).toLowerCase().replace(/[^a-z0-9]/g, '');
+  const filename = kind === 'video'
+    ? `video-${ts}.${safeExt}`
+    : `photo-${ts}-${String(index).padStart(3, '0')}.${safeExt}`;
+
+  const room = state.rooms.find(x => x.id === state.currentInspectingRoomId);
+  if (!room) throw new Error('Room not found');
+
+  const sess = await api('/api/media/upload-session', {
+    method: 'POST',
+    body: JSON.stringify({
+      activationId: state.session.activationId,
+      siteName: state.session.siteName,
+      hotelName: state.session.hotelName,
+      roomNumber: room.roomNumber,
+      filename
+    })
+  });
+
+  const item = await uploadToGraph(sess.uploadUrl, file, p => {
+    if (kind === 'photo') {
+      const target = state.imPhotos.find(x => x.file === file);
+      if (target) {
+        target.progress = p;
+        renderMediaPhotos();
+      }
+    } else {
+      if (state.imVideo && state.imVideo.file === file) {
+        state.imVideo.progress = p;
+        renderMediaVideo();
+      }
+    }
+  });
+
+  return { webUrl: item.webUrl, folderWebUrl: sess.folderWebUrl };
+}
+
+// =============================================================================
+// SAVE INSPECTION
+// =============================================================================
+$('#imSave').addEventListener('click', async () => {
+  const room = state.rooms.find(x => x.id === state.currentInspectingRoomId);
+  if (!room) return;
+
+  const btn = $('#imSave');
+  btn.disabled = true;
+  $('#imSaveLabel').innerHTML = '<span class="spinner"></span> Saving…';
+
+  try {
+    // Upload pending photos
+    let folderWebUrl = '';
+    const uploadedPhotoUrls = [];
+    let photoIdx = state.imPhotos.filter(p => p.uploadedUrl).length; // start numbering after existing
+    for (const p of state.imPhotos) {
+      if (p.uploadedUrl) {
+        uploadedPhotoUrls.push(p.uploadedUrl);
+        continue;
+      }
+      photoIdx++;
+      $('#imSaveLabel').innerHTML = `<span class="spinner"></span> Uploading photo ${photoIdx}…`;
+      const r = await uploadOneFile(p.file, 'photo', photoIdx);
+      p.uploadedUrl = r.webUrl;
+      folderWebUrl = folderWebUrl || r.folderWebUrl;
+      uploadedPhotoUrls.push(r.webUrl);
+    }
+
+    // Upload pending video
+    let videoUrl = '';
+    if (state.imVideo) {
+      if (state.imVideo.uploadedUrl) {
+        videoUrl = state.imVideo.uploadedUrl;
+      } else {
+        $('#imSaveLabel').innerHTML = '<span class="spinner"></span> Uploading video…';
+        const r = await uploadOneFile(state.imVideo.file, 'video', 0);
+        state.imVideo.uploadedUrl = r.webUrl;
+        folderWebUrl = folderWebUrl || r.folderWebUrl;
+        videoUrl = r.webUrl;
+      }
+    }
+
+    // Build patch from form
+    const patch = {
+      RoomNumber: $('#imRoomNumber').value.trim(),
+      Floor: $('#imFloor').value.trim(),
+      RoomType: $('#imRoomType').value || null,
+      NumberOfBeds: $('#imBeds').value ? Number($('#imBeds').value) : null,
+      BedConfiguration: $('#imBedConfig').value || null,
+      BathroomType: $('#imBathroom').value || null,
+      MaxOccupancy: $('#imMaxOcc').value ? Number($('#imMaxOcc').value) : null,
+      IsAccessible: $('#imAccessible').checked,
+      HasKitchenette: $('#imKitchenette').checked,
+      Notes: $('#imNotes').value
+    };
+
+    // If RoomNumber changed, update Title via the generic update endpoint first
+    if (patch.RoomNumber && patch.RoomNumber !== room.roomNumber) {
+      await api('/api/rooms/update', {
+        method: 'POST',
+        body: JSON.stringify({ spId: room.spId, patch: { RoomNumber: patch.RoomNumber } })
+      });
+      room.roomNumber = patch.RoomNumber;
+    }
+
+    // Finalize (sets RoomPhotoURL + patches everything else)
+    $('#imSaveLabel').innerHTML = '<span class="spinner"></span> Saving to SharePoint…';
+    await api('/api/rooms/finalize', {
+      method: 'POST',
+      body: JSON.stringify({
+        spId: room.spId,
+        videoUrl,
+        photoUrls: uploadedPhotoUrls,
+        folderWebUrl: folderWebUrl || room.folderWebUrl,
+        patch
+      })
+    });
+
+    // Update local state
+    room.floor = patch.Floor;
+    room.roomType = patch.RoomType;
+    room.beds = patch.NumberOfBeds;
+    room.bedConfig = patch.BedConfiguration;
+    room.bathroom = patch.BathroomType;
+    room.maxOcc = patch.MaxOccupancy;
+    room.accessible = patch.IsAccessible;
+    room.kitchenette = patch.HasKitchenette;
+    room.notes = patch.Notes;
+    room.photoUrls = uploadedPhotoUrls;
+    room.videoUrl = videoUrl;
+    room.folderWebUrl = folderWebUrl || room.folderWebUrl;
+    room.inspectionStatus = (uploadedPhotoUrls.length || videoUrl) ? 'done' : 'partial';
+    room.finalizedAt = new Date().toISOString();
+
+    saveLS(LS.rooms, state.rooms);
+    renderInspectList();
+    closeInspectModal();
+    toast('Room saved', 'success');
+  } catch (e) {
+    console.error(e);
+    toast('Save failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    $('#imSaveLabel').textContent = 'Save & close';
+  }
+});
+
+$('#imDelete').addEventListener('click', async () => {
+  const room = state.rooms.find(x => x.id === state.currentInspectingRoomId);
+  if (!room) return;
+  if (!confirm(`Remove room ${room.roomNumber} from SharePoint? (It will be marked inactive, not hard-deleted.)`)) return;
+  try {
+    await api('/api/rooms/update', {
+      method: 'POST',
+      body: JSON.stringify({ spId: room.spId, patch: { Active: false } })
+    });
+    state.rooms = state.rooms.filter(r => r.id !== room.id);
+    saveLS(LS.rooms, state.rooms);
+    renderInspectList();
+    closeInspectModal();
+    toast('Room removed', 'success');
+  } catch (e) {
+    toast('Remove failed: ' + e.message, 'error');
+  }
+});
+
+// =============================================================================
+// HEADER BUTTONS
+// =============================================================================
+$('#btnBack').addEventListener('click', () => {
+  const active = document.querySelector('.screen.active')?.id;
+  if (active === 'screenBuild' || active === 'screenInspect') {
+    if (confirm('Go back to setup? Your in-progress work stays saved locally.')) {
+      showScreen('screenSetup');
+    }
+  }
+});
+
+$('#btnMenu').addEventListener('click', () => {
+  const opts = [
+    'Sign out',
+    'Clear all local data (danger)',
+    'Cancel'
+  ];
+  const n = prompt(opts.map((o, i) => `${i + 1}. ${o}`).join('\n') + '\n\nEnter number:');
+  const idx = parseInt(n, 10);
+  if (idx === 1) {
+    state.auth = null;
+    sessionStorage.removeItem(LS.auth);
+    showScreen('screenLogin');
+  } else if (idx === 2) {
+    if (confirm('This wipes local classes/rooms/session. Committed rooms stay in SharePoint. Continue?')) {
+      localStorage.removeItem(LS.session);
+      localStorage.removeItem(LS.classes);
+      localStorage.removeItem(LS.rooms);
+      state.session = null; state.classes = []; state.rooms = [];
+      showScreen('screenSetup');
+      $('#resumeCard').style.display = 'none';
+    }
+  }
+});
+
+$('#btnLogin').addEventListener('click', doLogin);
+$('#inpPassword').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// =============================================================================
+// UTIL
+// =============================================================================
+function escapeHtml(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// =============================================================================
+// BOOT
+// =============================================================================
+(function boot() {
+  const auth = loadAuth();
+  if (auth && auth.token && auth.ts) {
+    const age = Date.now() - parseInt(auth.ts, 10);
+    if (age < 12 * 60 * 60 * 1000) {
+      state.auth = auth;
+      onSignedIn();
+      return;
+    }
+  }
+  showScreen('screenLogin');
+})();
+</script>
+</body>
+</html>
