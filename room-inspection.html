@@ -9,6 +9,7 @@
 <meta name="theme-color" content="#1a4e7e">
 <title>Room Inspector — LOOMI</title>
 <style>
+  
   :root {
     --navy: #1a4e7e;
     --navy-dark: #123656;
@@ -174,6 +175,9 @@
     box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
     z-index: 5;
   }
+
+  .inspect-room.inspect-room-done { background: #f4f8f6; }
+.inspect-room.inspect-room-done .inspect-room-num { color: var(--muted); }
 
   /* Room list & classes */
   .room-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
@@ -479,6 +483,14 @@
       <div id="resumeMeta" style="font-size:14px; margin-bottom:10px; color:var(--muted)"></div>
       <button class="btn btn-ghost btn-block" id="btnResume">Resume</button>
     </div>
+
+    <div class="card">
+      <h2 class="card-title">Already started on another iPad?</h2>
+      <p class="hint" style="margin-bottom:14px">
+        Pick the activation, site, and hotel above, then tap Load. This pulls all existing rooms from SharePoint so you can continue the inspection.
+      </p>
+      <button class="btn btn-ghost btn-block" id="btnLoadHotel">Load existing rooms</button>
+    </div>
   </section>
 
   <!-- ======================= SCREEN: BUILD ======================= -->
@@ -571,6 +583,7 @@
       <div style="display:flex; gap:8px; margin-bottom:12px">
         <input type="text" id="inpFilter" placeholder="Filter room number…">
         <button class="btn btn-ghost" id="btnFilterToggle" style="padding-left:12px; padding-right:12px" title="Show only incomplete">⚪</button>
+        <button class="btn btn-ghost" id="btnRefreshHotel" style="padding-left:12px; padding-right:12px" title="Refresh from SharePoint">↻</button>
       </div>
       <div id="inspectList"></div>
     </div>
@@ -1070,6 +1083,103 @@ $('#btnResume').addEventListener('click', () => {
   showScreen(anyCommitted && state.rooms.length > 0 ? 'screenInspect' : 'screenBuild');
 });
 
+$('#btnLoadHotel').addEventListener('click', async () => {
+  const actId = $('#selActivation').value;
+  const siteSelEl = $('#selSite');
+  const siteId = siteSelEl.value;
+  const siteName = siteSelEl.options[siteSelEl.selectedIndex]?.dataset.name || '';
+  const hotel = $('#inpHotel').value.trim();
+  if (!actId || !siteId || !hotel) return toast('Fill all fields first', 'error');
+  const act = state.activations.find(a => a.id === actId);
+
+  const btn = $('#btnLoadHotel');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Loading…';
+
+  try {
+    state.session = {
+      activationId: act.id,
+      activationName: act.name,
+      siteId,
+      siteName,
+      hotelName: hotel,
+      startedAt: new Date().toISOString()
+    };
+    saveLS(LS.session, state.session);
+    state.classes = []; // loaded rooms don't belong to classes
+    saveLS(LS.classes, state.classes);
+    await loadHotelFromSP();
+    renderClasses();
+    renderInspectList();
+    showScreen('screenInspect');
+    toast(`Loaded ${state.rooms.length} rooms`, 'success');
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Load existing rooms';
+  }
+});
+
+$('#btnRefreshHotel').addEventListener('click', async () => {
+  const btn = $('#btnRefreshHotel');
+  btn.disabled = true;
+  btn.textContent = '⏳';
+  try {
+    await loadHotelFromSP();
+    renderInspectList();
+    toast(`Refreshed — ${state.rooms.length} rooms`, 'success');
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '↻';
+  }
+});
+
+// Fetch all rooms for the current hotel from SP and merge into local state
+async function loadHotelFromSP() {
+  const res = await api('/api/rooms/load-hotel', {
+    method: 'POST',
+    body: JSON.stringify({
+      siteName: state.session.siteName,
+      building: state.session.hotelName
+    })
+  });
+
+  // Build new room list. Preserve local id + pending media state if the room was
+  // already in state.rooms (so an in-progress inspection on THIS iPad isn't wiped).
+  const existingById = new Map(state.rooms.map(r => [String(r.spId), r]));
+  const merged = [];
+  for (const spRoom of (res.rooms || [])) {
+    const existing = existingById.get(String(spRoom.spId));
+    merged.push({
+      id: existing?.id || uid(),
+      classId: existing?.classId || null,
+      spId: spRoom.spId,
+      roomNumber: spRoom.roomNumber,
+      building: spRoom.building,
+      floor: spRoom.floor,
+      roomType: spRoom.roomType,
+      beds: spRoom.beds,
+      bedConfig: spRoom.bedConfig,
+      bathroom: spRoom.bathroom,
+      maxOcc: spRoom.maxOcc,
+      kitchenette: spRoom.kitchenette,
+      accessible: spRoom.accessible,
+      notes: spRoom.notes,
+      photoUrls: existing?.photoUrls || [],
+      videoUrl: existing?.videoUrl || '',
+      folderWebUrl: existing?.folderWebUrl || '',
+      inspectionStatus: spRoom.inspectionStatus || 'not-started',
+      committedAt: existing?.committedAt || new Date().toISOString(),
+      finalizedAt: existing?.finalizedAt || null
+    });
+  }
+  state.rooms = merged;
+  saveLS(LS.rooms, state.rooms);
+}  
+
 // =============================================================================
 // BUILD SCREEN
 // =============================================================================
@@ -1390,7 +1500,7 @@ async function doCommit(uncommitted, skipRoomNumbers) {
 function renderInspectList() {
   const rooms = state.rooms;
   $('#stTotal').textContent = rooms.length;
-  $('#stDone').textContent = rooms.filter(r => r.inspectionStatus === 'done').length;
+  $('#stDone').textContent = rooms.filter(r => r.inspectionStatus === 'done' || r.inspectionStatus === 'complete').length;
   $('#stPartial').textContent = rooms.filter(r => r.inspectionStatus === 'partial').length;
   $('#stTodo').textContent = rooms.filter(r => r.inspectionStatus === 'not-started').length;
 
@@ -1416,16 +1526,23 @@ function renderInspectList() {
     return;
   }
   list.innerHTML = filtered.map(r => {
-    const dotCls = r.inspectionStatus === 'done' ? 'done'
-                : r.inspectionStatus === 'partial' ? 'partial' : '';
+    const isComplete = r.inspectionStatus === 'complete' || r.inspectionStatus === 'done';
+    const isPartial = r.inspectionStatus === 'partial';
+    const dotCls = isComplete ? 'done' : isPartial ? 'partial' : '';
     const meta = [r.roomType, r.bedConfig].filter(Boolean).join(' · ');
+    const statusBadge = isComplete
+      ? `<span style="background:var(--teal); color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; letter-spacing:0.05em">INSPECTED</span>`
+      : isPartial
+      ? `<span style="background:var(--amber); color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; letter-spacing:0.05em">PARTIAL</span>`
+      : '';
     return `
-      <div class="inspect-room" data-roomid="${r.id}">
-        <div>
+      <div class="inspect-room ${isComplete ? 'inspect-room-done' : ''}" data-roomid="${r.id}">
+        <div style="flex:1; min-width:0">
           <div class="inspect-room-num">${escapeHtml(state.session.hotelName)} — ${escapeHtml(r.roomNumber)}</div>
           <div class="inspect-room-meta">${escapeHtml(meta || 'No class info')}</div>
         </div>
-        <div style="display:flex; align-items:center; gap:8px">
+        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0">
+          ${statusBadge}
           ${r.photoUrls.length ? `<span style="font-size:12px; color:var(--muted)">📷${r.photoUrls.length}</span>` : ''}
           ${r.videoUrl ? `<span style="font-size:12px; color:var(--muted)">🎥</span>` : ''}
           <div class="status-dot ${dotCls}"></div>
@@ -1728,6 +1845,7 @@ $('#imSave').addEventListener('click', async () => {
     }
 
     // Build patch from form
+    const willBeComplete = uploadedPhotoUrls.length > 0 || !!videoUrl;
     const patch = {
       RoomNumber: $('#imRoomNumber').value.trim(),
       Floor: $('#imFloor').value.trim(),
@@ -1738,7 +1856,8 @@ $('#imSave').addEventListener('click', async () => {
       MaxOccupancy: $('#imMaxOcc').value ? Number($('#imMaxOcc').value) : null,
       IsAccessible: $('#imAccessible').checked,
       HasKitchenette: $('#imKitchenette').checked,
-      Notes: $('#imNotes').value
+      Notes: $('#imNotes').value,
+      InspectionStatus: willBeComplete ? "Complete" : "Partial"
     };
 
     // If RoomNumber changed, update Title via the generic update endpoint first
