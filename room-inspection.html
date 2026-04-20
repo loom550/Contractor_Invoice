@@ -1490,14 +1490,18 @@ async function doCommit(uncommitted, skipRoomNumbers) {
       if (res.errors && res.errors.length) {
         totalErrors += res.errors.length;
         for (const er of res.errors) console.error('Commit error', er);
+        toast(`${res.errors.length} room${res.errors.length === 1 ? '' : 's'} in "${c.roomType || 'class'}" failed to commit — check console`, 'error');
+      }
+      // Warn if NO rooms were created at all in this class (silent total failure)
+      if ((!res.created || !res.created.length) && numsToCommit.length > 0) {
+        toast(`All ${numsToCommit.length} rooms in "${c.roomType || 'class'}" failed — check console`, 'error');
       }
     } catch (e) {
       totalErrors += numsToCommit.length;
-      toast(`Commit failed: ${e.message}`, 'error');
+      toast(`Commit failed for "${c.roomType || 'class'}": ${e.message}`, 'error');
       console.error(e);
     }
   }
-
   saveLS(LS.classes, state.classes);
   saveLS(LS.rooms, state.rooms);
   renderClasses();
