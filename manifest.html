@@ -988,7 +988,7 @@ function renderFlights() {
   }
 
   // Sort: active first, then departed; within active by ETD
-  var statusOrder = { 'Loading': 0, 'Ready': 1, 'Received': 2, 'Departed': 3 };
+  var statusOrder = { 'Loading': 0, 'Ready': 1, 'Received': 2, 'Departed': 3, 'Departed-Revised': 3 };
   var sorted = flights.slice().sort(function(a, b) {
     var sa = statusOrder[a.status] !== undefined ? statusOrder[a.status] : 2;
     var sb = statusOrder[b.status] !== undefined ? statusOrder[b.status] : 2;
@@ -1003,8 +1003,11 @@ function renderFlights() {
     });
     var totalLug = paxForFlight.reduce(function(s, p) { return s + (Number(p.luggageWeight) || 0); }, 0);
     var totalCarry = paxForFlight.reduce(function(s, p) { return s + (Number(p.carryOnWeight) || 0); }, 0);
-    var statusClass = f.status === 'Departed' ? 'pill-departed' : f.status === 'Ready' ? 'pill-ready' : 'pill-loading';
-    var cardClass = 'flight-card' + (f.status === 'Departed' ? ' departed' : '') + (f.id === selectedFlightId ? ' active' : '');
+    // Terminal statuses must match renderPaxPanel's `locked` set, or the card
+    // looks editable while the detail panel says locked.
+    var isTerminal = f.status === 'Departed' || f.status === 'Departed-Revised' || f.status === 'Received';
+    var statusClass = isTerminal ? 'pill-departed' : f.status === 'Ready' ? 'pill-ready' : 'pill-loading';
+    var cardClass = 'flight-card' + (isTerminal ? ' departed' : '') + (f.id === selectedFlightId ? ' active' : '');
 
     return '<div class="' + cardClass + '" data-id="' + f.id + '">' +
       '<div class="fc-top">' +
@@ -1026,7 +1029,7 @@ function renderFlights() {
         '<div class="fc-stat"><span class="fc-stat-val">' + totalCarry + '</span>Carry lbs</div>' +
         '<div class="fc-stat"><span class="fc-stat-val">' + (totalLug + totalCarry) + '</span>Total lbs</div>' +
       '</div>' +
-      (f.status !== 'Departed'
+      (!isTerminal
         ? '<div class="fc-actions"><button class="fc-action-btn upload-btn" data-id="' + f.id + '" data-num="' + esc(f.flightNumber) + '">&#9650; Upload Manifest</button></div>'
         : '') +
     '</div>';
@@ -1070,14 +1073,22 @@ function renderPaxPanel(flightId) {
     return p.flightId === flightId;
   });
 
-  // Pool: At Hub only, not already on this flight
+  // Pool: At Hub only, excluding anyone already rendered in the assigned list.
+  // The old outboundFlightId-only test let inbound pax appear in both sections.
+  var assignedIds = {};
+  flightPax.forEach(function(p) { assignedIds[p.id] = true; });
   var pool = allPax.filter(function(p) {
-    return p.paxStatus === 'At Hub' && (!p.outboundFlightId || p.outboundFlightId !== flightId);
+    return p.paxStatus === 'At Hub' && !assignedIds[p.id];
   });
 
-  // Duplicate detection
+ // Duplicate detection — count each pax record once. Pool and flightPax
+  // overlap on inbound flights (everyone is At Hub with no outbound assigned),
+  // so a naive concat double-counted every name and flagged all of them.
   var nameCounts = {};
+  var counted = {};
   pool.concat(flightPax).forEach(function(p) {
+    if (counted[p.id]) return;
+    counted[p.id] = true;
     var key = (p.firstName + ' ' + p.lastName).toLowerCase().trim();
     nameCounts[key] = (nameCounts[key] || 0) + 1;
   });
@@ -1539,7 +1550,9 @@ function openEditModal(paxId) {
   // Populate flight dropdown
   var flightSel = document.getElementById('edit-flight');
   flightSel.innerHTML = '<option value="">Unassigned</option>';
-  flights.filter(function(f) { return f.status !== 'Departed'; }).forEach(function(f) {
+  flights.filter(function(f) {
+    return f.status !== 'Departed' && f.status !== 'Departed-Revised' && f.status !== 'Received';
+  }).forEach(function(f) {
     var opt = document.createElement('option');
     opt.value = f.id;
     opt.textContent = f.flightNumber + (f.destination ? ' \u2192 ' + f.destination : '');
