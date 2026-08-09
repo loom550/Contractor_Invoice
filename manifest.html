@@ -100,11 +100,16 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 .fc-num{
   font-size:18px;font-weight:800;color:var(--navy);
   font-family:-apple-system,BlinkMacSystemFont,monospace;
-  line-height:1;flex-shrink:0;
+  line-height:1.15;
+  /* Was flex-shrink:0. Users enter long descriptive flight "numbers"
+     (e.g. "1 - Hamilton to Timmins - Aug 8") which then pushed the
+     status pill and meta line off the card entirely. */
+  flex-shrink:1;min-width:0;max-width:48%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .fc-info{flex:1;min-width:0;}
 .fc-dest{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.fc-meta{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.fc-meta{font-size:11px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .fc-status{flex-shrink:0;}
 .status-pill{
   display:inline-block;padding:2px 9px;border-radius:20px;
@@ -162,7 +167,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
   background:var(--navy);color:#fff;
   padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.1);
 }
-.flt-detail-num{font-size:20px;font-weight:800;font-family:monospace;margin-bottom:4px;}
+.flt-detail-num{font-size:20px;font-weight:800;font-family:monospace;margin-bottom:4px;min-width:0;overflow-wrap:anywhere;line-height:1.2;}
 .flt-detail-meta{font-size:12px;color:rgba(255,255,255,.65);display:flex;flex-wrap:wrap;gap:8px;}
 .flt-detail-meta span{display:flex;align-items:center;gap:4px;}
 
