@@ -694,13 +694,20 @@
         <div class="media-grid" id="photoGrid"></div>
       </div>
 
-      <div class="card" style="margin-bottom:10px">
+            <div class="card" style="margin-bottom:10px">
         <h3 class="card-title">Video (optional, one max)</h3>
-        <label class="capture-btn" id="videoCaptureBtn">
-          <span class="emoji">🎥</span>
-          <span id="videoCaptureLabel">Record video</span>
-          <input type="file" class="hidden-file" id="imVideoCapture" accept="video/*" capture="environment">
-        </label>
+        <div class="media-row">
+          <label class="capture-btn" id="videoCaptureBtn">
+            <span class="emoji">🎥</span>
+            <span id="videoCaptureLabel">Record video</span>
+            <input type="file" class="hidden-file" id="imVideoCapture" accept="video/*" capture="environment">
+          </label>
+          <label class="capture-btn">
+            <span class="emoji">🎞️</span>
+            <span>Upload video</span>
+            <input type="file" class="hidden-file" id="imVideoGallery" accept="video/*">
+          </label>
+        </div>
         <div id="videoPreview" style="margin-top:10px"></div>
       </div>
 
@@ -940,7 +947,21 @@
             <input type="file" class="hidden-file" id="coCheckoutPhotoGallery" accept="image/*" multiple>
           </label>
         </div>
-        <div class="media-grid" id="coCheckoutPhotoGrid" style="margin-bottom:14px"></div>
+                <div class="media-grid" id="coCheckoutPhotoGrid" style="margin-bottom:14px"></div>
+
+        <p style="font-size:13px; font-weight:600; color:var(--text); margin:0 0 6px 0">Checkout video (optional)</p>
+        <div class="media-row" style="margin-bottom:8px">
+          <label class="capture-btn" style="padding:14px 10px">
+            <span class="emoji">🎥</span><span>Record video</span>
+            <input type="file" class="hidden-file" id="coCheckoutVideoCapture" accept="video/*" capture="environment">
+          </label>
+          <label class="capture-btn" style="padding:14px 10px">
+            <span class="emoji">🎞️</span><span>Upload video</span>
+            <input type="file" class="hidden-file" id="coCheckoutVideoGallery" accept="video/*">
+          </label>
+        </div>
+        <div id="coCheckoutVideoPreview" style="margin-bottom:14px"></div>
+
         <div class="divider"></div>
 
         <div class="form-row">
@@ -1000,9 +1021,9 @@ let state = {
   coDamageRoomId: null,
   coDamages: [],
   coDmgNewPhotos: [],
-  coCheckoutPhotos: []
+  coCheckoutPhotos: [],
+  coCheckoutVideo: null
 };
-
 // =============================================================================
 // UTILITIES
 // =============================================================================
@@ -1667,9 +1688,12 @@ document.body.addEventListener('click', e => {
   } else if (e.target.dataset.action === 'rm-co-photo') {
     state.coDmgNewPhotos = state.coDmgNewPhotos.filter(p => p.id !== e.target.dataset.photo);
     renderDamageFormPhotos();
-  } else if (e.target.dataset.action === 'rm-co-checkout-photo') {
+    } else if (e.target.dataset.action === 'rm-co-checkout-photo') {
     state.coCheckoutPhotos = state.coCheckoutPhotos.filter(p => p.id !== e.target.dataset.photo);
     renderCheckoutPhotos();
+  } else if (e.target.dataset.action === 'rm-co-checkout-video') {
+    state.coCheckoutVideo = null;
+    renderCheckoutVideo();
   }
 });
 
@@ -2094,6 +2118,7 @@ $('#imCancel').addEventListener('click', closeInspectModal);
 $('#imPhotoCapture').addEventListener('change', e => handlePhotoFiles(e.target.files));
 $('#imPhotoGallery').addEventListener('change', e => handlePhotoFiles(e.target.files));
 $('#imVideoCapture').addEventListener('change', e => handleVideoFile(e.target.files[0]));
+$('#imVideoGallery').addEventListener('change', e => handleVideoFile(e.target.files[0]));
 
 function handlePhotoFiles(files) {
   if (!files || !files.length) return;
@@ -2109,6 +2134,7 @@ function handleVideoFile(f) {
   state.imVideo = { file: f, previewUrl: URL.createObjectURL(f), uploadedUrl: null, progress: 0 };
   renderMediaVideo();
   $('#imVideoCapture').value = '';
+  $('#imVideoGallery').value = '';
 }
 
 function renderMediaPhotos() {
@@ -2443,8 +2469,10 @@ async function openDamageModal(roomId) {
 
   $('#coDamageList').innerHTML = '<div class="empty-state" style="padding:12px 0">Loading…</div>';
   $('#damageModal').classList.add('active');
-  state.coCheckoutPhotos = [];
+    state.coCheckoutPhotos = [];
   renderCheckoutPhotos();
+  state.coCheckoutVideo = null;
+  renderCheckoutVideo();
 
   try {
     const res = await api('/api/damages/list', {
@@ -2470,7 +2498,8 @@ function closeDamageModal() {
   state.coDamageRoomId = null;
   state.coDamages = [];
   state.coDmgNewPhotos = [];
-  state.coCheckoutPhotos = [];
+    state.coCheckoutPhotos = [];
+  state.coCheckoutVideo = null;
   state.currentInspectingRoomId = null;
 }
 $('#coClose').addEventListener('click', closeDamageModal);
@@ -2549,6 +2578,29 @@ $('#coCheckoutPhotoGallery').addEventListener('change', e => {
   renderCheckoutPhotos();
   e.target.value = '';
 });
+
+// ▼▼▼ PATCH 6 — checkout video handlers + renderer ▼▼▼
+$('#coCheckoutVideoCapture').addEventListener('change', e => handleCheckoutVideo(e.target.files[0]));
+$('#coCheckoutVideoGallery').addEventListener('change', e => handleCheckoutVideo(e.target.files[0]));
+function handleCheckoutVideo(f) {
+  if (!f) return;
+  state.coCheckoutVideo = { id: uid(), file: f, previewUrl: URL.createObjectURL(f) };
+  renderCheckoutVideo();
+  $('#coCheckoutVideoCapture').value = '';
+  $('#coCheckoutVideoGallery').value = '';
+}
+function renderCheckoutVideo() {
+  const div = $('#coCheckoutVideoPreview');
+  if (!div) return;
+  if (!state.coCheckoutVideo) { div.innerHTML = ''; return; }
+  div.innerHTML = `
+    <div class="media-tile" style="aspect-ratio:16/9; max-width:300px">
+      <video src="${state.coCheckoutVideo.previewUrl}" controls playsinline></video>
+      <button class="media-tile-remove" data-action="rm-co-checkout-video">×</button>
+    </div>
+  `;
+}
+
 
 // Damage photo capture
 $('#coDmgPhotoCapture').addEventListener('change', e => {
@@ -2682,8 +2734,13 @@ $('#coCheckout').addEventListener('click', async () => {
     for (let i = 0; i < state.coCheckoutPhotos.length; i++) {
       const p = state.coCheckoutPhotos[i];
       $('#coCheckoutLabel').innerHTML = `<span class="spinner"></span> Uploading photo ${i + 1} of ${state.coCheckoutPhotos.length}…`;
-      const r = await uploadOneFile(p.file, 'photo', i + 1, 'Checkout Photos');
+            const r = await uploadOneFile(p.file, 'photo', i + 1, 'Checkout Photos');
       checkoutPhotoUrls.push(r.webUrl);
+    }
+    if (state.coCheckoutVideo) {
+      $('#coCheckoutLabel').innerHTML = '<span class="spinner"></span> Uploading video…';
+      const rv = await uploadOneFile(state.coCheckoutVideo.file, 'video', 0, 'Checkout Photos');
+      checkoutPhotoUrls.push(rv.webUrl);
     }
     $('#coCheckoutLabel').innerHTML = '<span class="spinner"></span> Checking out…';
     await api('/api/rooms/checkout', {
